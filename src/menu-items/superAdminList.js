@@ -1,8 +1,9 @@
 // assets
-import { IconTypography, IconPalette, IconShadow, IconWindmill } from '@tabler/icons-react';
+import { IconTypography, IconPalette, IconShadow, IconWindmill, IconDroneOff } from '@tabler/icons-react';
 
 // constant
 const icons = {
+  IconDroneOff,
   IconTypography,
   IconPalette,
   IconShadow,
@@ -20,7 +21,7 @@ const superAdminList = {
       title: 'Projects',
       type: 'item',
       url: '/project',
-      icon: icons.IconTypography,
+      icon: icons.IconDroneOff,
       breadcrumbs: false
     },
     {
@@ -30,7 +31,7 @@ const superAdminList = {
       url: '/file',
       icon: icons.IconPalette,
       breadcrumbs: false
-    },
+    }
     // {
     //   id: 'options',
     //   title: 'Option 3',

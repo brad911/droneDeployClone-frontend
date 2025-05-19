@@ -26,7 +26,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 export default function AuthLogin() {
   const theme = useTheme();
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   const [checked, setChecked] = useState(true);
 
@@ -38,15 +38,15 @@ export default function AuthLogin() {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  const handleLogin=()=>{
-    navigate("/dashboard")
-  }
+  const handleLogin = () => {
+    navigate('/dashboard');
+  };
 
   return (
     <>
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
         <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
-        <OutlinedInput id="outlined-adornment-email-login" type="email" value="info@codedthemes.com" name="email" />
+        <OutlinedInput id="outlined-adornment-email-login" type="email" value="" name="email" />
       </FormControl>
 
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
@@ -54,7 +54,7 @@ export default function AuthLogin() {
         <OutlinedInput
           id="outlined-adornment-password-login"
           type={showPassword ? 'text' : 'password'}
-          value="123456"
+          value=""
           name="password"
           endAdornment={
             <InputAdornment position="end">

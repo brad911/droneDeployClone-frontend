@@ -22,6 +22,7 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { MenuItem, Select } from '@mui/material';
 
 // ===========================|| JWT - REGISTER ||=========================== //
 
@@ -49,7 +50,7 @@ export default function AuthRegister() {
         </Grid>
       </Grid>
 
-      <Grid container spacing={{ xs: 0, sm: 2 }}>
+      {/* <Grid container spacing={{ xs: 0, sm: 2 }}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
@@ -72,10 +73,49 @@ export default function AuthRegister() {
             sx={{ ...theme.typography.customInput }}
           />
         </Grid>
-      </Grid>
+      </Grid> */}
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-        <InputLabel htmlFor="outlined-adornment-email-register">Email Address / Username</InputLabel>
-        <OutlinedInput id="outlined-adornment-email-register" type="email" value="jones@doe.com" name="email" />
+        <InputLabel htmlFor="outlined-adornment-email-register">Full Name</InputLabel>
+        <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="email" />
+      </FormControl>
+      <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+        <InputLabel htmlFor="outlined-adornment-email-register">Email Address</InputLabel>
+        <OutlinedInput id="outlined-adornment-email-register" type="email" value="" name="email" />
+      </FormControl>
+      <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+        <InputLabel htmlFor="outlined-adornment-email-register">Organization</InputLabel>
+        <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="email" />
+      </FormControl>
+      <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+        <InputLabel htmlFor="outlined-adornment-email-register">Category</InputLabel>
+        <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="email" />
+      </FormControl>
+      <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+        <InputLabel htmlFor="outlined-adornment-email-register">Designation</InputLabel>
+        <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="email" />
+      </FormControl>
+      <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+        <InputLabel id="demo-simple-select-helper-label">Gender</InputLabel>
+        <Select
+          labelId="demo-simple-select-helper-label"
+          id="demo-simple-select-helper"
+          // value={''}
+          label="Select role"
+          // onChange={handleChange}
+          // onBlur={handleBlur}
+          name="type"
+          sx={{
+            ...theme.typography.customSelect
+          }}
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          <MenuItem value={'customer'}>Male</MenuItem>
+          <MenuItem value={'vendor'}>Female</MenuItem>
+          <MenuItem value={'vendor'}>Other</MenuItem>
+        </Select>
+        {/* {touched.type && errors.type ? <FormHelperText error id="standard-weight-helper-text--register"></FormHelperText> : null} */}
       </FormControl>
 
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
@@ -83,7 +123,7 @@ export default function AuthRegister() {
         <OutlinedInput
           id="outlined-adornment-password-register"
           type={showPassword ? 'text' : 'password'}
-          value="Jhones@123"
+          value=""
           name="password"
           label="Password"
           endAdornment={

@@ -5,9 +5,11 @@ import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import FilesHandler from '../views/dashboard/Default/Files/FilesHandler';
 import Projects from '../views/dashboard/Default/Projects/Projects';
+import AddProject from '../views/dashboard/Default/Projects/createProjectForm';
+import CreateProjectPage from '../views/dashboard/Default/Projects/CreateProjectPage';
 
 // dashboard routing
-const   DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
+const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
 // utilities routing
 const UtilsTypography = Loadable(lazy(() => import('views/utilities/Typography')));
@@ -40,15 +42,19 @@ const MainRoutes = {
       path: 'file',
       element: <FilesHandler />
     },
-     {
+    {
       path: 'project',
       element: <Projects />
+    },
+    {
+      path: 'createProject',
+      element: <CreateProjectPage />
     },
     {
       path: 'typography',
       element: <UtilsTypography />
     },
-  {
+    {
       path: 'color',
       element: <UtilsColor />
     },

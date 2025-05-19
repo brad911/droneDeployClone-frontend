@@ -81,6 +81,61 @@ export default function Typography(theme, borderRadius, fontFamily) {
         top: 0
       }
     },
+    customMultiSelect: {
+      marginTop: 1,
+      marginBottom: 1,
+      '& > label': {
+        top: 20,
+        left: 0,
+        color: theme.grey500,
+        '&[data-shrink="false"]': {
+          top: 5
+        }
+      },
+      '& > div > input, & > div > select, & > div > div': {
+        // Works for both TextField, Select, and MultiSelect
+        padding: '30px 14px 10px !important',
+        height: '56px'
+      },
+
+      '& legend': {
+        display: 'none'
+      },
+      '& fieldset': {
+        top: 0
+      }
+    },
+    customSelect: {
+      // marginTop: 1,
+      // marginBottom: 1,
+      '& > label': {
+        top: 23,
+        left: 0,
+        color: theme.palette.grey[500],
+        '&[data-shrink="false"]': {
+          top: 5
+        }
+      },
+
+      '& .MuiOutlinedInput-root': {
+        height: '64px', // increase box height
+        paddingRight: '14px' // keep right padding clean
+      },
+
+      '& .MuiOutlinedInput-input': {
+        padding: '30.5px 14px 11.5px !important', // adjust text padding inside box
+        display: 'flex',
+        alignItems: 'center'
+      },
+
+      '& legend': {
+        display: 'none'
+      },
+
+      '& fieldset': {
+        top: 0
+      }
+    },
     mainContent: {
       backgroundColor: theme.palette.grey[100],
       width: '100%',
