@@ -48,7 +48,6 @@ export default function AuthRegister() {
           </Box>
         </Grid>
       </Grid>
-
       <Grid container spacing={{ xs: 0, sm: 2 }}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
@@ -72,9 +71,25 @@ export default function AuthRegister() {
         <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="email" />
       </FormControl>
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-        <InputLabel htmlFor="outlined-adornment-email-register">Role</InputLabel>
-        <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="email" />
-      </FormControl>
+        <InputLabel id="demo-simple-select-helper-label">Role</InputLabel>
+        <Select
+          labelId="demo-simple-select-helper-label"
+          id="demo-simple-select-helper"
+          // value={''}
+          label="Select role"
+          // onChange={handleChange}
+          // onBlur={handleBlur}
+          name="type"
+          sx={{
+            ...theme.typography.customSelect
+          }}
+        >
+          <MenuItem value={'client'}>Client</MenuItem>
+          <MenuItem value={'contractor'}>Contractor</MenuItem>
+          <MenuItem value={'consultant'}>Consultant</MenuItem>
+        </Select>
+        {/* {touched.type && errors.type ? <FormHelperText error id="standard-weight-helper-text--register"></FormHelperText> : null} */}
+      </FormControl>{' '}
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
         <InputLabel htmlFor="outlined-adornment-email-register">Designation</InputLabel>
         <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="email" />
@@ -99,7 +114,6 @@ export default function AuthRegister() {
         </Select>
         {/* {touched.type && errors.type ? <FormHelperText error id="standard-weight-helper-text--register"></FormHelperText> : null} */}
       </FormControl>
-
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
         <InputLabel htmlFor="outlined-adornment-password-register">Password</InputLabel>
         <OutlinedInput
@@ -146,7 +160,6 @@ export default function AuthRegister() {
           }
         />
       </FormControl>
-
       <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
         <Grid>
           <FormControlLabel
@@ -162,7 +175,6 @@ export default function AuthRegister() {
           />
         </Grid>
       </Grid>
-
       <Box sx={{ mt: 2 }}>
         <AnimateButton>
           <Button disableElevation fullWidth size="large" type="submit" variant="contained" color="secondary">
