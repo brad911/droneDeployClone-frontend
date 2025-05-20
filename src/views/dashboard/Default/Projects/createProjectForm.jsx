@@ -32,6 +32,21 @@ const CreateProjectForm = ({ onSubmit }) => {
           <Form>
             {/* Project Name */}
             <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+              <InputLabel htmlFor="outlined-adornment-email-login">Project's Location</InputLabel>
+              <OutlinedInput
+                id="outlined-adornment-email-login"
+                fullWidth
+                name="name"
+                label="Project Name"
+                value={values.name}
+                onChange={(e) => setFieldValue('name', e.target.value)}
+                error={touched.name && Boolean(errors.name)}
+                helperText={touched.name && errors.name}
+                sx={{ mb: 2 }}
+              />
+            </FormControl>
+            {/* Project Name */}
+            <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
               <InputLabel htmlFor="outlined-adornment-email-login">Project Name</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"

@@ -12,7 +12,6 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
@@ -50,34 +49,20 @@ export default function AuthRegister() {
         </Grid>
       </Grid>
 
-      {/* <Grid container spacing={{ xs: 0, sm: 2 }}>
+      <Grid container spacing={{ xs: 0, sm: 2 }}>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField
-            fullWidth
-            label="First Name"
-            margin="normal"
-            name="firstName"
-            type="text"
-            value="Jhones"
-            sx={{ ...theme.typography.customInput }}
-          />
+          <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+            <InputLabel htmlFor="outlined-adornment-email-register">First Name</InputLabel>
+            <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="text" />
+          </FormControl>
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField
-            fullWidth
-            label="Last Name"
-            margin="normal"
-            name="lastName"
-            type="text"
-            value="Doe"
-            sx={{ ...theme.typography.customInput }}
-          />
+          <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+            <InputLabel htmlFor="outlined-adornment-email-register">Last Name</InputLabel>
+            <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="text" />
+          </FormControl>
         </Grid>
-      </Grid> */}
-      <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-        <InputLabel htmlFor="outlined-adornment-email-register">Full Name</InputLabel>
-        <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="email" />
-      </FormControl>
+      </Grid>
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
         <InputLabel htmlFor="outlined-adornment-email-register">Email Address</InputLabel>
         <OutlinedInput id="outlined-adornment-email-register" type="email" value="" name="email" />
@@ -87,7 +72,7 @@ export default function AuthRegister() {
         <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="email" />
       </FormControl>
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-        <InputLabel htmlFor="outlined-adornment-email-register">Category</InputLabel>
+        <InputLabel htmlFor="outlined-adornment-email-register">Role</InputLabel>
         <OutlinedInput id="outlined-adornment-email-register" type="text" value="" name="email" />
       </FormControl>
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
@@ -108,9 +93,6 @@ export default function AuthRegister() {
             ...theme.typography.customSelect
           }}
         >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
           <MenuItem value={'customer'}>Male</MenuItem>
           <MenuItem value={'vendor'}>Female</MenuItem>
           <MenuItem value={'vendor'}>Other</MenuItem>
@@ -120,6 +102,29 @@ export default function AuthRegister() {
 
       <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
         <InputLabel htmlFor="outlined-adornment-password-register">Password</InputLabel>
+        <OutlinedInput
+          id="outlined-adornment-password-register"
+          type={showPassword ? 'text' : 'password'}
+          value=""
+          name="password"
+          label="Password"
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+                size="large"
+              >
+                {showPassword ? <Visibility /> : <VisibilityOff />}
+              </IconButton>
+            </InputAdornment>
+          }
+        />
+      </FormControl>
+      <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+        <InputLabel htmlFor="outlined-adornment-password-register">Confirm Password</InputLabel>
         <OutlinedInput
           id="outlined-adornment-password-register"
           type={showPassword ? 'text' : 'password'}
