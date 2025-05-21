@@ -32,7 +32,7 @@ const CreateProjectForm = ({ onSubmit }) => {
           <Form>
             {/* Project Name */}
             <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-email-login">Project's Location</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-email-login">Project Name</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
                 fullWidth
@@ -47,7 +47,7 @@ const CreateProjectForm = ({ onSubmit }) => {
             </FormControl>
             {/* Project Name */}
             <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-email-login">Project Name</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-email-login">Project's Location</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
                 fullWidth
