@@ -8,11 +8,13 @@ export default function NavigationScroll({ children }) {
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   }, []);
 
   return children || null;
 }
 
-NavigationScroll.propTypes = { children: PropTypes.oneOfType([PropTypes.any, PropTypes.node]) };
+NavigationScroll.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.any, PropTypes.node]),
+};

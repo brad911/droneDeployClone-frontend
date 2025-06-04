@@ -30,18 +30,29 @@ import useConfig from 'hooks/useConfig';
 
 // assets
 import User1 from 'assets/images/users/user-round.svg';
-import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons-react';
+import {
+  IconLogout,
+  IconSearch,
+  IconSettings,
+  IconUser,
+} from '@tabler/icons-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../../../store/slices/authSlice';
+import { useNavigate } from 'react-router';
 
 // ==============================|| PROFILE MENU ||============================== //
 
 export default function ProfileSection() {
   const theme = useTheme();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { borderRadius } = useConfig();
   const [sdm, setSdm] = useState(true);
   const [value, setValue] = useState('');
   const [notification, setNotification] = useState(false);
   const [selectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
+  const user = useSelector((state) => state.auth.user);
 
   /**
    * anchorRef is used on different components and specifying one type leads to other components throwing an error
@@ -60,6 +71,10 @@ export default function ProfileSection() {
     setOpen(false);
   };
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
   const prevOpen = useRef(open);
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
@@ -78,17 +93,17 @@ export default function ProfileSection() {
           alignItems: 'center',
           borderRadius: '27px',
           '& .MuiChip-label': {
-            lineHeight: 0
-          }
+            lineHeight: 0,
+          },
         }}
         icon={
           <Avatar
-            src={User1}
+            // src={User1}
             alt="user-images"
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px 0 8px 8px !important',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
             ref={anchorRef}
             aria-controls={open ? 'menu-list-grow' : undefined}
@@ -101,7 +116,7 @@ export default function ProfileSection() {
         aria-controls={open ? 'menu-list-grow' : undefined}
         aria-haspopup="true"
         onClick={handleToggle}
-        color="primary"
+        color="secondary"
         aria-label="user-account"
       />
       <Popper
@@ -115,9 +130,9 @@ export default function ProfileSection() {
           {
             name: 'offset',
             options: {
-              offset: [0, 14]
-            }
-          }
+              offset: [0, 14],
+            },
+          },
         ]}
       >
         {({ TransitionProps }) => (
@@ -125,18 +140,34 @@ export default function ProfileSection() {
             <Transitions in={open} {...TransitionProps}>
               <Paper>
                 {open && (
-                  <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
+                  <MainCard
+                    border={false}
+                    elevation={16}
+                    content={false}
+                    boxShadow
+                    shadow={theme.shadows[16]}
+                  >
                     <Box sx={{ p: 2, pb: 0 }}>
                       <Stack>
-                        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-                          <Typography variant="h4">Good Morning,</Typography>
-                          <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                            Johne Doe
+                        <Stack
+                          direction="row"
+                          spacing={0.5}
+                          sx={{ alignItems: 'center' }}
+                        >
+                          {/* <Typography variant="h4">Good Morning,</Typography> */}
+                          <Typography
+                            component="span"
+                            variant="h4"
+                            sx={{ fontWeight: 400 }}
+                          >
+                            {user?.firstName + ' ' + user?.lastName}
                           </Typography>
                         </Stack>
-                        <Typography variant="subtitle2">Project Admin</Typography>
+                        <Typography variant="subtitle2">
+                          {user?.role}
+                        </Typography>
                       </Stack>
-                      <OutlinedInput
+                      {/* <OutlinedInput
                         sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
                         id="input-search-profile"
                         value={value}
@@ -149,7 +180,7 @@ export default function ProfileSection() {
                         }
                         aria-describedby="search-helper-text"
                         slotProps={{ input: { 'aria-label': 'weight' } }}
-                      />
+                      /> */}
                       <Divider />
                     </Box>
                     <Box
@@ -159,18 +190,26 @@ export default function ProfileSection() {
                         height: '100%',
                         maxHeight: 'calc(100vh - 250px)',
                         overflowX: 'hidden',
-                        '&::-webkit-scrollbar': { width: 5 }
+                        '&::-webkit-scrollbar': { width: 5 },
                       }}
                     >
-                      <UpgradePlanCard />
+                      {/* <UpgradePlanCard /> */}
                       <Divider />
-                      <Card sx={{ bgcolor: 'primary.light', my: 2 }}>
+                      {/* <Card sx={{ bgcolor: 'primary.light', my: 2 }}>
                         <CardContent>
                           <Grid container spacing={3} direction="column">
                             <Grid>
-                              <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                              <Grid
+                                container
+                                sx={{
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                }}
+                              >
                                 <Grid>
-                                  <Typography variant="subtitle1">Start DND Mode</Typography>
+                                  <Typography variant="subtitle1">
+                                    Start DND Mode
+                                  </Typography>
                                 </Grid>
                                 <Grid>
                                   <Switch
@@ -184,14 +223,24 @@ export default function ProfileSection() {
                               </Grid>
                             </Grid>
                             <Grid>
-                              <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                              <Grid
+                                container
+                                sx={{
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                }}
+                              >
                                 <Grid>
-                                  <Typography variant="subtitle1">Allow Notifications</Typography>
+                                  <Typography variant="subtitle1">
+                                    Allow Notifications
+                                  </Typography>
                                 </Grid>
                                 <Grid>
                                   <Switch
                                     checked={notification}
-                                    onChange={(e) => setNotification(e.target.checked)}
+                                    onChange={(e) =>
+                                      setNotification(e.target.checked)
+                                    }
                                     name="sdm"
                                     size="small"
                                   />
@@ -200,7 +249,7 @@ export default function ProfileSection() {
                             </Grid>
                           </Grid>
                         </CardContent>
-                      </Card>
+                      </Card> */}
                       <Divider />
                       <List
                         component="nav"
@@ -209,24 +258,42 @@ export default function ProfileSection() {
                           maxWidth: 350,
                           minWidth: 300,
                           borderRadius: `${borderRadius}px`,
-                          '& .MuiListItemButton-root': { mt: 0.5 }
+                          '& .MuiListItemButton-root': { mt: 0.5 },
                         }}
                       >
-                        <ListItemButton sx={{ borderRadius: `${borderRadius}px` }} selected={selectedIndex === 0}>
+                        <ListItemButton
+                          sx={{ borderRadius: `${borderRadius}px` }}
+                          selected={selectedIndex === 0}
+                        >
                           <ListItemIcon>
                             <IconSettings stroke={1.5} size="20px" />
                           </ListItemIcon>
-                          <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
+                          <ListItemText
+                            primary={
+                              <Typography variant="body2">
+                                Account Settings
+                              </Typography>
+                            }
+                          />
                         </ListItemButton>
-                        <ListItemButton sx={{ borderRadius: `${borderRadius}px` }} selected={selectedIndex === 1}>
+                        {/* <ListItemButton
+                          sx={{ borderRadius: `${borderRadius}px` }}
+                          selected={selectedIndex === 1}
+                        >
                           <ListItemIcon>
                             <IconUser stroke={1.5} size="20px" />
                           </ListItemIcon>
                           <ListItemText
                             primary={
-                              <Grid container spacing={1} sx={{ justifyContent: 'space-between' }}>
+                              <Grid
+                                container
+                                spacing={1}
+                                sx={{ justifyContent: 'space-between' }}
+                              >
                                 <Grid>
-                                  <Typography variant="body2">Social Profile</Typography>
+                                  <Typography variant="body2">
+                                    Social Profile
+                                  </Typography>
                                 </Grid>
                                 <Grid>
                                   <Chip
@@ -240,12 +307,20 @@ export default function ProfileSection() {
                               </Grid>
                             }
                           />
-                        </ListItemButton>
-                        <ListItemButton sx={{ borderRadius: `${borderRadius}px` }} selected={selectedIndex === 4}>
+                        </ListItemButton> */}
+                        <ListItemButton
+                          sx={{ borderRadius: `${borderRadius}px` }}
+                          selected={selectedIndex === 4}
+                          onClick={handleLogout}
+                        >
                           <ListItemIcon>
                             <IconLogout stroke={1.5} size="20px" />
                           </ListItemIcon>
-                          <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
+                          <ListItemText
+                            primary={
+                              <Typography variant="body2">Logout</Typography>
+                            }
+                          />
                         </ListItemButton>
                       </List>
                     </Box>

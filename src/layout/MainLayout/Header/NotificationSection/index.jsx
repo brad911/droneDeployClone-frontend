@@ -30,20 +30,20 @@ import { IconBell } from '@tabler/icons-react';
 const status = [
   {
     value: 'all',
-    label: 'All Notification'
+    label: 'All Notification',
   },
   {
     value: 'new',
-    label: 'New'
+    label: 'New',
   },
   {
     value: 'unread',
-    label: 'Unread'
+    label: 'Unread',
   },
   {
     value: 'other',
-    label: 'Other'
-  }
+    label: 'Other',
+  },
 ];
 
 // ==============================|| NOTIFICATION ||============================== //
@@ -96,8 +96,8 @@ export default function NotificationSection() {
             color: 'secondary.dark',
             '&[aria-controls="menu-list-grow"],&:hover': {
               bgcolor: 'secondary.dark',
-              color: 'secondary.light'
-            }
+              color: 'secondary.light',
+            },
           }}
           ref={anchorRef}
           aria-controls={open ? 'menu-list-grow' : undefined}
@@ -119,28 +119,60 @@ export default function NotificationSection() {
           {
             name: 'offset',
             options: {
-              offset: [downMD ? 5 : 0, 20]
-            }
-          }
+              offset: [downMD ? 5 : 0, 20],
+            },
+          },
         ]}
       >
         {({ TransitionProps }) => (
           <ClickAwayListener onClickAway={handleClose}>
-            <Transitions position={downMD ? 'top' : 'top-right'} in={open} {...TransitionProps}>
+            <Transitions
+              position={downMD ? 'top' : 'top-right'}
+              in={open}
+              {...TransitionProps}
+            >
               <Paper>
                 {open && (
-                  <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
+                  <MainCard
+                    border={false}
+                    elevation={16}
+                    content={false}
+                    boxShadow
+                    shadow={theme.shadows[16]}
+                  >
                     <Grid container direction="column" spacing={2}>
                       <Grid size={12}>
-                        <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between', pt: 2, px: 2 }}>
+                        <Grid
+                          container
+                          sx={{
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            pt: 2,
+                            px: 2,
+                          }}
+                        >
                           <Grid>
                             <Stack direction="row" spacing={2}>
-                              <Typography variant="subtitle1">All Notification</Typography>
-                              <Chip size="small" label="01" sx={{ color: 'background.default', bgcolor: 'warning.dark' }} />
+                              <Typography variant="subtitle1">
+                                All Notification
+                              </Typography>
+                              <Chip
+                                size="small"
+                                label="01"
+                                sx={{
+                                  color: 'background.default',
+                                  bgcolor: 'warning.dark',
+                                }}
+                              />
                             </Stack>
                           </Grid>
                           <Grid>
-                            <Typography component={Link} to="#" variant="subtitle2" color="primary">
+                            <Typography
+                              component={Link}
+                              to="#"
+                              variant="subtitle2"
+                              color="primary"
+                            >
                               Mark as all read
                             </Typography>
                           </Grid>
@@ -152,7 +184,7 @@ export default function NotificationSection() {
                             height: '100%',
                             maxHeight: 'calc(100vh - 205px)',
                             overflowX: 'hidden',
-                            '&::-webkit-scrollbar': { width: 5 }
+                            '&::-webkit-scrollbar': { width: 5 },
                           }}
                         >
                           <Grid container direction="column" spacing={2}>
@@ -167,7 +199,10 @@ export default function NotificationSection() {
                                   slotProps={{ select: { native: true } }}
                                 >
                                   {status.map((option) => (
-                                    <option key={option.value} value={option.value}>
+                                    <option
+                                      key={option.value}
+                                      value={option.value}
+                                    >
                                       {option.label}
                                     </option>
                                   ))}

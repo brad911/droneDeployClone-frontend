@@ -4,61 +4,61 @@ export default function Typography(theme, borderRadius, fontFamily) {
     h6: {
       fontWeight: 500,
       color: theme.palette.grey[900],
-      fontSize: '0.75rem'
+      fontSize: '0.75rem',
     },
     h5: {
       fontSize: '0.875rem',
       color: theme.palette.grey[900],
-      fontWeight: 500
+      fontWeight: 500,
     },
     h4: {
       fontSize: '1rem',
       color: theme.palette.grey[900],
-      fontWeight: 600
+      fontWeight: 600,
     },
     h3: {
       fontSize: '1.25rem',
       color: theme.palette.grey[900],
-      fontWeight: 600
+      fontWeight: 600,
     },
     h2: {
       fontSize: '1.5rem',
       color: theme.palette.grey[900],
-      fontWeight: 700
+      fontWeight: 700,
     },
     h1: {
       fontSize: '2.125rem',
       color: theme.palette.grey[900],
-      fontWeight: 700
+      fontWeight: 700,
     },
     subtitle1: {
       fontSize: '0.875rem',
       fontWeight: 500,
-      color: theme.palette.text.dark
+      color: theme.palette.text.dark,
     },
     subtitle2: {
       fontSize: '0.75rem',
       fontWeight: 400,
-      color: theme.palette.text.secondary
+      color: theme.palette.text.secondary,
     },
     caption: {
       fontSize: '0.75rem',
       color: theme.palette.text.secondary,
-      fontWeight: 400
+      fontWeight: 400,
     },
     body1: {
       fontSize: '0.875rem',
       fontWeight: 400,
-      lineHeight: '1.334em'
+      lineHeight: '1.334em',
     },
     body2: {
       letterSpacing: '0em',
       fontWeight: 400,
       lineHeight: '1.5em',
-      color: theme.palette.text.primary
+      color: theme.palette.text.primary,
     },
     button: {
-      textTransform: 'capitalize'
+      textTransform: 'capitalize',
     },
     customInput: {
       marginTop: 1,
@@ -68,18 +68,18 @@ export default function Typography(theme, borderRadius, fontFamily) {
         left: 0,
         color: theme.palette.grey[500],
         '&[data-shrink="false"]': {
-          top: 5
-        }
+          top: 5,
+        },
       },
       '& > div > input': {
-        padding: '30.5px 14px 11.5px !important'
+        padding: '30.5px 14px 11.5px !important',
       },
       '& legend': {
-        display: 'none'
+        display: 'none',
       },
       '& fieldset': {
-        top: 0
-      }
+        top: 0,
+      },
     },
     customMultiSelect: {
       marginTop: 1,
@@ -89,21 +89,21 @@ export default function Typography(theme, borderRadius, fontFamily) {
         left: 0,
         color: theme.grey500,
         '&[data-shrink="false"]': {
-          top: 5
-        }
+          top: 5,
+        },
       },
       '& > div > input, & > div > select, & > div > div': {
         // Works for both TextField, Select, and MultiSelect
         padding: '30px 14px 10px !important',
-        height: '56px'
+        height: '56px',
       },
 
       '& legend': {
-        display: 'none'
+        display: 'none',
       },
       '& fieldset': {
-        top: 0
-      }
+        top: 0,
+      },
     },
     customSelect: {
       // marginTop: 1,
@@ -113,28 +113,28 @@ export default function Typography(theme, borderRadius, fontFamily) {
         left: 0,
         color: theme.palette.grey[500],
         '&[data-shrink="false"]': {
-          top: 5
-        }
+          top: 5,
+        },
       },
 
       '& .MuiOutlinedInput-root': {
         height: '64px', // increase box height
-        paddingRight: '14px' // keep right padding clean
+        paddingRight: '14px', // keep right padding clean
       },
 
       '& .MuiOutlinedInput-input': {
         padding: '30.5px 14px 11.5px !important', // adjust text padding inside box
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
       },
 
       '& legend': {
-        display: 'none'
+        display: 'none',
       },
 
       '& fieldset': {
-        top: 0
-      }
+        top: 0,
+      },
     },
     mainContent: {
       backgroundColor: theme.palette.grey[100],
@@ -144,7 +144,7 @@ export default function Typography(theme, borderRadius, fontFamily) {
       padding: '20px',
       marginTop: '88px',
       marginRight: '20px',
-      borderRadius: `${borderRadius}px`
+      borderRadius: `${borderRadius}px`,
     },
     menuCaption: {
       fontSize: '0.875rem',
@@ -152,32 +152,32 @@ export default function Typography(theme, borderRadius, fontFamily) {
       color: theme.palette.grey[900],
       padding: '6px',
       textTransform: 'capitalize',
-      marginTop: '10px'
+      marginTop: '10px',
     },
     subMenuCaption: {
       fontSize: '0.6875rem',
       fontWeight: 500,
       color: theme.palette.text.secondary,
-      textTransform: 'capitalize'
+      textTransform: 'capitalize',
     },
     commonAvatar: {
       cursor: 'pointer',
-      borderRadius: '8px'
+      borderRadius: '8px',
     },
     smallAvatar: {
       width: '22px',
       height: '22px',
-      fontSize: '1rem'
+      fontSize: '1rem',
     },
     mediumAvatar: {
       width: '34px',
       height: '34px',
-      fontSize: '1.2rem'
+      fontSize: '1.2rem',
     },
     largeAvatar: {
       width: '44px',
       height: '44px',
-      fontSize: '1.5rem'
-    }
+      fontSize: '1.5rem',
+    },
   };
 }

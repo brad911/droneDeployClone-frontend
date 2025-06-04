@@ -24,7 +24,12 @@ import Box from '@mui/material/Box';
 import Logo from 'ui-component/Logo';
 
 // assets
-import { IconBook, IconCreditCard, IconDashboard, IconHome2 } from '@tabler/icons-react';
+import {
+  IconBook,
+  IconCreditCard,
+  IconDashboard,
+  IconHome2,
+} from '@tabler/icons-react';
 import MenuIcon from '@mui/icons-material/Menu';
 
 function ElevationScroll({ children, window }) {
@@ -32,15 +37,15 @@ function ElevationScroll({ children, window }) {
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 0,
-    target: window
+    target: window,
   });
 
   return cloneElement(children, {
     elevation: trigger ? 1 : 0,
     style: {
       backgroundColor: theme.palette.background.default,
-      color: theme.palette.text.dark
-    }
+      color: theme.palette.text.dark,
+    },
   });
 }
 
@@ -50,7 +55,10 @@ export default function AppBar({ ...others }) {
   const [drawerToggle, setDrawerToggle] = useState(false);
 
   const drawerToggler = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+    if (
+      event.type === 'keydown' &&
+      (event.key === 'Tab' || event.key === 'Shift')
+    ) {
       return;
     }
     setDrawerToggle(open);
@@ -61,32 +69,73 @@ export default function AppBar({ ...others }) {
       <MuiAppBar>
         <Container>
           <Toolbar sx={{ py: 2.5, px: `0 !important` }}>
-            <Typography component={RouterLink} to="/" sx={{ flexGrow: 1, textAlign: 'left' }}>
+            <Typography
+              component={RouterLink}
+              to="/"
+              sx={{ flexGrow: 1, textAlign: 'left' }}
+            >
               <Logo />
             </Typography>
-            <Stack direction="row" sx={{ display: { xs: 'none', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
+            <Stack
+              direction="row"
+              sx={{ display: { xs: 'none', sm: 'block' } }}
+              spacing={{ xs: 1.5, md: 2.5 }}
+            >
               <Button color="inherit" component={Link} href="#">
                 Home
               </Button>
-              <Button color="inherit" component={RouterLink} to="/login" target="_blank">
+              <Button
+                color="inherit"
+                component={RouterLink}
+                to="/login"
+                target="_blank"
+              >
                 Dashboard
               </Button>
-              <Button color="inherit" component={Link} href="https://codedthemes.gitbook.io/berry" target="_blank">
+              <Button
+                color="inherit"
+                component={Link}
+                href="https://codedthemes.gitbook.io/berry"
+                target="_blank"
+              >
                 Documentation
               </Button>
-              <Button component={Link} href="https://links.codedthemes.com/hsqll" disableElevation variant="contained" color="secondary">
+              <Button
+                component={Link}
+                href="https://links.codedthemes.com/hsqll"
+                disableElevation
+                variant="contained"
+                color="secondary"
+              >
                 Purchase Now
               </Button>
             </Stack>
             <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-              <IconButton color="inherit" onClick={drawerToggler(true)} size="large">
+              <IconButton
+                color="inherit"
+                onClick={drawerToggler(true)}
+                size="large"
+              >
                 <MenuIcon />
               </IconButton>
-              <Drawer anchor="top" open={drawerToggle} onClose={drawerToggler(false)}>
+              <Drawer
+                anchor="top"
+                open={drawerToggle}
+                onClose={drawerToggler(false)}
+              >
                 {drawerToggle && (
-                  <Box sx={{ width: 'auto' }} role="presentation" onClick={drawerToggler(false)} onKeyDown={drawerToggler(false)}>
+                  <Box
+                    sx={{ width: 'auto' }}
+                    role="presentation"
+                    onClick={drawerToggler(false)}
+                    onKeyDown={drawerToggler(false)}
+                  >
                     <List>
-                      <Link sx={{ textDecoration: 'none' }} href="#" target="_blank">
+                      <Link
+                        sx={{ textDecoration: 'none' }}
+                        href="#"
+                        target="_blank"
+                      >
                         <ListItemButton component="a">
                           <ListItemIcon>
                             <IconHome2 />
@@ -94,7 +143,11 @@ export default function AppBar({ ...others }) {
                           <ListItemText primary="Home" />
                         </ListItemButton>
                       </Link>
-                      <Link sx={{ textDecoration: 'none' }} href="/login" target="_blank">
+                      <Link
+                        sx={{ textDecoration: 'none' }}
+                        href="/login"
+                        target="_blank"
+                      >
                         <ListItemButton component="a">
                           <ListItemIcon>
                             <IconDashboard />
@@ -102,7 +155,11 @@ export default function AppBar({ ...others }) {
                           <ListItemText primary="Dashboard" />
                         </ListItemButton>
                       </Link>
-                      <Link sx={{ textDecoration: 'none' }} href="https://codedthemes.gitbook.io/berry" target="_blank">
+                      <Link
+                        sx={{ textDecoration: 'none' }}
+                        href="https://codedthemes.gitbook.io/berry"
+                        target="_blank"
+                      >
                         <ListItemButton component="a">
                           <ListItemIcon>
                             <IconBook />
@@ -110,7 +167,11 @@ export default function AppBar({ ...others }) {
                           <ListItemText primary="Documentation" />
                         </ListItemButton>
                       </Link>
-                      <Link sx={{ textDecoration: 'none' }} href="https://links.codedthemes.com/hsqll" target="_blank">
+                      <Link
+                        sx={{ textDecoration: 'none' }}
+                        href="https://links.codedthemes.com/hsqll"
+                        target="_blank"
+                      >
                         <ListItemButton component="a">
                           <ListItemIcon>
                             <IconCreditCard />

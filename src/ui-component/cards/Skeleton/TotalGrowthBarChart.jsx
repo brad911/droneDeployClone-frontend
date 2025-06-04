@@ -15,7 +15,11 @@ export default function TotalGrowthBarChart() {
       <CardContent>
         <Grid container spacing={gridSpacing}>
           <Grid size={12}>
-            <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+            <Grid
+              container
+              spacing={gridSpacing}
+              sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+            >
               <Grid size="grow">
                 <Grid container spacing={1}>
                   <Grid size={12}>

@@ -23,18 +23,18 @@ export default function FontFamilyPage() {
     {
       id: 'inter',
       value: `'Inter', sans-serif`,
-      label: 'Inter'
+      label: 'Inter',
     },
     {
       id: 'poppins',
       value: `'Poppins', sans-serif`,
-      label: 'Poppins'
+      label: 'Poppins',
     },
     {
       id: 'roboto',
       value: `'Roboto', sans-serif`,
-      label: 'Roboto'
-    }
+      label: 'Roboto',
+    },
   ];
 
   const bgColor = 'grey.50';
@@ -43,25 +43,43 @@ export default function FontFamilyPage() {
   return (
     <Stack spacing={2.5} sx={{ p: 2, width: '100%' }}>
       <Typography variant="h5">FONT STYLE</Typography>
-      <RadioGroup aria-label="payment-card" name="payment-card" value={fontFamily} onChange={handleFontChange}>
+      <RadioGroup
+        aria-label="payment-card"
+        name="payment-card"
+        value={fontFamily}
+        onChange={handleFontChange}
+      >
         <Grid container spacing={1.25}>
           {fonts.map((item, index) => (
             <Grid key={index} size={12}>
-              <MainCard content={false} sx={{ p: 0.75, bgcolor: fontFamily === item.value ? bgActiveColor : bgColor }}>
+              <MainCard
+                content={false}
+                sx={{
+                  p: 0.75,
+                  bgcolor: fontFamily === item.value ? bgActiveColor : bgColor,
+                }}
+              >
                 <MainCard
                   content={false}
                   border
                   sx={{
                     p: 1.75,
                     borderWidth: 1,
-                    ...(fontFamily === item.value && { borderColor: 'primary.main' })
+                    ...(fontFamily === item.value && {
+                      borderColor: 'primary.main',
+                    }),
                   }}
                 >
                   <FormControlLabel
                     sx={{ width: 1 }}
-                    control={<Radio value={item.value} sx={{ display: 'none' }} />}
+                    control={
+                      <Radio value={item.value} sx={{ display: 'none' }} />
+                    }
                     label={
-                      <Typography variant="h5" sx={{ pl: 2, fontFamily: item.value }}>
+                      <Typography
+                        variant="h5"
+                        sx={{ pl: 2, fontFamily: item.value }}
+                      >
                         {item.label}
                       </Typography>
                     }

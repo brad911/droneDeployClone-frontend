@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Formik, Form } from 'formik';
-import { Box, Button, Typography, Chip, Stack, FormControl, InputLabel, OutlinedInput } from '@mui/material';
+import {
+  Box,
+  Button,
+  Typography,
+  Chip,
+  Stack,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+} from '@mui/material';
 import * as Yup from 'yup';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useTheme } from '@emotion/react';
@@ -8,7 +17,7 @@ import { useTheme } from '@emotion/react';
 // Validation schema
 const ProjectSchema = Yup.object().shape({
   name: Yup.string().required('Project name is required'),
-  team: Yup.array().of(Yup.string().email('Invalid email'))
+  team: Yup.array().of(Yup.string().email('Invalid email')),
 });
 
 const CreateProjectForm = ({ onSubmit }) => {
@@ -32,7 +41,9 @@ const CreateProjectForm = ({ onSubmit }) => {
           <Form>
             {/* Project Name */}
             <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-email-login">Project Name</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-email-login">
+                Project Name
+              </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
                 fullWidth
@@ -47,7 +58,9 @@ const CreateProjectForm = ({ onSubmit }) => {
             </FormControl>
             {/* Project Name */}
             <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-email-login">Project's Location</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-email-login">
+                Project's Location
+              </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
                 fullWidth
@@ -63,7 +76,9 @@ const CreateProjectForm = ({ onSubmit }) => {
 
             {/* Invite Team Members (Multi-email) */}
             <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="teamInvite">Invite Team Member (press Enter to add)</InputLabel>
+              <InputLabel htmlFor="teamInvite">
+                Invite Team Member (press Enter to add)
+              </InputLabel>
               <OutlinedInput
                 fullWidth
                 label="Invite Team Member (press Enter to add)"
@@ -94,7 +109,12 @@ const CreateProjectForm = ({ onSubmit }) => {
             </Stack>
 
             {/* File Upload */}
-            <Button variant="outlined" component="label" startIcon={<UploadFileIcon />} sx={{ mb: 2 }}>
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<UploadFileIcon />}
+              sx={{ mb: 2 }}
+            >
               {file ? file.name : 'Upload File'}
               <input
                 type="file"
@@ -107,7 +127,12 @@ const CreateProjectForm = ({ onSubmit }) => {
 
             {/* Submit Button */}
             <Box mt={3}>
-              <Button color="secondary" variant="contained" type="submit" fullWidth>
+              <Button
+                color="secondary"
+                variant="contained"
+                type="submit"
+                fullWidth
+              >
                 Create Project
               </Button>
             </Box>

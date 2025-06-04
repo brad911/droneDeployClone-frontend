@@ -5,14 +5,18 @@ import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import FilesHandler from '../views/dashboard/Default/Files/FilesHandler';
 import Projects from '../views/dashboard/Default/Projects/Projects';
-import AddProject from '../views/dashboard/Default/Projects/createProjectForm';
 import CreateProjectPage from '../views/dashboard/Default/Projects/CreateProjectPage';
+import ProtectedRoute from '../utils/protectedRoute';
 
 // dashboard routing
-const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
+const DashboardDefault = Loadable(
+  lazy(() => import('views/dashboard/Default')),
+);
 
 // utilities routing
-const UtilsTypography = Loadable(lazy(() => import('views/utilities/Typography')));
+const UtilsTypography = Loadable(
+  lazy(() => import('views/utilities/Typography')),
+);
 const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
 const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
 
@@ -27,7 +31,7 @@ const MainRoutes = {
   children: [
     {
       path: '/dashboard',
-      element: <DashboardDefault />
+      element: <ProtectedRoute element={DashboardDefault} />,
     },
     // {
     //   path: 'dashboard',
@@ -40,33 +44,33 @@ const MainRoutes = {
     // },
     {
       path: 'file',
-      element: <FilesHandler />
+      element: <FilesHandler />,
     },
     {
       path: 'project',
-      element: <Projects />
+      element: <ProtectedRoute element={Projects} />,
     },
     {
       path: 'createProject',
-      element: <CreateProjectPage />
+      element: <ProtectedRoute element={CreateProjectPage} />,
     },
     {
       path: 'typography',
-      element: <UtilsTypography />
+      element: <UtilsTypography />,
     },
     {
       path: 'color',
-      element: <UtilsColor />
+      element: <UtilsColor />,
     },
     {
       path: 'shadow',
-      element: <UtilsShadow />
+      element: <UtilsShadow />,
     },
     {
       path: '/sample-page',
-      element: <SamplePage />
-    }
-  ]
+      element: <SamplePage />,
+    },
+  ],
 };
 
 export default MainRoutes;

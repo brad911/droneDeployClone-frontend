@@ -45,7 +45,7 @@ export default function TotalOrderLineChartCard({ isLoading }) {
             position: 'relative',
             '&>div': {
               position: 'relative',
-              zIndex: 5
+              zIndex: 5,
             },
             '&:after': {
               content: '""',
@@ -55,7 +55,7 @@ export default function TotalOrderLineChartCard({ isLoading }) {
               background: theme.palette.primary[800],
               borderRadius: '50%',
               top: { xs: -85 },
-              right: { xs: -95 }
+              right: { xs: -95 },
             },
             '&:before': {
               content: '""',
@@ -66,8 +66,8 @@ export default function TotalOrderLineChartCard({ isLoading }) {
               borderRadius: '50%',
               top: { xs: -125 },
               right: { xs: -15 },
-              opacity: 0.5
-            }
+              opacity: 0.5,
+            },
           }}
         >
           <Box sx={{ p: 2.25 }}>
@@ -82,7 +82,7 @@ export default function TotalOrderLineChartCard({ isLoading }) {
                         ...theme.typography.largeAvatar,
                         bgcolor: 'primary.800',
                         color: '#fff',
-                        mt: 1
+                        mt: 1,
                       }}
                     >
                       <LocalMallOutlinedIcon fontSize="inherit" />
@@ -116,9 +116,29 @@ export default function TotalOrderLineChartCard({ isLoading }) {
                     <Grid container sx={{ alignItems: 'center' }}>
                       <Grid>
                         {timeValue ? (
-                          <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>$108</Typography>
+                          <Typography
+                            sx={{
+                              fontSize: '2.125rem',
+                              fontWeight: 500,
+                              mr: 1,
+                              mt: 1.75,
+                              mb: 0.75,
+                            }}
+                          >
+                            $108
+                          </Typography>
                         ) : (
-                          <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>$961</Typography>
+                          <Typography
+                            sx={{
+                              fontSize: '2.125rem',
+                              fontWeight: 500,
+                              mr: 1,
+                              mt: 1.75,
+                              mb: 0.75,
+                            }}
+                          >
+                            $961
+                          </Typography>
                         )}
                       </Grid>
                       <Grid>
@@ -127,10 +147,13 @@ export default function TotalOrderLineChartCard({ isLoading }) {
                             ...theme.typography.smallAvatar,
                             cursor: 'pointer',
                             bgcolor: 'primary.200',
-                            color: 'primary.dark'
+                            color: 'primary.dark',
                           }}
                         >
-                          <ArrowDownwardIcon fontSize="inherit" sx={{ transform: 'rotate3d(1, 1, 1, 45deg)' }} />
+                          <ArrowDownwardIcon
+                            fontSize="inherit"
+                            sx={{ transform: 'rotate3d(1, 1, 1, 45deg)' }}
+                          />
                         </Avatar>
                       </Grid>
                       <Grid size={12}>
@@ -138,7 +161,7 @@ export default function TotalOrderLineChartCard({ isLoading }) {
                           sx={{
                             fontSize: '1rem',
                             fontWeight: 500,
-                            color: 'primary.200'
+                            color: 'primary.200',
                           }}
                         >
                           Total Order
@@ -151,11 +174,15 @@ export default function TotalOrderLineChartCard({ isLoading }) {
                     sx={{
                       '.apexcharts-tooltip.apexcharts-theme-light': {
                         color: theme.palette.text.primary,
-                        background: theme.palette.background.default
-                      }
+                        background: theme.palette.background.default,
+                      },
                     }}
                   >
-                    {timeValue ? <Chart {...ChartDataMonth} /> : <Chart {...ChartDataYear} />}
+                    {timeValue ? (
+                      <Chart {...ChartDataMonth} />
+                    ) : (
+                      <Chart {...ChartDataYear} />
+                    )}
                   </Grid>
                 </Grid>
               </Grid>

@@ -12,7 +12,13 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 // ==============================|| ACCORDION ||============================== //
 
-export default function Accordion({ data, defaultExpandedId = null, expandIcon, square, toggle }) {
+export default function Accordion({
+  data,
+  defaultExpandedId = null,
+  expandIcon,
+  square,
+  toggle,
+}) {
   const [expanded, setExpanded] = useState(null);
   const handleChange = (panel) => (event, newExpanded) => {
     toggle && setExpanded(newExpanded ? panel : false);
@@ -30,13 +36,22 @@ export default function Accordion({ data, defaultExpandedId = null, expandIcon, 
             key={item.id}
             elevation={0}
             defaultExpanded={!item.disabled && item.defaultExpand}
-            expanded={(!toggle && !item.disabled && item.expanded) || (toggle && expanded === item.id)}
+            expanded={
+              (!toggle && !item.disabled && item.expanded) ||
+              (toggle && expanded === item.id)
+            }
             disabled={item.disabled}
             square={square}
             onChange={handleChange(item.id)}
           >
             <MuiAccordionSummary
-              expandIcon={expandIcon || expandIcon === false ? expandIcon : <ExpandMoreIcon />}
+              expandIcon={
+                expandIcon || expandIcon === false ? (
+                  expandIcon
+                ) : (
+                  <ExpandMoreIcon />
+                )
+              }
               sx={{ color: 'grey.600', fontWeight: 500 }}
             >
               {item.title}
@@ -50,8 +65,12 @@ export default function Accordion({ data, defaultExpandedId = null, expandIcon, 
 
 Accordion.propTypes = {
   data: PropTypes.array,
-  defaultExpandedId: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.any]),
+  defaultExpandedId: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.string,
+    PropTypes.any,
+  ]),
   expandIcon: PropTypes.node,
   square: PropTypes.bool,
-  toggle: PropTypes.bool
+  toggle: PropTypes.bool,
 };

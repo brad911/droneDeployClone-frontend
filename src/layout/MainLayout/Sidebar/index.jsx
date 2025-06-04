@@ -36,7 +36,7 @@ function Sidebar() {
         <LogoSection />
       </Box>
     ),
-    []
+    [],
   );
 
   const drawer = useMemo(() => {
@@ -44,13 +44,26 @@ function Sidebar() {
       <>
         <MenuCard />
         <Stack direction="row" sx={{ justifyContent: 'center', mb: 2 }}>
-          <Chip label={import.meta.env.VITE_APP_VERSION} size="small" color="default" />
+          <Chip
+            label={import.meta.env.VITE_APP_VERSION}
+            size="small"
+            color="default"
+          />
         </Stack>
       </>
     );
 
-    let drawerSX = { paddingLeft: '0px', paddingRight: '0px', marginTop: '20px' };
-    if (drawerOpen) drawerSX = { paddingLeft: '16px', paddingRight: '16px', marginTop: '0px' };
+    let drawerSX = {
+      paddingLeft: '0px',
+      paddingRight: '0px',
+      marginTop: '20px',
+    };
+    if (drawerOpen)
+      drawerSX = {
+        paddingLeft: '16px',
+        paddingRight: '16px',
+        marginTop: '0px',
+      };
 
     return (
       <>
@@ -60,7 +73,9 @@ function Sidebar() {
             {drawerOpen && drawerContent}
           </Box>
         ) : (
-          <PerfectScrollbar style={{ height: 'calc(100vh - 88px)', ...drawerSX }}>
+          <PerfectScrollbar
+            style={{ height: 'calc(100vh - 88px)', ...drawerSX }}
+          >
             <MenuList />
             {drawerOpen && drawerContent}
           </PerfectScrollbar>
@@ -71,7 +86,11 @@ function Sidebar() {
   }, [downMD, drawerOpen, mode]);
 
   return (
-    <Box component="nav" sx={{ flexShrink: { md: 0 }, width: { xs: 'auto', md: drawerWidth } }} aria-label="mailbox folders">
+    <Box
+      component="nav"
+      sx={{ flexShrink: { md: 0 }, width: { xs: 'auto', md: drawerWidth } }}
+      aria-label="mailbox folders"
+    >
       {downMD || (miniDrawer && drawerOpen) ? (
         <Drawer
           variant={downMD ? 'temporary' : 'persistent'}
@@ -86,8 +105,8 @@ function Sidebar() {
               bgcolor: 'background.default',
               color: 'text.primary',
               borderRight: 'none',
-              height: 'auto'
-            }
+              height: 'auto',
+            },
           }}
           ModalProps={{ keepMounted: true }}
           color="inherit"

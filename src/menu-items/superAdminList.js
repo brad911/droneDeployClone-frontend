@@ -1,5 +1,11 @@
 // assets
-import { IconTypography, IconPalette, IconShadow, IconWindmill, IconDroneOff } from '@tabler/icons-react';
+import {
+  IconTypography,
+  IconPalette,
+  IconShadow,
+  IconWindmill,
+  IconDroneOff,
+} from '@tabler/icons-react';
 
 // constant
 const icons = {
@@ -7,7 +13,7 @@ const icons = {
   IconTypography,
   IconPalette,
   IconShadow,
-  IconWindmill
+  IconWindmill,
 };
 // ==============================|| UTILITIES MENU ITEMS ||============================== //
 
@@ -22,7 +28,7 @@ const superAdminList = {
       type: 'item',
       url: '/project',
       icon: icons.IconDroneOff,
-      breadcrumbs: false
+      breadcrumbs: false,
     },
     {
       id: 'files',
@@ -30,8 +36,8 @@ const superAdminList = {
       type: 'item',
       url: '/file',
       icon: icons.IconPalette,
-      breadcrumbs: false
-    }
+      breadcrumbs: false,
+    },
     // {
     //   id: 'options',
     //   title: 'Option 3',
@@ -48,7 +54,7 @@ const superAdminList = {
     //   icon: icons.IconShadow,
     //   breadcrumbs: false
     // }
-  ]
+  ],
 };
 
 export default superAdminList;

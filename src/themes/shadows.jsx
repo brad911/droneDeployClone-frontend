@@ -16,7 +16,7 @@ function createCustomShadow(theme, color) {
     orange: `0px 12px 14px 0px ${alpha(theme.palette.orange.main, 0.3)}`,
     success: `0px 12px 14px 0px ${alpha(theme.palette.success.main, 0.3)}`,
     warning: `0px 12px 14px 0px ${alpha(theme.palette.warning.main, 0.3)}`,
-    error: `0px 12px 14px 0px ${alpha(theme.palette.error.main, 0.3)}`
+    error: `0px 12px 14px 0px ${alpha(theme.palette.error.main, 0.3)}`,
   };
 }
 

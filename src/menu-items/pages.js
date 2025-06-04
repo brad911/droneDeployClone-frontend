@@ -3,7 +3,7 @@ import { IconKey } from '@tabler/icons-react';
 
 // constant
 const icons = {
-  IconKey
+  IconKey,
 };
 
 // ==============================|| EXTRA PAGES MENU ITEMS ||============================== //
@@ -26,18 +26,18 @@ const pages = {
           title: 'login',
           type: 'item',
           url: '/pages/login',
-          target: true
+          target: true,
         },
         {
           id: 'register',
           title: 'register',
           type: 'item',
           url: '/pages/register',
-          target: true
-        }
-      ]
-    }
-  ]
+          target: true,
+        },
+      ],
+    },
+  ],
 };
 
 export default pages;

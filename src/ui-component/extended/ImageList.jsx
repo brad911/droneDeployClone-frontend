@@ -25,7 +25,7 @@ export default function ImageList({ itemData }) {
         // Promote the list into its own layer in Chrome. This costs memory, but helps keeping high FPS.
         transform: 'translateZ(0)',
         overflowY: 'visible',
-        mb: 0
+        mb: 0,
       }}
       gap={8}
     >
@@ -34,19 +34,31 @@ export default function ImageList({ itemData }) {
         const rows = item.featured ? 2 : 1;
 
         return (
-          <ImageListItem key={item.img} cols={cols} rows={rows} sx={{ overflow: 'hidden', borderRadius: `${borderRadius}px` }}>
+          <ImageListItem
+            key={item.img}
+            cols={cols}
+            rows={rows}
+            sx={{ overflow: 'hidden', borderRadius: `${borderRadius}px` }}
+          >
             <Box sx={{ height: item.featured ? 320 : 220, maxWidth: '100%' }}>
               <CardMedia
                 component="img"
                 sx={{ height: 1 }}
-                src={srcset(getImageUrl(`${item.img}`, ImagePath.PROFILE), 250, 200, rows, cols)}
+                src={srcset(
+                  getImageUrl(`${item.img}`, ImagePath.PROFILE),
+                  250,
+                  200,
+                  rows,
+                  cols,
+                )}
                 alt={item.title}
                 loading="lazy"
               />
             </Box>
             <ImageListItemBar
               sx={{
-                background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)'
+                background:
+                  'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
               }}
               title={item.title}
               position="top"

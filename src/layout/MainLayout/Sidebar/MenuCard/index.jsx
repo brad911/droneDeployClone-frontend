@@ -32,7 +32,10 @@ function LinearProgressWithLabel({ value, ...others }) {
             </Typography>
           </Grid>
           <Grid>
-            <Typography variant="h6" color="inherit">{`${Math.round(value)}%`}</Typography>
+            <Typography
+              variant="h6"
+              color="inherit"
+            >{`${Math.round(value)}%`}</Typography>
           </Grid>
         </Grid>
       </Grid>
@@ -46,12 +49,12 @@ function LinearProgressWithLabel({ value, ...others }) {
             height: 10,
             borderRadius: 30,
             [`&.${linearProgressClasses.colorPrimary}`]: {
-              bgcolor: 'background.paper'
+              bgcolor: 'background.paper',
             },
             [`& .${linearProgressClasses.bar}`]: {
               borderRadius: 5,
-              bgcolor: 'primary.dark'
-            }
+              bgcolor: 'primary.dark',
+            },
           }}
         />
       </Grid>
@@ -79,8 +82,8 @@ function MenuCard() {
           bgcolor: 'primary.200',
           borderRadius: '50%',
           top: -105,
-          right: -96
-        }
+          right: -96,
+        },
       }}
     >
       {/* <Box sx={{ p: 2 }}>
@@ -120,4 +123,7 @@ function MenuCard() {
 
 export default memo(MenuCard);
 
-LinearProgressWithLabel.propTypes = { value: PropTypes.number, others: PropTypes.any };
+LinearProgressWithLabel.propTypes = {
+  value: PropTypes.number,
+  others: PropTypes.any,
+};

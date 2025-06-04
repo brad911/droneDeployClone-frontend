@@ -7,7 +7,7 @@ import AdminDashboard from './superAdminList';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-  items: [AdminDashboard, other, utilities]
+  items: [AdminDashboard, other, utilities],
 };
 
 export default menuItems;

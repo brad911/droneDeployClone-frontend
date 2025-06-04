@@ -6,12 +6,24 @@ import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import MUIFormControl from '@mui/material/FormControl';
 
-export default function FormControl({ captionLabel, formState, iconPrimary, iconSecondary, placeholder, textPrimary, textSecondary }) {
+export default function FormControl({
+  captionLabel,
+  formState,
+  iconPrimary,
+  iconSecondary,
+  placeholder,
+  textPrimary,
+  textSecondary,
+}) {
   const IconPrimary = iconPrimary;
-  const primaryIcon = iconPrimary ? <IconPrimary fontSize="small" sx={{ color: 'grey.700' }} /> : null;
+  const primaryIcon = iconPrimary ? (
+    <IconPrimary fontSize="small" sx={{ color: 'grey.700' }} />
+  ) : null;
 
   const IconSecondary = iconSecondary;
-  const secondaryIcon = iconSecondary ? <IconSecondary fontSize="small" sx={{ color: 'grey.700' }} /> : null;
+  const secondaryIcon = iconSecondary ? (
+    <IconSecondary fontSize="small" sx={{ color: 'grey.700' }} />
+  ) : null;
 
   const errorState = formState === 'error';
 
@@ -24,18 +36,25 @@ export default function FormControl({ captionLabel, formState, iconPrimary, icon
         label={captionLabel}
         startAdornment={
           <>
-            {primaryIcon && <InputAdornment position="start">{primaryIcon}</InputAdornment>}
+            {primaryIcon && (
+              <InputAdornment position="start">{primaryIcon}</InputAdornment>
+            )}
             {textPrimary && (
               <>
                 <InputAdornment position="start">{textPrimary}</InputAdornment>
-                <Divider sx={{ height: 28, m: 0.5, mr: 1.5 }} orientation="vertical" />
+                <Divider
+                  sx={{ height: 28, m: 0.5, mr: 1.5 }}
+                  orientation="vertical"
+                />
               </>
             )}
           </>
         }
         endAdornment={
           <>
-            {secondaryIcon && <InputAdornment position="end">{secondaryIcon}</InputAdornment>}
+            {secondaryIcon && (
+              <InputAdornment position="end">{secondaryIcon}</InputAdornment>
+            )}
             {textSecondary && (
               <>
                 <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
@@ -56,5 +75,5 @@ FormControl.propTypes = {
   iconSecondary: PropTypes.any,
   placeholder: PropTypes.string,
   textPrimary: PropTypes.string,
-  textSecondary: PropTypes.string
+  textSecondary: PropTypes.string,
 };

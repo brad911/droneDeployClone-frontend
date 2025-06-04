@@ -5,7 +5,10 @@ import App from 'App';
 import * as serviceWorker from 'serviceWorker';
 import reportWebVitals from 'reportWebVitals';
 import { ConfigProvider } from 'contexts/ConfigContext';
-
+import { SnackbarProvider } from 'notistack';
+import { Provider } from 'react-redux';
+import store, { persistor } from './store/store';
+import { PersistGate } from 'redux-persist/integration/react';
 // style + assets
 import 'assets/scss/style.scss';
 
@@ -31,8 +34,14 @@ const container = document.getElementById('root');
 const root = createRoot(container);
 root.render(
   <ConfigProvider>
-    <App />
-  </ConfigProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <SnackbarProvider maxSnack={3}>
+          <App />
+        </SnackbarProvider>
+      </PersistGate>
+    </Provider>
+  </ConfigProvider>,
 );
 
 // If you want your app to work offline and load faster, you can change

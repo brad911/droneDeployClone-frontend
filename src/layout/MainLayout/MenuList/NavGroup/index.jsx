@@ -17,7 +17,13 @@ import { useGetMenuMaster } from 'api/menu';
 
 // ==============================|| SIDEBAR MENU LIST GROUP ||============================== //
 
-export default function NavGroup({ item, lastItem, remItems, lastItemId, setSelectedID }) {
+export default function NavGroup({
+  item,
+  lastItem,
+  remItems,
+  lastItemId,
+  setSelectedID,
+}) {
   const theme = useTheme();
   const { pathname } = useLocation();
 
@@ -47,7 +53,13 @@ export default function NavGroup({ item, lastItem, remItems, lastItemId, setSele
       if (ele.children?.length) {
         checkOpenForParent(ele.children, currentItem.id);
       }
-      if (ele?.url && !!matchPath({ path: ele?.link ? ele.link : ele.url, end: true }, pathname)) {
+      if (
+        ele?.url &&
+        !!matchPath(
+          { path: ele?.link ? ele.link : ele.url, end: true },
+          pathname,
+        )
+      ) {
         setSelectedID(id);
       }
     });
@@ -59,12 +71,24 @@ export default function NavGroup({ item, lastItem, remItems, lastItemId, setSele
       if (itemCheck?.children?.length) {
         checkOpenForParent(itemCheck.children, currentItem.id);
       }
-      if (itemCheck?.url && !!matchPath({ path: itemCheck?.link ? itemCheck.link : itemCheck.url, end: true }, pathname)) {
+      if (
+        itemCheck?.url &&
+        !!matchPath(
+          { path: itemCheck?.link ? itemCheck.link : itemCheck.url, end: true },
+          pathname,
+        )
+      ) {
         setSelectedID(currentItem.id);
       }
     });
 
-    if (data?.url && !!matchPath({ path: data?.link ? data.link : data.url, end: true }, pathname)) {
+    if (
+      data?.url &&
+      !!matchPath(
+        { path: data?.link ? data.link : data.url, end: true },
+        pathname,
+      )
+    ) {
       setSelectedID(currentItem.id);
     }
   };
@@ -80,7 +104,14 @@ export default function NavGroup({ item, lastItem, remItems, lastItemId, setSele
   const items = currentItem.children?.map((menu) => {
     switch (menu?.type) {
       case 'collapse':
-        return <NavCollapse key={menu.id} menu={menu} level={1} parentId={currentItem.id} />;
+        return (
+          <NavCollapse
+            key={menu.id}
+            menu={menu}
+            level={1}
+            parentId={currentItem.id}
+          />
+        );
       case 'item':
         return <NavItem key={menu.id} item={menu} level={1} />;
       default:
@@ -99,10 +130,18 @@ export default function NavGroup({ item, lastItem, remItems, lastItemId, setSele
         subheader={
           currentItem.title &&
           drawerOpen && (
-            <Typography variant="caption" gutterBottom sx={{ display: 'block', ...theme.typography.menuCaption }}>
+            <Typography
+              variant="caption"
+              gutterBottom
+              sx={{ display: 'block', ...theme.typography.menuCaption }}
+            >
               {currentItem.title}
               {currentItem.caption && (
-                <Typography variant="caption" gutterBottom sx={{ display: 'block', ...theme.typography.subMenuCaption }}>
+                <Typography
+                  variant="caption"
+                  gutterBottom
+                  sx={{ display: 'block', ...theme.typography.subMenuCaption }}
+                >
                   {currentItem.caption}
                 </Typography>
               )}
@@ -125,5 +164,5 @@ NavGroup.propTypes = {
   remItems: PropTypes.array,
   lastItemId: PropTypes.string,
   selectedID: PropTypes.oneOfType([PropTypes.any, PropTypes.string]),
-  setSelectedID: PropTypes.oneOfType([PropTypes.any, PropTypes.func])
+  setSelectedID: PropTypes.oneOfType([PropTypes.any, PropTypes.func]),
 };

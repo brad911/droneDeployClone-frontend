@@ -3,13 +3,21 @@ import PropTypes from 'prop-types';
 // material-ui
 import MuiAvatar from '@mui/material/Avatar';
 
-export default function Avatar({ className, color, outline, size, sx, ...others }) {
-  const colorSX = color && !outline && { color: 'background.paper', bgcolor: `${color}.main` };
+export default function Avatar({
+  className,
+  color,
+  outline,
+  size,
+  sx,
+  ...others
+}) {
+  const colorSX = color &&
+    !outline && { color: 'background.paper', bgcolor: `${color}.main` };
   const outlineSX = outline && {
     color: color ? `${color}.main` : `primary.main`,
     bgcolor: 'background.paper',
     border: '2px solid',
-    borderColor: color ? `${color}.main` : `primary.main`
+    borderColor: color ? `${color}.main` : `primary.main`,
   };
   let sizeSX = {};
 
@@ -36,7 +44,12 @@ export default function Avatar({ className, color, outline, size, sx, ...others 
       sizeSX = {};
   }
 
-  return <MuiAvatar sx={{ ...colorSX, ...outlineSX, ...sizeSX, ...sx }} {...others} />;
+  return (
+    <MuiAvatar
+      sx={{ ...colorSX, ...outlineSX, ...sizeSX, ...sx }}
+      {...others}
+    />
+  );
 }
 
 Avatar.propTypes = {
@@ -45,5 +58,5 @@ Avatar.propTypes = {
   outline: PropTypes.bool,
   size: PropTypes.oneOf(['badge', 'xs', 'sm', 'md', 'lg', 'xl']),
   sx: PropTypes.any,
-  others: PropTypes.any
+  others: PropTypes.any,
 };

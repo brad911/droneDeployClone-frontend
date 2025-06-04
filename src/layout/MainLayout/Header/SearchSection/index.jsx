@@ -18,7 +18,11 @@ import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
 import Transitions from 'ui-component/extended/Transitions';
 
 // assets
-import { IconAdjustmentsHorizontal, IconSearch, IconX } from '@tabler/icons-react';
+import {
+  IconAdjustmentsHorizontal,
+  IconSearch,
+  IconX,
+} from '@tabler/icons-react';
 
 function HeaderAvatarComponent({ children, ref, ...others }) {
   const theme = useTheme();
@@ -34,8 +38,8 @@ function HeaderAvatarComponent({ children, ref, ...others }) {
         color: 'secondary.dark',
         '&:hover': {
           bgcolor: 'secondary.dark',
-          color: 'secondary.light'
-        }
+          color: 'secondary.light',
+        },
       }}
       {...others}
     >
@@ -77,8 +81,8 @@ function MobileSearch({ value, setValue, popupState }) {
                 color: 'orange.dark',
                 '&:hover': {
                   bgcolor: 'orange.dark',
-                  color: 'orange.light'
-                }
+                  color: 'orange.light',
+                },
               }}
               {...bindToggle(popupState)}
             >
@@ -88,7 +92,12 @@ function MobileSearch({ value, setValue, popupState }) {
         </InputAdornment>
       }
       aria-describedby="search-helper-text"
-      slotProps={{ input: { 'aria-label': 'weight', sx: { bgcolor: 'transparent', pl: 0.5 } } }}
+      slotProps={{
+        input: {
+          'aria-label': 'weight',
+          sx: { bgcolor: 'transparent', pl: 0.5 },
+        },
+      }}
       sx={{ width: '100%', ml: 0.5, px: 2, bgcolor: 'background.paper' }}
     />
   );
@@ -113,16 +122,41 @@ export default function SearchSection() {
               <Popper
                 {...bindPopper(popupState)}
                 transition
-                sx={{ zIndex: 1100, width: '99%', top: '-55px !important', px: { xs: 1.25, sm: 1.5 } }}
+                sx={{
+                  zIndex: 1100,
+                  width: '99%',
+                  top: '-55px !important',
+                  px: { xs: 1.25, sm: 1.5 },
+                }}
               >
                 {({ TransitionProps }) => (
                   <>
-                    <Transitions type="zoom" {...TransitionProps} sx={{ transformOrigin: 'center left' }}>
-                      <Card sx={{ bgcolor: 'background.default', border: 0, boxShadow: 'none' }}>
+                    <Transitions
+                      type="zoom"
+                      {...TransitionProps}
+                      sx={{ transformOrigin: 'center left' }}
+                    >
+                      <Card
+                        sx={{
+                          bgcolor: 'background.default',
+                          border: 0,
+                          boxShadow: 'none',
+                        }}
+                      >
                         <Box sx={{ p: 2 }}>
-                          <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                          <Grid
+                            container
+                            sx={{
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}
+                          >
                             <Grid size="grow">
-                              <MobileSearch value={value} setValue={setValue} popupState={popupState} />
+                              <MobileSearch
+                                value={value}
+                                setValue={setValue}
+                                popupState={popupState}
+                              />
                             </Grid>
                           </Grid>
                         </Box>
@@ -154,7 +188,12 @@ export default function SearchSection() {
             </InputAdornment>
           }
           aria-describedby="search-helper-text"
-          slotProps={{ input: { 'aria-label': 'weight', sx: { bgcolor: 'transparent', pl: 0.5 } } }}
+          slotProps={{
+            input: {
+              'aria-label': 'weight',
+              sx: { bgcolor: 'transparent', pl: 0.5 },
+            },
+          }}
           sx={{ width: { md: 250, lg: 434 }, ml: 2, px: 2 }}
         />
       </Box>
@@ -162,6 +201,13 @@ export default function SearchSection() {
   );
 }
 
-HeaderAvatarComponent.propTypes = { children: PropTypes.node, others: PropTypes.any };
+HeaderAvatarComponent.propTypes = {
+  children: PropTypes.node,
+  others: PropTypes.any,
+};
 
-MobileSearch.propTypes = { value: PropTypes.string, setValue: PropTypes.func, popupState: PropTypes.any };
+MobileSearch.propTypes = {
+  value: PropTypes.string,
+  setValue: PropTypes.func,
+  popupState: PropTypes.any,
+};

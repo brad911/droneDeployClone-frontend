@@ -1,5 +1,16 @@
 import React from 'react';
-import { Card, CardContent, CardMedia, IconButton, Typography, Box, Menu, MenuItem, Stack, Tooltip } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  IconButton,
+  Typography,
+  Box,
+  Menu,
+  MenuItem,
+  Stack,
+  Tooltip,
+} from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ImageIcon from '@mui/icons-material/PhotoLibrary';
 import PersonIcon from '@mui/icons-material/Person';
@@ -21,7 +32,7 @@ const ProjectTile = ({ project }) => {
         overflow: 'hidden',
         cursor: 'pointer',
         transition: '0.3s',
-        '&:hover': { boxShadow: 6 }
+        '&:hover': { boxShadow: 6 },
       }}
     >
       {/* Status Bubble */}
@@ -38,7 +49,7 @@ const ProjectTile = ({ project }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1
+          zIndex: 1,
         }}
       >
         <Tooltip title="Example Project">
@@ -47,7 +58,13 @@ const ProjectTile = ({ project }) => {
       </Box>
 
       {/* Image */}
-      <CardMedia component="img" height="140" image={project.image} alt={project.title} sx={{ objectFit: 'cover' }} />
+      <CardMedia
+        component="img"
+        height="140"
+        image={project.image}
+        alt={project.title}
+        sx={{ objectFit: 'cover' }}
+      />
 
       {/* Content */}
       <CardContent sx={{ paddingBottom: '8px !important' }}>
@@ -76,7 +93,7 @@ const ProjectTile = ({ project }) => {
         sx={{
           position: 'absolute',
           bottom: 8,
-          right: 8
+          right: 8,
         }}
       >
         <IconButton onClick={handleMenuOpen}>

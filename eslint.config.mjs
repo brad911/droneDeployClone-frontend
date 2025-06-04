@@ -82,12 +82,15 @@ export default [
       'prettier/prettier': [
         'warn',
         {
-          bracketSpacing: true,
-          printWidth: 140,
-          singleQuote: true,
-          trailingComma: 'none',
+          printWidth: 80,
           tabWidth: 2,
-          useTabs: false
+          semi: true,
+          singleQuote: true,
+          bracketSpacing: true,
+          jsxSingleQuote: false,
+          jsxBracketSameLine: false,
+          arrowParens: 'always',
+          endOfLine: 'lf'
         }
       ]
     }

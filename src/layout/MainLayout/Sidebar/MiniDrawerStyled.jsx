@@ -15,8 +15,8 @@ function openedMixin(theme) {
     boxShadow: 'none',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen + 200
-    })
+      duration: theme.transitions.duration.enteringScreen + 200,
+    }),
   };
 }
 
@@ -30,14 +30,16 @@ function closedMixin(theme) {
     height: 'auto',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen + 200
-    })
+      duration: theme.transitions.duration.leavingScreen + 200,
+    }),
   };
 }
 
 // ==============================|| DRAWER - MINI STYLED ||============================== //
 
-const MiniDrawerStyled = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
+const MiniDrawerStyled = styled(Drawer, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
   width: drawerWidth,
   borderRight: '0px',
   flexShrink: 0,
@@ -45,12 +47,12 @@ const MiniDrawerStyled = styled(Drawer, { shouldForwardProp: (prop) => prop !== 
   boxSizing: 'border-box',
   ...(open && {
     ...openedMixin(theme),
-    '& .MuiDrawer-paper': openedMixin(theme)
+    '& .MuiDrawer-paper': openedMixin(theme),
   }),
   ...(!open && {
     ...closedMixin(theme),
-    '& .MuiDrawer-paper': closedMixin(theme)
-  })
+    '& .MuiDrawer-paper': closedMixin(theme),
+  }),
 }));
 
 export default MiniDrawerStyled;

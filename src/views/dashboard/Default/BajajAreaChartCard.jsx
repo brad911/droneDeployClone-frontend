@@ -26,8 +26,8 @@ export default function BajajAreaChartCard() {
       options: {
         ...prevState.options,
         colors: [orangeDark],
-        tooltip: { ...prevState?.options?.tooltip, theme: 'light' }
-      }
+        tooltip: { ...prevState?.options?.tooltip, theme: 'light' },
+      },
     }));
   }, [orangeDark]);
 
@@ -35,7 +35,10 @@ export default function BajajAreaChartCard() {
     <Card sx={{ bgcolor: 'secondary.light' }}>
       <Grid container sx={{ p: 2, pb: 0, color: '#fff' }}>
         <Grid size={12}>
-          <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          <Grid
+            container
+            sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+          >
             <Grid>
               <Typography variant="subtitle1" sx={{ color: 'secondary.dark' }}>
                 Bajaj Finery

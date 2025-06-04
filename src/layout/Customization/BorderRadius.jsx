@@ -18,7 +18,11 @@ export default function BorderRadius() {
   return (
     <Stack spacing={2.5} sx={{ pl: 2, pb: 2, pr: 4 }}>
       <Typography variant="h5">BORDER RADIUS</Typography>
-      <Grid container spacing={1.25} sx={{ pt: 2, alignItems: 'center', justifyContent: 'center' }}>
+      <Grid
+        container
+        spacing={1.25}
+        sx={{ pt: 2, alignItems: 'center', justifyContent: 'center' }}
+      >
         <Grid>
           <Typography variant="h6">4px</Typography>
         </Grid>
@@ -35,8 +39,8 @@ export default function BorderRadius() {
             color="primary"
             sx={{
               '& .MuiSlider-valueLabel': {
-                color: 'primary.light'
-              }
+                color: 'primary.light',
+              },
             }}
           />
         </Grid>

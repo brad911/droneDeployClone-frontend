@@ -23,7 +23,7 @@ function ShadowBox({ shadow }) {
           alignItems: 'center',
           py: 4.5,
           bgcolor: 'primary.light',
-          color: 'grey.800'
+          color: 'grey.800',
         }}
       >
         <Box sx={{ color: 'inherit' }}>boxShadow: {shadow}</Box>
@@ -44,7 +44,7 @@ function CustomShadowBox({ shadow, label, color }) {
           alignItems: 'center',
           py: 3,
           bgcolor: color,
-          color: 'background.default'
+          color: 'background.default',
         }}
       >
         {!label && <Box sx={{ color: 'inherit' }}>boxShadow: {shadow}</Box>}
@@ -60,7 +60,12 @@ export default function UtilitiesShadow() {
   const theme = useTheme();
 
   return (
-    <MainCard title="Basic Shadow" secondary={<SecondaryAction link="https://next.material-ui.com/system/shadows/" />}>
+    <MainCard
+      title="Basic Shadow"
+      secondary={
+        <SecondaryAction link="https://next.material-ui.com/system/shadows/" />
+      }
+    >
       <Grid container spacing={gridSpacing}>
         <Grid size={12}>
           <SubCard title="Basic Shadow">
@@ -147,22 +152,46 @@ export default function UtilitiesShadow() {
           <SubCard title="Color Shadow">
             <Grid container spacing={gridSpacing}>
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <CustomShadowBox color="primary.main" shadow={theme.customShadows.primary} label="primary" />
+                <CustomShadowBox
+                  color="primary.main"
+                  shadow={theme.customShadows.primary}
+                  label="primary"
+                />
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <CustomShadowBox color="secondary.main" shadow={theme.customShadows.secondary} label="secondary" />
+                <CustomShadowBox
+                  color="secondary.main"
+                  shadow={theme.customShadows.secondary}
+                  label="secondary"
+                />
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <CustomShadowBox color="orange.main" shadow={theme.customShadows.orange} label="orange" />
+                <CustomShadowBox
+                  color="orange.main"
+                  shadow={theme.customShadows.orange}
+                  label="orange"
+                />
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <CustomShadowBox color="success.main" shadow={theme.customShadows.success} label="success" />
+                <CustomShadowBox
+                  color="success.main"
+                  shadow={theme.customShadows.success}
+                  label="success"
+                />
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <CustomShadowBox color="warning.main" shadow={theme.customShadows.warning} label="warning" />
+                <CustomShadowBox
+                  color="warning.main"
+                  shadow={theme.customShadows.warning}
+                  label="warning"
+                />
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <CustomShadowBox color="error.main" shadow={theme.customShadows.error} label="error" />
+                <CustomShadowBox
+                  color="error.main"
+                  shadow={theme.customShadows.error}
+                  label="error"
+                />
               </Grid>
             </Grid>
           </SubCard>
@@ -174,4 +203,8 @@ export default function UtilitiesShadow() {
 
 ShadowBox.propTypes = { shadow: PropTypes.string };
 
-CustomShadowBox.propTypes = { shadow: PropTypes.string, label: PropTypes.string, color: PropTypes.string };
+CustomShadowBox.propTypes = {
+  shadow: PropTypes.string,
+  label: PropTypes.string,
+  color: PropTypes.string,
+};

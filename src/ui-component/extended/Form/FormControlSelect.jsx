@@ -16,13 +16,17 @@ export default function FormControlSelect({
   iconSecondary,
   selected,
   textPrimary,
-  textSecondary
+  textSecondary,
 }) {
   const IconPrimary = iconPrimary;
-  const primaryIcon = iconPrimary ? <IconPrimary fontSize="small" sx={{ color: 'grey.700' }} /> : null;
+  const primaryIcon = iconPrimary ? (
+    <IconPrimary fontSize="small" sx={{ color: 'grey.700' }} />
+  ) : null;
 
   const IconSecondary = iconSecondary;
-  const secondaryIcon = iconSecondary ? <IconSecondary fontSize="small" sx={{ color: 'grey.700' }} /> : null;
+  const secondaryIcon = iconSecondary ? (
+    <IconSecondary fontSize="small" sx={{ color: 'grey.700' }} />
+  ) : null;
 
   const errorState = formState === 'error';
   const val = selected || '';
@@ -45,27 +49,45 @@ export default function FormControlSelect({
           input: {
             startAdornment: (
               <>
-                {primaryIcon && <InputAdornment position="start">{primaryIcon}</InputAdornment>}
+                {primaryIcon && (
+                  <InputAdornment position="start">
+                    {primaryIcon}
+                  </InputAdornment>
+                )}
                 {textPrimary && (
                   <>
-                    <InputAdornment position="start">{textPrimary}</InputAdornment>
-                    <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+                    <InputAdornment position="start">
+                      {textPrimary}
+                    </InputAdornment>
+                    <Divider
+                      sx={{ height: 28, m: 0.5 }}
+                      orientation="vertical"
+                    />
                   </>
                 )}
               </>
             ),
             endAdornment: (
               <>
-                {secondaryIcon && <InputAdornment position="end">{secondaryIcon}</InputAdornment>}
+                {secondaryIcon && (
+                  <InputAdornment position="end">
+                    {secondaryIcon}
+                  </InputAdornment>
+                )}
                 {textSecondary && (
                   <>
-                    <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                    <InputAdornment position="end">{textSecondary}</InputAdornment>
+                    <Divider
+                      sx={{ height: 28, m: 0.5 }}
+                      orientation="vertical"
+                    />
+                    <InputAdornment position="end">
+                      {textSecondary}
+                    </InputAdornment>
                   </>
                 )}
               </>
-            )
-          }
+            ),
+          },
         }}
       >
         {currencies?.map((option, index) => (
@@ -86,5 +108,5 @@ FormControlSelect.propTypes = {
   iconSecondary: PropTypes.any,
   selected: PropTypes.string,
   textPrimary: PropTypes.string,
-  textSecondary: PropTypes.string
+  textSecondary: PropTypes.string,
 };

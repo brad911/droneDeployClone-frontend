@@ -12,28 +12,55 @@ import AuthCardWrapper from './AuthCardWrapper';
 import AuthRegister from '../auth-forms/AuthRegister';
 
 import Logo from 'ui-component/Logo';
+import { useTheme } from '@emotion/react';
 // import AuthFooter from 'ui-component/cards/AuthFooter';
 
 export default function Register() {
+  const theme = useTheme();
   const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   return (
     <AuthWrapper1>
-      <Grid container direction="column" sx={{ justifyContent: 'flex-end', minHeight: '100vh' }}>
+      <Grid
+        container
+        direction="column"
+        sx={{ justifyContent: 'flex-end', minHeight: '100vh' }}
+      >
         <Grid size={12}>
-          <Grid container sx={{ justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 38px)' }}>
+          <Grid
+            container
+            sx={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: 'calc(100vh - 38px)',
+            }}
+          >
             <Grid sx={{ m: { xs: 1, sm: 3 }, mb: 0 }}>
               <AuthCardWrapper>
-                <Grid container spacing={0} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+                <Grid
+                  container
+                  spacing={0}
+                  sx={{ alignItems: 'center', justifyContent: 'center' }}
+                >
                   <Grid sx={{ mb: 3 }}>
                     <Link to="#" aria-label="theme logo">
                       <Logo />
                     </Link>
                   </Grid>
                   <Grid size={12}>
-                    <Grid container direction={{ xs: 'column-reverse', md: 'row' }} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+                    <Grid
+                      container
+                      direction={{ xs: 'column-reverse', md: 'row' }}
+                      sx={{ alignItems: 'center', justifyContent: 'center' }}
+                    >
                       <Grid>
-                        <Stack spacing={1} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+                        <Stack
+                          spacing={1}
+                          sx={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
                           {/* <Typography gutterBottom variant={downMD ? 'h3' : 'h2'} sx={{ color: 'secondary.main' }}>
                             Sign up
                           </Typography> */}
@@ -51,8 +78,25 @@ export default function Register() {
                     <Divider />
                   </Grid>
                   <Grid size={12}>
-                    <Grid container direction="column" sx={{ alignItems: 'center' }} size={12}>
-                      <Typography component={Link} to="/" variant="subtitle1" sx={{ textDecoration: 'none' }}>
+                    <Grid
+                      container
+                      direction="column"
+                      sx={{ alignItems: 'center' }}
+                      size={12}
+                    >
+                      <Typography
+                        component={Link}
+                        to="/login"
+                        variant="subtitle1"
+                        sx={{
+                          textDecoration: 'underline',
+                          textDecorationColor: theme.palette.secondary[200],
+                          color: 'inherit', // optional: keeps text color consistent
+                          '&:hover': {
+                            textDecorationColor: theme.palette.secondary[800], // optional: darker shade on hover
+                          },
+                        }}
+                      >
                         Already have an account?
                       </Typography>
                     </Grid>

@@ -13,16 +13,25 @@ export default function Footer() {
         alignItems: 'center',
         justifyContent: 'space-between',
         pt: 3,
-        mt: 'auto'
+        mt: 'auto',
       }}
     >
       <Typography variant="caption">
         &copy; All rights reserved{' '}
-        <Typography component={Link} href="https://codedthemes.com/about-us/" underline="hover" target="_blank" color="secondary.main">
+        <Typography
+          component={Link}
+          href="https://codedthemes.com/about-us/"
+          underline="hover"
+          target="_blank"
+          color="secondary.main"
+        >
           CodedThemes
         </Typography>
       </Typography>
-      <Stack direction="row" sx={{ gap: 1.5, alignItems: 'center', justifyContent: 'space-between' }}>
+      <Stack
+        direction="row"
+        sx={{ gap: 1.5, alignItems: 'center', justifyContent: 'space-between' }}
+      >
         <Link
           component={RouterLink}
           to="https://x.com/codedthemes"

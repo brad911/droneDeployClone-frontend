@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 
 // constant
 const headerStyle = {
-  '& .MuiCardHeader-action': { mr: 0 }
+  '& .MuiCardHeader-action': { mr: 0 },
 };
 
 const MainCard = function MainCard({
@@ -36,15 +36,25 @@ const MainCard = function MainCard({
         border: border ? '1px solid' : 'none',
         borderColor: 'divider',
         ':hover': {
-          boxShadow: boxShadow ? shadow || defaultShadow : 'inherit'
+          boxShadow: boxShadow ? shadow || defaultShadow : 'inherit',
         },
-        ...sx
+        ...sx,
       }}
     >
       {/* card header and action */}
-      {!darkTitle && title && <CardHeader sx={{ ...headerStyle, ...headerSX }} title={title} action={secondary} />}
+      {!darkTitle && title && (
+        <CardHeader
+          sx={{ ...headerStyle, ...headerSX }}
+          title={title}
+          action={secondary}
+        />
+      )}
       {darkTitle && title && (
-        <CardHeader sx={{ ...headerStyle, ...headerSX }} title={<Typography variant="h3">{title}</Typography>} action={secondary} />
+        <CardHeader
+          sx={{ ...headerStyle, ...headerSX }}
+          title={<Typography variant="h3">{title}</Typography>}
+          action={secondary}
+        />
       )}
 
       {/* content & header divider */}

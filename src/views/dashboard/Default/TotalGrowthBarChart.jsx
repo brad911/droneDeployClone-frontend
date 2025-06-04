@@ -22,14 +22,17 @@ import barChartOptions from './chart-data/total-growth-bar-chart';
 const status = [
   { value: 'today', label: 'Today' },
   { value: 'month', label: 'This Month' },
-  { value: 'year', label: 'This Year' }
+  { value: 'year', label: 'This Year' },
 ];
 
 const series = [
-  { name: 'Investment', data: [35, 125, 35, 35, 35, 80, 35, 20, 35, 45, 15, 75] },
+  {
+    name: 'Investment',
+    data: [35, 125, 35, 35, 35, 80, 35, 20, 35, 45, 15, 75],
+  },
   { name: 'Loss', data: [35, 15, 15, 35, 65, 40, 80, 25, 15, 85, 25, 75] },
   { name: 'Profit', data: [35, 145, 35, 35, 20, 105, 100, 10, 65, 45, 30, 10] },
-  { name: 'Maintenance', data: [0, 0, 75, 0, 0, 115, 0, 0, 0, 0, 150, 0] }
+  { name: 'Maintenance', data: [0, 0, 75, 0, 0, 115, 0, 0, 0, 0, 150, 0] },
 ];
 
 export default function TotalGrowthBarChart({ isLoading }) {
@@ -53,17 +56,17 @@ export default function TotalGrowthBarChart({ isLoading }) {
       colors: [primary200, primaryDark, secondaryMain, secondaryLight],
       xaxis: {
         ...prev.xaxis,
-        labels: { style: { colors: primary } }
+        labels: { style: { colors: primary } },
       },
       yaxis: {
-        labels: { style: { colors: primary } }
+        labels: { style: { colors: primary } },
       },
       grid: { ...prev.grid, borderColor: divider },
       tooltip: { theme: 'light' },
       legend: {
         ...prev.legend,
-        labels: { ...prev.legend?.labels, colors: grey500 }
-      }
+        labels: { ...prev.legend?.labels, colors: grey500 },
+      },
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme.palette]);
@@ -76,7 +79,10 @@ export default function TotalGrowthBarChart({ isLoading }) {
         <MainCard>
           <Grid container spacing={gridSpacing}>
             <Grid size={12}>
-              <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+              <Grid
+                container
+                sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+              >
                 <Grid>
                   <Grid container direction="column" spacing={1}>
                     <Grid>
@@ -88,7 +94,12 @@ export default function TotalGrowthBarChart({ isLoading }) {
                   </Grid>
                 </Grid>
                 <Grid>
-                  <TextField id="standard-select-currency" select value={value} onChange={(e) => setValue(e.target.value)}>
+                  <TextField
+                    id="standard-select-currency"
+                    select
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                  >
                     {status.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
@@ -104,22 +115,27 @@ export default function TotalGrowthBarChart({ isLoading }) {
                 ...theme.applyStyles('light', {
                   '& .apexcharts-series:nth-of-type(4) path:hover': {
                     filter: `brightness(0.95)`,
-                    transition: 'all 0.3s ease'
-                  }
+                    transition: 'all 0.3s ease',
+                  },
                 }),
                 '& .apexcharts-menu': {
-                  bgcolor: 'background.paper'
+                  bgcolor: 'background.paper',
                 },
                 '.apexcharts-theme-light .apexcharts-menu-item:hover': {
-                  bgcolor: 'grey.200'
+                  bgcolor: 'grey.200',
                 },
                 '& .apexcharts-theme-light .apexcharts-menu-icon:hover svg, .apexcharts-theme-light .apexcharts-reset-icon:hover svg, .apexcharts-theme-light .apexcharts-selection-icon:not(.apexcharts-selected):hover svg, .apexcharts-theme-light .apexcharts-zoom-icon:not(.apexcharts-selected):hover svg, .apexcharts-theme-light .apexcharts-zoomin-icon:hover svg, .apexcharts-theme-light .apexcharts-zoomout-icon:hover svg':
                   {
-                    fill: theme.palette.grey[400]
-                  }
+                    fill: theme.palette.grey[400],
+                  },
               }}
             >
-              <Chart options={chartOptions} series={series} type="bar" height={480} />
+              <Chart
+                options={chartOptions}
+                series={series}
+                type="bar"
+                height={480}
+              />
             </Grid>
           </Grid>
         </MainCard>

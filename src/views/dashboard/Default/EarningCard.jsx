@@ -58,7 +58,7 @@ export default function EarningCard({ isLoading }) {
               background: theme.palette.secondary[800],
               borderRadius: '50%',
               top: { xs: -85 },
-              right: { xs: -95 }
+              right: { xs: -95 },
             },
             '&:before': {
               content: '""',
@@ -69,8 +69,8 @@ export default function EarningCard({ isLoading }) {
               borderRadius: '50%',
               top: { xs: -125 },
               right: { xs: -15 },
-              opacity: 0.5
-            }
+              opacity: 0.5,
+            },
           }}
         >
           <Box sx={{ p: 2.25 }}>
@@ -84,10 +84,15 @@ export default function EarningCard({ isLoading }) {
                         ...theme.typography.commonAvatar,
                         ...theme.typography.largeAvatar,
                         bgcolor: 'secondary.800',
-                        mt: 1
+                        mt: 1,
                       }}
                     >
-                      <CardMedia sx={{ width: 24, height: 24 }} component="img" src={EarningIcon} alt="Notification" />
+                      <CardMedia
+                        sx={{ width: 24, height: 24 }}
+                        component="img"
+                        src={EarningIcon}
+                        alt="Notification"
+                      />
                     </Avatar>
                   </Grid>
                   <Grid>
@@ -98,7 +103,7 @@ export default function EarningCard({ isLoading }) {
                         ...theme.typography.mediumAvatar,
                         bgcolor: 'secondary.dark',
                         color: 'secondary.200',
-                        zIndex: 1
+                        zIndex: 1,
                       }}
                       aria-controls="menu-earning-card"
                       aria-haspopup="true"
@@ -115,11 +120,11 @@ export default function EarningCard({ isLoading }) {
                       variant="selectedMenu"
                       anchorOrigin={{
                         vertical: 'bottom',
-                        horizontal: 'right'
+                        horizontal: 'right',
                       }}
                       transformOrigin={{
                         vertical: 'top',
-                        horizontal: 'right'
+                        horizontal: 'right',
                       }}
                     >
                       <MenuItem onClick={handleClose}>
@@ -141,7 +146,17 @@ export default function EarningCard({ isLoading }) {
               <Grid>
                 <Grid container sx={{ alignItems: 'center' }}>
                   <Grid>
-                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>$500.00</Typography>
+                    <Typography
+                      sx={{
+                        fontSize: '2.125rem',
+                        fontWeight: 500,
+                        mr: 1,
+                        mt: 1.75,
+                        mb: 0.75,
+                      }}
+                    >
+                      $500.00
+                    </Typography>
                   </Grid>
                   <Grid>
                     <Avatar
@@ -149,10 +164,13 @@ export default function EarningCard({ isLoading }) {
                         cursor: 'pointer',
                         ...theme.typography.smallAvatar,
                         bgcolor: 'secondary.200',
-                        color: 'secondary.dark'
+                        color: 'secondary.dark',
                       }}
                     >
-                      <ArrowUpwardIcon fontSize="inherit" sx={{ transform: 'rotate3d(1, 1, 1, 45deg)' }} />
+                      <ArrowUpwardIcon
+                        fontSize="inherit"
+                        sx={{ transform: 'rotate3d(1, 1, 1, 45deg)' }}
+                      />
                     </Avatar>
                   </Grid>
                 </Grid>
@@ -162,7 +180,7 @@ export default function EarningCard({ isLoading }) {
                   sx={{
                     fontSize: '1rem',
                     fontWeight: 500,
-                    color: 'secondary.200'
+                    color: 'secondary.200',
                   }}
                 >
                   Total Earning

@@ -45,7 +45,13 @@ export default function PopularCard({ isLoading }) {
           <CardContent>
             <Grid container spacing={gridSpacing}>
               <Grid size={12}>
-                <Grid container sx={{ alignContent: 'center', justifyContent: 'space-between' }}>
+                <Grid
+                  container
+                  sx={{
+                    alignContent: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   <Grid>
                     <Typography variant="h4">Popular Stocks</Typography>
                   </Grid>
@@ -82,14 +88,26 @@ export default function PopularCard({ isLoading }) {
               <Grid size={12}>
                 <Grid container direction="column">
                   <Grid>
-                    <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Grid
+                      container
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Grid>
                         <Typography variant="subtitle1" color="inherit">
                           Bajaj Finery
                         </Typography>
                       </Grid>
                       <Grid>
-                        <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Grid
+                          container
+                          sx={{
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Grid>
                             <Typography variant="subtitle1" color="inherit">
                               $1839.00
@@ -104,10 +122,13 @@ export default function PopularCard({ isLoading }) {
                                 borderRadius: '5px',
                                 bgcolor: 'success.light',
                                 color: 'success.dark',
-                                ml: 2
+                                ml: 2,
                               }}
                             >
-                              <KeyboardArrowUpOutlinedIcon fontSize="small" color="inherit" />
+                              <KeyboardArrowUpOutlinedIcon
+                                fontSize="small"
+                                color="inherit"
+                              />
                             </Avatar>
                           </Grid>
                         </Grid>
@@ -115,7 +136,10 @@ export default function PopularCard({ isLoading }) {
                     </Grid>
                   </Grid>
                   <Grid>
-                    <Typography variant="subtitle2" sx={{ color: 'success.dark' }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ color: 'success.dark' }}
+                    >
                       10% Profit
                     </Typography>
                   </Grid>
@@ -123,14 +147,26 @@ export default function PopularCard({ isLoading }) {
                 <Divider sx={{ my: 1.5 }} />
                 <Grid container direction="column">
                   <Grid>
-                    <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Grid
+                      container
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Grid>
                         <Typography variant="subtitle1" color="inherit">
                           TTML
                         </Typography>
                       </Grid>
                       <Grid>
-                        <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Grid
+                          container
+                          sx={{
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Grid>
                             <Typography variant="subtitle1" color="inherit">
                               $100.00
@@ -145,10 +181,13 @@ export default function PopularCard({ isLoading }) {
                                 borderRadius: '5px',
                                 bgcolor: 'orange.light',
                                 color: 'orange.dark',
-                                marginLeft: 1.875
+                                marginLeft: 1.875,
                               }}
                             >
-                              <KeyboardArrowDownOutlinedIcon fontSize="small" color="inherit" />
+                              <KeyboardArrowDownOutlinedIcon
+                                fontSize="small"
+                                color="inherit"
+                              />
                             </Avatar>
                           </Grid>
                         </Grid>
@@ -156,7 +195,10 @@ export default function PopularCard({ isLoading }) {
                     </Grid>
                   </Grid>
                   <Grid>
-                    <Typography variant="subtitle2" sx={{ color: 'orange.dark' }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ color: 'orange.dark' }}
+                    >
                       10% loss
                     </Typography>
                   </Grid>
@@ -164,14 +206,26 @@ export default function PopularCard({ isLoading }) {
                 <Divider sx={{ my: 1.5 }} />
                 <Grid container direction="column">
                   <Grid>
-                    <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Grid
+                      container
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Grid>
                         <Typography variant="subtitle1" color="inherit">
                           Reliance
                         </Typography>
                       </Grid>
                       <Grid>
-                        <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Grid
+                          container
+                          sx={{
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Grid>
                             <Typography variant="subtitle1" color="inherit">
                               $200.00
@@ -186,10 +240,13 @@ export default function PopularCard({ isLoading }) {
                                 borderRadius: '5px',
                                 bgcolor: 'success.light',
                                 color: 'success.dark',
-                                ml: 2
+                                ml: 2,
                               }}
                             >
-                              <KeyboardArrowUpOutlinedIcon fontSize="small" color="inherit" />
+                              <KeyboardArrowUpOutlinedIcon
+                                fontSize="small"
+                                color="inherit"
+                              />
                             </Avatar>
                           </Grid>
                         </Grid>
@@ -197,7 +254,10 @@ export default function PopularCard({ isLoading }) {
                     </Grid>
                   </Grid>
                   <Grid>
-                    <Typography variant="subtitle2" sx={{ color: 'success.dark' }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ color: 'success.dark' }}
+                    >
                       10% Profit
                     </Typography>
                   </Grid>
@@ -205,14 +265,26 @@ export default function PopularCard({ isLoading }) {
                 <Divider sx={{ my: 1.5 }} />
                 <Grid container direction="column">
                   <Grid>
-                    <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Grid
+                      container
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Grid>
                         <Typography variant="subtitle1" color="inherit">
                           TTML
                         </Typography>
                       </Grid>
                       <Grid>
-                        <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Grid
+                          container
+                          sx={{
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Grid>
                             <Typography variant="subtitle1" color="inherit">
                               $189.00
@@ -227,10 +299,13 @@ export default function PopularCard({ isLoading }) {
                                 borderRadius: '5px',
                                 bgcolor: 'orange.light',
                                 color: 'orange.dark',
-                                ml: 2
+                                ml: 2,
                               }}
                             >
-                              <KeyboardArrowDownOutlinedIcon fontSize="small" color="inherit" />
+                              <KeyboardArrowDownOutlinedIcon
+                                fontSize="small"
+                                color="inherit"
+                              />
                             </Avatar>
                           </Grid>
                         </Grid>
@@ -238,7 +313,10 @@ export default function PopularCard({ isLoading }) {
                     </Grid>
                   </Grid>
                   <Grid>
-                    <Typography variant="subtitle2" sx={{ color: 'orange.dark' }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ color: 'orange.dark' }}
+                    >
                       10% loss
                     </Typography>
                   </Grid>
@@ -246,14 +324,26 @@ export default function PopularCard({ isLoading }) {
                 <Divider sx={{ my: 1.5 }} />
                 <Grid container direction="column">
                   <Grid>
-                    <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Grid
+                      container
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Grid>
                         <Typography variant="subtitle1" color="inherit">
                           Stolon
                         </Typography>
                       </Grid>
                       <Grid>
-                        <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Grid
+                          container
+                          sx={{
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <Grid>
                             <Typography variant="subtitle1" color="inherit">
                               $189.00
@@ -268,10 +358,13 @@ export default function PopularCard({ isLoading }) {
                                 borderRadius: '5px',
                                 bgcolor: 'orange.light',
                                 color: 'orange.dark',
-                                ml: 2
+                                ml: 2,
                               }}
                             >
-                              <KeyboardArrowDownOutlinedIcon fontSize="small" color="inherit" />
+                              <KeyboardArrowDownOutlinedIcon
+                                fontSize="small"
+                                color="inherit"
+                              />
                             </Avatar>
                           </Grid>
                         </Grid>
@@ -279,7 +372,10 @@ export default function PopularCard({ isLoading }) {
                     </Grid>
                   </Grid>
                   <Grid>
-                    <Typography variant="subtitle2" sx={{ color: 'orange.dark' }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ color: 'orange.dark' }}
+                    >
                       10% loss
                     </Typography>
                   </Grid>

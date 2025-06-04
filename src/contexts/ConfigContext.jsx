@@ -10,7 +10,7 @@ const initialState = {
   ...defaultConfig,
   onChangeFontFamily: () => {},
   onChangeBorderRadius: () => {},
-  onReset: () => {}
+  onReset: () => {},
 };
 
 // ==============================|| CONFIG CONTEXT & PROVIDER ||============================== //
@@ -20,20 +20,20 @@ const ConfigContext = createContext(initialState);
 function ConfigProvider({ children }) {
   const [config, setConfig] = useLocalStorage('berry-config-vite-ts', {
     fontFamily: initialState.fontFamily,
-    borderRadius: initialState.borderRadius
+    borderRadius: initialState.borderRadius,
   });
 
   const onChangeFontFamily = (fontFamily) => {
     setConfig({
       ...config,
-      fontFamily
+      fontFamily,
     });
   };
 
   const onChangeBorderRadius = (event, newValue) => {
     setConfig({
       ...config,
-      borderRadius: newValue
+      borderRadius: newValue,
     });
   };
 
@@ -47,7 +47,7 @@ function ConfigProvider({ children }) {
         ...config,
         onChangeFontFamily,
         onChangeBorderRadius,
-        onReset
+        onReset,
       }}
     >
       {children}

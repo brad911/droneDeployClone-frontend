@@ -12,34 +12,71 @@ import AuthCardWrapper from './AuthCardWrapper';
 import AuthLogin from '../auth-forms/AuthLogin';
 
 import Logo from 'ui-component/Logo';
-import AuthFooter from 'ui-component/cards/AuthFooter';
+import { useTheme } from '@emotion/react';
+// import AuthFooter from 'ui-component/cards/AuthFooter';
 
 // ================================|| AUTH3 - LOGIN ||================================ //
 
 export default function Login() {
+  const theme = useTheme();
   const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   return (
     <AuthWrapper1>
-      <Grid container direction="column" sx={{ justifyContent: 'flex-end', minHeight: '100vh' }}>
+      <Grid
+        container
+        direction="column"
+        sx={{ justifyContent: 'flex-end', minHeight: '100vh' }}
+      >
         <Grid size={12}>
-          <Grid container sx={{ justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 68px)' }}>
+          <Grid
+            container
+            sx={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: 'calc(100vh - 68px)',
+            }}
+          >
             <Grid sx={{ m: { xs: 1, sm: 3 }, mb: 0 }}>
               <AuthCardWrapper>
-                <Grid container spacing={2} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+                <Grid
+                  container
+                  spacing={2}
+                  sx={{ alignItems: 'center', justifyContent: 'center' }}
+                >
                   <Grid sx={{ mb: 3 }}>
                     <Link to="#" aria-label="logo">
                       <Logo />
                     </Link>
                   </Grid>
                   <Grid size={12}>
-                    <Grid container direction={{ xs: 'column-reverse', md: 'row' }} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+                    <Grid
+                      container
+                      direction={{ xs: 'column-reverse', md: 'row' }}
+                      sx={{ alignItems: 'center', justifyContent: 'center' }}
+                    >
                       <Grid>
-                        <Stack spacing={1} sx={{ alignItems: 'center', justifyContent: 'center' }}>
-                          <Typography gutterBottom variant={downMD ? 'h3' : 'h2'} sx={{ color: 'secondary.main' }}>
+                        <Stack
+                          spacing={1}
+                          sx={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Typography
+                            gutterBottom
+                            variant={downMD ? 'h3' : 'h2'}
+                            sx={{ color: 'secondary.main' }}
+                          >
                             Hi, Welcome Back
                           </Typography>
-                          <Typography variant="caption" sx={{ fontSize: '16px', textAlign: { xs: 'center', md: 'inherit' } }}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontSize: '16px',
+                              textAlign: { xs: 'center', md: 'inherit' },
+                            }}
+                          >
                             Enter your credentials to continue
                           </Typography>
                         </Stack>
@@ -53,8 +90,25 @@ export default function Login() {
                     <Divider />
                   </Grid>
                   <Grid size={12}>
-                    <Grid container direction="column" sx={{ alignItems: 'center' }} size={12}>
-                      <Typography component={Link} to="/register" variant="subtitle1" sx={{ textDecoration: 'none' }}>
+                    <Grid
+                      container
+                      direction="column"
+                      sx={{ alignItems: 'center' }}
+                      size={12}
+                    >
+                      <Typography
+                        component={Link}
+                        to="/register"
+                        variant="subtitle1"
+                        sx={{
+                          textDecoration: 'underline',
+                          textDecorationColor: theme.palette.secondary[200],
+                          color: 'inherit', // optional: keeps text color consistent
+                          '&:hover': {
+                            textDecorationColor: theme.palette.secondary[800], // optional: darker shade on hover
+                          },
+                        }}
+                      >
                         Don&apos;t have an account?
                       </Typography>
                     </Grid>
@@ -63,9 +117,6 @@ export default function Login() {
               </AuthCardWrapper>
             </Grid>
           </Grid>
-        </Grid>
-        <Grid sx={{ px: 3, my: 3 }} size={12}>
-          <AuthFooter />
         </Grid>
       </Grid>
     </AuthWrapper1>

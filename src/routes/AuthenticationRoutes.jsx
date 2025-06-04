@@ -5,8 +5,12 @@ import Loadable from 'ui-component/Loadable';
 import MinimalLayout from 'layout/MinimalLayout';
 
 // maintenance routing
-const LoginPage = Loadable(lazy(() => import('views/pages/authentication/Login')));
-const RegisterPage = Loadable(lazy(() => import('views/pages/authentication/Register')));
+const LoginPage = Loadable(
+  lazy(() => import('views/pages/authentication/Login')),
+);
+const RegisterPage = Loadable(
+  lazy(() => import('views/pages/authentication/Register')),
+);
 
 // ==============================|| AUTHENTICATION ROUTING ||============================== //
 
@@ -15,14 +19,14 @@ const AuthenticationRoutes = {
   element: <MinimalLayout />,
   children: [
     {
-      path: '/',
-      element: <LoginPage />
+      path: '/login',
+      element: <LoginPage />,
     },
     {
       path: '/register',
-      element: <RegisterPage />
-    }
-  ]
+      element: <RegisterPage />,
+    },
+  ],
 };
 
 export default AuthenticationRoutes;

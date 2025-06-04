@@ -15,7 +15,11 @@ export default function PopularCard() {
       <CardContent>
         <Grid container spacing={gridSpacing}>
           <Grid size={12}>
-            <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+            <Grid
+              container
+              spacing={gridSpacing}
+              sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+            >
               <Grid size="grow">
                 <Skeleton variant="rectangular" height={20} />
               </Grid>
@@ -30,17 +34,32 @@ export default function PopularCard() {
           <Grid size={12}>
             <Grid container spacing={1}>
               <Grid size={12}>
-                <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                <Grid
+                  container
+                  spacing={gridSpacing}
+                  sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+                >
                   <Grid size={6}>
                     <Skeleton variant="rectangular" height={20} />
                   </Grid>
                   <Grid size={6}>
-                    <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Grid
+                      container
+                      spacing={gridSpacing}
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Grid size="grow">
                         <Skeleton variant="rectangular" height={20} />
                       </Grid>
                       <Grid>
-                        <Skeleton variant="rectangular" height={16} width={16} />
+                        <Skeleton
+                          variant="rectangular"
+                          height={16}
+                          width={16}
+                        />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -54,17 +73,32 @@ export default function PopularCard() {
           <Grid size={12}>
             <Grid container spacing={1}>
               <Grid size={12}>
-                <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                <Grid
+                  container
+                  spacing={gridSpacing}
+                  sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+                >
                   <Grid size={6}>
                     <Skeleton variant="rectangular" height={20} />
                   </Grid>
                   <Grid size={6}>
-                    <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Grid
+                      container
+                      spacing={gridSpacing}
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Grid size="grow">
                         <Skeleton variant="rectangular" height={20} />
                       </Grid>
                       <Grid>
-                        <Skeleton variant="rectangular" height={16} width={16} />
+                        <Skeleton
+                          variant="rectangular"
+                          height={16}
+                          width={16}
+                        />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -78,17 +112,32 @@ export default function PopularCard() {
           <Grid size={12}>
             <Grid container spacing={1}>
               <Grid size={12}>
-                <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                <Grid
+                  container
+                  spacing={gridSpacing}
+                  sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+                >
                   <Grid size={6}>
                     <Skeleton variant="rectangular" height={20} />
                   </Grid>
                   <Grid size={6}>
-                    <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Grid
+                      container
+                      spacing={gridSpacing}
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Grid size="grow">
                         <Skeleton variant="rectangular" height={20} />
                       </Grid>
                       <Grid>
-                        <Skeleton variant="rectangular" height={16} width={16} />
+                        <Skeleton
+                          variant="rectangular"
+                          height={16}
+                          width={16}
+                        />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -102,17 +151,32 @@ export default function PopularCard() {
           <Grid size={12}>
             <Grid container spacing={1}>
               <Grid size={12}>
-                <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                <Grid
+                  container
+                  spacing={gridSpacing}
+                  sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+                >
                   <Grid size={6}>
                     <Skeleton variant="rectangular" height={20} />
                   </Grid>
                   <Grid size={6}>
-                    <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Grid
+                      container
+                      spacing={gridSpacing}
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Grid size="grow">
                         <Skeleton variant="rectangular" height={20} />
                       </Grid>
                       <Grid>
-                        <Skeleton variant="rectangular" height={16} width={16} />
+                        <Skeleton
+                          variant="rectangular"
+                          height={16}
+                          width={16}
+                        />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -126,17 +190,32 @@ export default function PopularCard() {
           <Grid size={12}>
             <Grid container spacing={1}>
               <Grid size={12}>
-                <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                <Grid
+                  container
+                  spacing={gridSpacing}
+                  sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+                >
                   <Grid size={6}>
                     <Skeleton variant="rectangular" height={20} />
                   </Grid>
                   <Grid size={6}>
-                    <Grid container spacing={gridSpacing} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Grid
+                      container
+                      spacing={gridSpacing}
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Grid size="grow">
                         <Skeleton variant="rectangular" height={20} />
                       </Grid>
                       <Grid>
-                        <Skeleton variant="rectangular" height={16} width={16} />
+                        <Skeleton
+                          variant="rectangular"
+                          height={16}
+                          width={16}
+                        />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -149,7 +228,9 @@ export default function PopularCard() {
           </Grid>
         </Grid>
       </CardContent>
-      <CardContent sx={{ p: 1.25, display: 'flex', pt: 0, justifyContent: 'center' }}>
+      <CardContent
+        sx={{ p: 1.25, display: 'flex', pt: 0, justifyContent: 'center' }}
+      >
         <Skeleton variant="rectangular" height={25} width={75} />
       </CardContent>
     </Card>

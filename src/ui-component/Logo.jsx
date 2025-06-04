@@ -18,6 +18,6 @@ export default function Logo() {
 
   return (
     // <img src={theme.palette.mode === ThemeMode.DARK ? logoDark : logo} alt="Berry" width="100" />
-    <img src={logo} alt="Berry" width="50" />
+    <img src={logo} alt="Infra-X-Logo" width="50" />
   );
 }

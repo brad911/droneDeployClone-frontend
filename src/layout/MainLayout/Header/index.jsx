@@ -28,10 +28,13 @@ export default function Header() {
     <>
       {/* logo & toggler button */}
       <Box sx={{ width: downMD ? 'auto' : 228, display: 'flex' }}>
-        <Box component="span" sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}>
+        <Box
+          component="span"
+          sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}
+        >
           <LogoSection />
         </Box>
-        <Avatar
+        {/* <Avatar
           variant="rounded"
           sx={{
             ...theme.typography.commonAvatar,
@@ -42,14 +45,14 @@ export default function Header() {
             color: 'secondary.dark',
             '&:hover': {
               bgcolor: 'secondary.dark',
-              color: 'secondary.light'
-            }
+              color: 'secondary.light',
+            },
           }}
           onClick={() => handlerDrawerOpen(!drawerOpen)}
           color="inherit"
         >
           <IconMenu2 stroke={1.5} size="20px" />
-        </Avatar>
+        </Avatar> */}
       </Box>
 
       {/* header search */}
@@ -61,7 +64,7 @@ export default function Header() {
       {/* <NotificationSection /> */}
 
       {/* profile */}
-      {/* <ProfileSection /> */}
+      <ProfileSection />
     </>
   );
 }

@@ -8,41 +8,49 @@ import Slide from '@mui/material/Slide';
 import Zoom from '@mui/material/Zoom';
 import Box from '@mui/material/Box';
 
-function Transitions({ children, position = 'top-left', sx, type = 'grow', direction = 'up', ref, ...others }) {
+function Transitions({
+  children,
+  position = 'top-left',
+  sx,
+  type = 'grow',
+  direction = 'up',
+  ref,
+  ...others
+}) {
   let positionSX = {
-    transformOrigin: '0 0 0'
+    transformOrigin: '0 0 0',
   };
 
   switch (position) {
     case 'top-right':
       positionSX = {
-        transformOrigin: 'top right'
+        transformOrigin: 'top right',
       };
       break;
     case 'top':
       positionSX = {
-        transformOrigin: 'top'
+        transformOrigin: 'top',
       };
       break;
     case 'bottom-left':
       positionSX = {
-        transformOrigin: 'bottom left'
+        transformOrigin: 'bottom left',
       };
       break;
     case 'bottom-right':
       positionSX = {
-        transformOrigin: 'bottom right'
+        transformOrigin: 'bottom right',
       };
       break;
     case 'bottom':
       positionSX = {
-        transformOrigin: 'bottom'
+        transformOrigin: 'bottom',
       };
       break;
     case 'top-left':
     default:
       positionSX = {
-        transformOrigin: '0 0 0'
+        transformOrigin: '0 0 0',
       };
       break;
   }
@@ -65,7 +73,7 @@ function Transitions({ children, position = 'top-left', sx, type = 'grow', direc
           timeout={{
             appear: 500,
             enter: 600,
-            exit: 400
+            exit: 400,
           }}
         >
           <Box sx={positionSX}>{children}</Box>
@@ -77,7 +85,7 @@ function Transitions({ children, position = 'top-left', sx, type = 'grow', direc
           timeout={{
             appear: 0,
             enter: 400,
-            exit: 200
+            exit: 200,
           }}
           direction={direction}
         >
@@ -101,5 +109,5 @@ Transitions.propTypes = {
   sx: PropTypes.any,
   type: PropTypes.string,
   direction: PropTypes.oneOf(['up', 'right', 'left', 'down']),
-  others: PropTypes.any
+  others: PropTypes.any,
 };

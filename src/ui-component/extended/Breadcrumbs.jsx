@@ -58,7 +58,7 @@ export default function Breadcrumbs({
     marginTop: -2,
     width: '1rem',
     height: '1rem',
-    color: theme.palette.secondary.main
+    color: theme.palette.secondary.main,
   };
 
   const linkSX = {
@@ -66,7 +66,7 @@ export default function Breadcrumbs({
     color: 'grey.900',
     textDecoration: 'none',
     alignContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   };
 
   let customLocation = location.pathname;
@@ -108,7 +108,11 @@ export default function Breadcrumbs({
 
   // item separator
   const SeparatorIcon = separator;
-  const separatorIcon = separator ? <SeparatorIcon stroke={1.5} size="16px" /> : <IconTallymark1 stroke={1.5} size="16px" />;
+  const separatorIcon = separator ? (
+    <SeparatorIcon stroke={1.5} size="16px" />
+  ) : (
+    <IconTallymark1 stroke={1.5} size="16px" />
+  );
 
   let mainContent;
   let itemContent;
@@ -131,9 +135,13 @@ export default function Breadcrumbs({
           mb: -0.625,
           textOverflow: 'ellipsis',
           maxWidth: { xs: 102, sm: 'unset' },
-          display: 'inline-block'
+          display: 'inline-block',
         }}
-        color={window.location.pathname === main.url ? 'text.primary' : 'text.secondary'}
+        color={
+          window.location.pathname === main.url
+            ? 'text.primary'
+            : 'text.secondary'
+        }
       >
         {icons && <CollapseIcon style={{ ...iconSX }} />}
         {main.title}
@@ -141,9 +149,21 @@ export default function Breadcrumbs({
     );
   }
 
-  if (!custom && main && main.type === 'collapse' && main.breadcrumbs === true) {
+  if (
+    !custom &&
+    main &&
+    main.type === 'collapse' &&
+    main.breadcrumbs === true
+  ) {
     breadcrumbContent = (
-      <Card sx={card === false ? { mb: 3, bgcolor: 'transparent', ...sx } : { mb: 3, bgcolor: 'background.default', ...sx }} {...others}>
+      <Card
+        sx={
+          card === false
+            ? { mb: 3, bgcolor: 'transparent', ...sx }
+            : { mb: 3, bgcolor: 'background.default', ...sx }
+        }
+        {...others}
+      >
         <Box sx={{ p: 1.25, px: card === false ? 0 : 2 }}>
           <Grid
             container
@@ -158,11 +178,25 @@ export default function Breadcrumbs({
                 aria-label="breadcrumb"
                 maxItems={maxItems || 8}
                 separator={separatorIcon}
-                sx={{ '& .MuiBreadcrumbs-separator': { width: 16, ml: 1.25, mr: 1.25 } }}
+                sx={{
+                  '& .MuiBreadcrumbs-separator': {
+                    width: 16,
+                    ml: 1.25,
+                    mr: 1.25,
+                  },
+                }}
               >
-                <Typography component={Link} to="/" color="textSecondary" variant="h6" sx={linkSX}>
+                <Typography
+                  component={Link}
+                  to="/"
+                  color="textSecondary"
+                  variant="h6"
+                  sx={linkSX}
+                >
                   {icons && <HomeTwoToneIcon style={iconSX} />}
-                  {icon && !icons && <HomeIcon style={{ ...iconSX, marginRight: 0 }} />}
+                  {icon && !icons && (
+                    <HomeIcon style={{ ...iconSX, marginRight: 0 }} />
+                  )}
                   {(!icon || icons) && 'Dashboard'}
                 </Typography>
                 {mainContent}
@@ -177,7 +211,11 @@ export default function Breadcrumbs({
   }
 
   // items
-  if ((item && item.type === 'item') || (item?.type === 'group' && item?.url) || custom) {
+  if (
+    (item && item.type === 'item') ||
+    (item?.type === 'group' && item?.url) ||
+    custom
+  ) {
     itemTitle = item?.title;
 
     ItemIcon = item?.icon ? item.icon : AccountTreeTwoToneIcon;
@@ -193,7 +231,7 @@ export default function Breadcrumbs({
           lineHeight: 1.5,
           mb: -0.625,
           textOverflow: 'ellipsis',
-          maxWidth: { xs: 102, sm: 'unset' }
+          maxWidth: { xs: 102, sm: 'unset' },
         }}
       >
         {icons && <ItemIcon style={{ ...iconSX }} />}
@@ -208,7 +246,13 @@ export default function Breadcrumbs({
         separator={separatorIcon}
         sx={{ '& .MuiBreadcrumbs-separator': { width: 16, mx: 0.75 } }}
       >
-        <Typography component={Link} to="/" color="textSecondary" variant="h6" sx={linkSX}>
+        <Typography
+          component={Link}
+          to="/"
+          color="textSecondary"
+          variant="h6"
+          sx={linkSX}
+        >
           {icons && <HomeTwoToneIcon style={{ ...iconSX }} />}
           {icon && !icons && <HomeIcon style={{ ...iconSX, marginRight: 0 }} />}
           {(!icon || icons) && 'Dashboard'}
@@ -224,7 +268,9 @@ export default function Breadcrumbs({
           aria-label="breadcrumb"
           maxItems={maxItems || 8}
           separator={separatorIcon}
-          sx={{ '& .MuiBreadcrumbs-separator': { width: 16, ml: 1.25, mr: 1.25 } }}
+          sx={{
+            '& .MuiBreadcrumbs-separator': { width: 16, ml: 1.25, mr: 1.25 },
+          }}
         >
           {links?.map((link, index) => {
             CollapseIcon = link.icon ? link.icon : AccountTreeTwoToneIcon;
@@ -249,7 +295,14 @@ export default function Breadcrumbs({
     // main
     if (item?.breadcrumbs !== false || custom) {
       breadcrumbContent = (
-        <Card sx={card === false ? { mb: 3, bgcolor: 'transparent', ...sx } : { mb: 3, bgcolor: 'background.default', ...sx }} {...others}>
+        <Card
+          sx={
+            card === false
+              ? { mb: 3, bgcolor: 'transparent', ...sx }
+              : { mb: 3, bgcolor: 'background.default', ...sx }
+          }
+          {...others}
+        >
           <Box sx={{ p: 1.25, px: card === false ? 0 : 2 }}>
             <Grid
               container
@@ -258,9 +311,13 @@ export default function Breadcrumbs({
               alignItems={rightAlign ? 'center' : 'flex-start'}
               spacing={1}
             >
-              {title && !titleBottom && <BTitle title={custom ? heading : item?.title} />}
+              {title && !titleBottom && (
+                <BTitle title={custom ? heading : item?.title} />
+              )}
               <Grid>{tempContent}</Grid>
-              {title && titleBottom && <BTitle title={custom ? heading : item?.title} />}
+              {title && titleBottom && (
+                <BTitle title={custom ? heading : item?.title} />
+              )}
             </Grid>
           </Box>
           {card === false && divider !== false && <Divider sx={{ mt: 2 }} />}
@@ -289,5 +346,5 @@ Breadcrumbs.propTypes = {
   title: PropTypes.bool,
   titleBottom: PropTypes.bool,
   sx: PropTypes.any,
-  others: PropTypes.any
+  others: PropTypes.any,
 };

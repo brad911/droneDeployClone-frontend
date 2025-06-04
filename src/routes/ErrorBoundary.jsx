@@ -14,11 +14,17 @@ export default function ErrorBoundary() {
     }
 
     if (error.status === 401) {
-      return <Alert color="error">Error 401 - You aren't authorized to see this</Alert>;
+      return (
+        <Alert color="error">
+          Error 401 - You aren't authorized to see this
+        </Alert>
+      );
     }
 
     if (error.status === 503) {
-      return <Alert color="error">Error 503 - Looks like our API is down</Alert>;
+      return (
+        <Alert color="error">Error 503 - Looks like our API is down</Alert>
+      );
     }
 
     if (error.status === 418) {

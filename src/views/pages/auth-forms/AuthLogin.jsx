@@ -1,19 +1,24 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useSnackbar } from 'notistack';
+import axios from '../../../utils/axios.config';
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
-import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  Typography,
+  Box,
+} from '@mui/material';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
@@ -21,41 +26,100 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCredentials } from '../../../store/slices/authSlice';
 
 // ===============================|| JWT - LOGIN ||=============================== //
 
 export default function AuthLogin() {
   const theme = useTheme();
   const navigate = useNavigate();
-
-  const [checked, setChecked] = useState(true);
-
   const [showPassword, setShowPassword] = useState(false);
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (event) => event.preventDefault();
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth);
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
+  const handleLogin = async (values, { setSubmitting }) => {
+    delete values.keepLoggedIn;
+    try {
+      const response = await axios.post('/auth/login', values); // Replace with your real endpoint
+
+      if (response.status === 200) {
+        enqueueSnackbar('Login successful!', { variant: 'success' });
+        dispatch(
+          setCredentials({
+            user: response.data.data.user,
+            token: response.data.data.tokens.access.token,
+          }),
+        );
+        localStorage.setItem('token', response.data.data.tokens.access.token);
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 500);
+      }
+    } catch (error) {
+      enqueueSnackbar(
+        error.response?.data?.message || 'Login failed. Please try again.',
+        { variant: 'error' },
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
-  const handleLogin = () => {
-    navigate('/dashboard');
-  };
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+      keepLoggedIn: true,
+    },
+    validationSchema: Yup.object({
+      email: Yup.string().email('Invalid email').required('Email is required'),
+      password: Yup.string().required('Password is required'),
+    }),
+    onSubmit: handleLogin,
+  });
 
   return (
-    <>
-      <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-        <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
-        <OutlinedInput id="outlined-adornment-email-login" type="email" value="" name="email" />
-      </FormControl>
-
-      <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-        <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
+    <form noValidate onSubmit={formik.handleSubmit}>
+      <FormControl
+        fullWidth
+        sx={{ ...theme.typography.customInput }}
+        error={formik.touched.email && Boolean(formik.errors.email)}
+      >
+        <InputLabel onClick={() => console.log(user)} htmlFor="email">
+          Email Address / Username
+        </InputLabel>
         <OutlinedInput
-          id="outlined-adornment-password-login"
+          id="email"
+          type="email"
+          value={formik.values.email}
+          name="email"
+          onBlur={formik.handleBlur}
+          onChange={formik.handleChange}
+          label="Email Address / Username"
+        />
+      </FormControl>
+      {formik.touched.email && formik.errors.email && (
+        <Typography color="error" variant="caption">
+          {formik.errors.email}
+        </Typography>
+      )}
+
+      <FormControl
+        fullWidth
+        sx={{ ...theme.typography.customInput }}
+        error={formik.touched.password && Boolean(formik.errors.password)}
+      >
+        <InputLabel htmlFor="password">Password</InputLabel>
+        <OutlinedInput
+          id="password"
           type={showPassword ? 'text' : 'password'}
-          value=""
+          value={formik.values.password}
           name="password"
+          onBlur={formik.handleBlur}
+          onChange={formik.handleChange}
           endAdornment={
             <InputAdornment position="end">
               <IconButton
@@ -72,27 +136,55 @@ export default function AuthLogin() {
           label="Password"
         />
       </FormControl>
+      {formik.touched.password && formik.errors.password && (
+        <Typography color="error" variant="caption">
+          {formik.errors.password}
+        </Typography>
+      )}
 
-      <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
-        <Grid>
+      <Grid
+        container
+        sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+      >
+        <Grid item>
           <FormControlLabel
-            control={<Checkbox checked={checked} onChange={(event) => setChecked(event.target.checked)} name="checked" color="primary" />}
+            control={
+              <Checkbox
+                checked={formik.values.keepLoggedIn}
+                onChange={formik.handleChange}
+                name="keepLoggedIn"
+                color="primary"
+              />
+            }
             label="Keep me logged in"
           />
         </Grid>
-        <Grid>
-          <Typography variant="subtitle1" component={Link} to="/forgot-password" color="secondary" sx={{ textDecoration: 'none' }}>
+        <Grid item>
+          <Typography
+            variant="subtitle1"
+            component={Link}
+            to="/forgot-password"
+            color="secondary"
+            sx={{ textDecoration: 'none' }}
+          >
             Forgot Password?
           </Typography>
         </Grid>
       </Grid>
+
       <Box sx={{ mt: 2 }}>
         <AnimateButton>
-          <Button onClick={handleLogin} color="secondary" fullWidth size="large" type="submit" variant="contained">
-            Sign In
+          <Button
+            color="secondary"
+            fullWidth
+            size="large"
+            type="submit"
+            variant="contained"
+          >
+            Log In
           </Button>
         </AnimateButton>
       </Box>
-    </>
+    </form>
   );
 }

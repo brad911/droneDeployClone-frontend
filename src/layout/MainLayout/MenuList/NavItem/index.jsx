@@ -21,7 +21,12 @@ import useConfig from 'hooks/useConfig';
 // assets
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
-export default function NavItem({ item, level, isParents = false, setSelectedID }) {
+export default function NavItem({
+  item,
+  level,
+  isParents = false,
+  setSelectedID,
+}) {
   const theme = useTheme();
   const downMD = useMediaQuery(theme.breakpoints.down('md'));
   const ref = useRef(null);
@@ -31,12 +36,16 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
 
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
-  const isSelected = !!matchPath({ path: item?.link ? item.link : item.url, end: false }, pathname);
+  const isSelected = !!matchPath(
+    { path: item?.link ? item.link : item.url, end: false },
+    pathname,
+  );
 
   const [hoverStatus, setHover] = useState(false);
 
   const compareSize = () => {
-    const compare = ref.current && ref.current.scrollWidth > ref.current.clientWidth;
+    const compare =
+      ref.current && ref.current.scrollWidth > ref.current.clientWidth;
     setHover(compare);
   };
 
@@ -48,9 +57,16 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
 
   const Icon = item?.icon;
   const itemIcon = item?.icon ? (
-    <Icon stroke={1.5} size={drawerOpen ? '20px' : '24px'} style={{ ...(isParents && { fontSize: 20, stroke: '1.5' }) }} />
+    <Icon
+      stroke={1.5}
+      size={drawerOpen ? '20px' : '24px'}
+      style={{ ...(isParents && { fontSize: 20, stroke: '1.5' }) }}
+    />
   ) : (
-    <FiberManualRecordIcon sx={{ width: isSelected ? 8 : 6, height: isSelected ? 8 : 6 }} fontSize={level > 0 ? 'inherit' : 'medium'} />
+    <FiberManualRecordIcon
+      sx={{ width: isSelected ? 8 : 6, height: isSelected ? 8 : 6 }}
+      fontSize={level > 0 ? 'inherit' : 'medium'}
+    />
   );
 
   let itemTarget = '_self';
@@ -85,34 +101,38 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
           ...(drawerOpen &&
             level === 1 && {
               '&:hover': {
-                bgcolor: 'secondary.light'
+                bgcolor: 'secondary.light',
               },
               '&.Mui-selected': {
                 bgcolor: 'secondary.light',
                 color: iconSelectedColor,
                 '&:hover': {
                   color: iconSelectedColor,
-                  bgcolor: 'secondary.light'
-                }
-              }
+                  bgcolor: 'secondary.light',
+                },
+              },
             }),
           ...((!drawerOpen || level !== 1) && {
             py: level === 1 ? 0 : 1,
             '&:hover': {
-              bgcolor: 'transparent'
+              bgcolor: 'transparent',
             },
             '&.Mui-selected': {
               '&:hover': {
-                bgcolor: 'transparent'
+                bgcolor: 'transparent',
               },
-              bgcolor: 'transparent'
-            }
-          })
+              bgcolor: 'transparent',
+            },
+          }),
         }}
         selected={isSelected}
         onClick={() => itemHandler()}
       >
-        <ButtonBase aria-label="theme-icon" sx={{ borderRadius: `${borderRadius}px` }} disableRipple={drawerOpen}>
+        <ButtonBase
+          aria-label="theme-icon"
+          sx={{ borderRadius: `${borderRadius}px` }}
+          disableRipple={drawerOpen}
+        >
           <ListItemIcon
             sx={{
               minWidth: level === 1 ? 36 : 18,
@@ -125,15 +145,15 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
                   alignItems: 'center',
                   justifyContent: 'center',
                   '&:hover': {
-                    bgcolor: 'secondary.light'
+                    bgcolor: 'secondary.light',
                   },
                   ...(isSelected && {
                     bgcolor: 'secondary.light',
                     '&:hover': {
-                      bgcolor: 'secondary.light'
-                    }
-                  })
-                })
+                      bgcolor: 'secondary.light',
+                    },
+                  }),
+                }),
             }}
           >
             {itemIcon}
@@ -152,7 +172,7 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
                   sx={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    width: 102
+                    width: 102,
                   }}
                 >
                   {item.title}
@@ -160,7 +180,14 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
               }
               secondary={
                 item.caption && (
-                  <Typography variant="caption" gutterBottom sx={{ display: 'block', ...theme.typography.subMenuCaption }}>
+                  <Typography
+                    variant="caption"
+                    gutterBottom
+                    sx={{
+                      display: 'block',
+                      ...theme.typography.subMenuCaption,
+                    }}
+                  >
                     {item.caption}
                   </Typography>
                 )
@@ -183,4 +210,9 @@ export default function NavItem({ item, level, isParents = false, setSelectedID 
   );
 }
 
-NavItem.propTypes = { item: PropTypes.any, level: PropTypes.number, isParents: PropTypes.bool, setSelectedID: PropTypes.func };
+NavItem.propTypes = {
+  item: PropTypes.any,
+  level: PropTypes.number,
+  isParents: PropTypes.bool,
+  setSelectedID: PropTypes.func,
+};

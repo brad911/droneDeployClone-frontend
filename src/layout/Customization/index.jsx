@@ -51,17 +51,27 @@ export default function Customization() {
             position: 'fixed',
             right: 10,
             zIndex: 1200,
-            boxShadow: theme.customShadows.secondary
+            boxShadow: theme.customShadows.secondary,
           }}
         >
           <AnimateButton type="rotate">
-            <IconButton color="inherit" size="large" disableRipple aria-label="live customize">
+            <IconButton
+              color="inherit"
+              size="large"
+              disableRipple
+              aria-label="live customize"
+            >
               <IconSettings />
             </IconButton>
           </AnimateButton>
         </Fab>
       </Tooltip>
-      <Drawer anchor="right" onClose={handleToggle} open={open} slotProps={{ paper: { sx: { width: 280 } } }}>
+      <Drawer
+        anchor="right"
+        onClose={handleToggle}
+        open={open}
+        slotProps={{ paper: { sx: { width: 280 } } }}
+      >
         <PerfectScrollbar>
           <Grid container spacing={2}>
             <Grid size={12}>
