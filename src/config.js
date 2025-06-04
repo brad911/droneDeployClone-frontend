@@ -1,7 +1,7 @@
 export const DASHBOARD_PATH = '/sample-page';
 
 const config = {
-  fontFamily: `'Roboto', sans-serif`,
+  fontFamily: `International Mono`,
   borderRadius: 8,
 };
 

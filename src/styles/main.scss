@@ -5,3 +5,27 @@
 @import 'pages/landingPage/siteView.scss';
 @import 'pages/landingPage/mainlayoutLandingPage.scss';
 @import 'pages/landingPage/landingPageFooter.scss';
+
+@font-face {
+  font-family: 'International Mono';
+  src: url('../assets/fonts/NB-International-Pro-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'International Mono';
+  src: url('../assets/fonts/NB-International-Pro-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: bold;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'International Mono';
+  src: url('../assets/fonts/NB-International-Pro-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
