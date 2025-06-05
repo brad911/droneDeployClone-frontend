@@ -1,0 +1,148 @@
+.feature-section {
+  background: linear-gradient(to bottom, #000 65%, #fff 35%);
+  padding: 2rem 12rem;
+
+  .content {
+    margin: 0 auto;
+    // max-width: 1200px;
+    text-align: center;
+
+    .section-heading {
+      color: white;
+      line-height: 1.5;
+      font-size: 2rem;
+      padding-bottom: 2rem;
+      &-span {
+        color: $primaryMain;
+      }
+    }
+
+    .boxes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+
+      .box {
+        position: relative;
+        width: 15rem;
+        height: 16rem;
+        background-size: cover;
+        background-position: center;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+
+        // Overlay filter
+        &::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.4); // dark overlay
+          z-index: 1;
+        }
+
+        .box-text {
+          position: absolute;
+          bottom: 20px;
+          left: 20px;
+          z-index: 2;
+          color: white;
+          font-size: 1.5rem;
+          font-weight: 600;
+        }
+
+        .arrow-icon {
+          position: absolute;
+          bottom: 16px;
+          right: 16px;
+          z-index: 2;
+          color: white;
+          transition: all 0.3s ease;
+        }
+
+        &:hover .arrow-icon {
+          color: $secondaryMain; // secondaryMain
+          transform: translateX(4px);
+        }
+
+        &:hover {
+          transform: scale(1.03);
+        }
+      }
+    }
+  }
+
+  // ✅ Responsive adjustments
+  @media (max-width: 1024px) {
+    background: linear-gradient(to bottom, #000 65%, #fff 35%);
+    padding: 4rem 3rem;
+
+    .content {
+      .section-heading {
+        font-size: 4rem;
+        line-height: 1.5;
+      }
+
+      .boxes {
+        .box {
+          width: 20rem;
+          height: 20rem;
+          .box-text {
+            font-size: 2rem;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem 1rem;
+    background: linear-gradient(to bottom, #000 66%, #fff 34%);
+    min-height: 800px;
+    .content {
+      .section-heading {
+        line-height: 1.5;
+        font-size: 3rem;
+      }
+
+      .boxes {
+        gap: 1.5rem;
+
+        .box {
+          width: 15rem;
+          height: 15rem;
+          .box-text {
+            font-size: 1.5rem;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 2rem 1rem;
+
+    .content {
+      .section-heading {
+        font-size: 1.8rem;
+      }
+
+      .boxes {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.2rem;
+
+        .box {
+          width: 100%;
+          max-width: 20rem;
+          height: 12rem;
+          .box-text {
+            font-size: 2rem;
+          }
+        }
+      }
+    }
+  }
+}

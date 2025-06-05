@@ -9,13 +9,7 @@ const LandingPageHeader = () => {
 
   const handleScroll = () => {
     const currentScrollY = window.scrollY;
-
-    if (currentScrollY > lastScrollY && currentScrollY > 50) {
-      setHideHeader(true); // scrolling down
-    } else {
-      setHideHeader(false); // scrolling up
-    }
-
+    setHideHeader(currentScrollY > lastScrollY && currentScrollY > 50);
     setLastScrollY(currentScrollY);
   };
 
@@ -26,10 +20,20 @@ const LandingPageHeader = () => {
 
   return (
     <header className={`transparent-header ${hideHeader ? 'hide' : ''}`}>
-      <Logo />
-      <button onClick={() => navigate('/login')} className="login-btn">
-        Log In
-      </button>
+      <div className="ribbon">
+        <div className="marquee">
+          <div className="marquee__inner">
+            <span>🚀 Welcome to our platform — Explore what's new!</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="header-main">
+        <Logo />
+        <button onClick={() => navigate('/login')} className="login-btn">
+          Log In
+        </button>
+      </div>
     </header>
   );
 };

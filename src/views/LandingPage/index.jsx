@@ -1,5 +1,6 @@
 import CompanyGroup from './companyGroup';
 import Hero from './hero';
+import IndustryCapture from './industryCapture';
 import LandingPageFooter from './landingPageFooter';
 import LandingPageHeader from './landingPageHeader';
 import MainLayout from './LandingPagelayout';
@@ -12,6 +13,7 @@ function LandingPage() {
         <LandingPageHeader />
         <Hero />
         <CompanyGroup />
+        <IndustryCapture />
         <SiteView />
         <LandingPageFooter />
       </MainLayout>
