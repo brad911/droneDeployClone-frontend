@@ -13,6 +13,7 @@ import {
 import * as Yup from 'yup';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useTheme } from '@emotion/react';
+import { useNavigate } from 'react-router';
 
 // Validation schema
 const ProjectSchema = Yup.object().shape({
@@ -24,6 +25,7 @@ const CreateProjectForm = ({ onSubmit }) => {
   const [emailInput, setEmailInput] = useState('');
   const [file, setFile] = useState(null);
   const theme = useTheme();
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ p: 5, maxWidth: 500 }}>
@@ -132,6 +134,7 @@ const CreateProjectForm = ({ onSubmit }) => {
                 variant="contained"
                 type="submit"
                 fullWidth
+                onClick={navigate('/project/:1')}
               >
                 Create Project
               </Button>

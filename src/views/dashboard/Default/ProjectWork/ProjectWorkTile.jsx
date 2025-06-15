@@ -8,29 +8,23 @@ import {
   Box,
   Menu,
   MenuItem,
-  Stack,
-  Tooltip,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ImageIcon from '@mui/icons-material/PhotoLibrary';
-import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from 'react-router';
 
-const ProjectTile = ({ project }) => {
-  const navigate = useNavigate();
+const ProjectWorkTile = ({ project }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-
+  const navigate = useNavigate();
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
-  const handleView = () => {
-    navigate('/project/1');
+  const viewProject = () => {
+    navigate('1');
   };
   return (
     <Card
       elevation={3}
-      onClick={() => handleView(1)}
       sx={{
         position: 'relative',
         width: 250,
@@ -41,28 +35,6 @@ const ProjectTile = ({ project }) => {
         '&:hover': { boxShadow: 6 },
       }}
     >
-      {/* Status Bubble */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 8,
-          right: 8,
-          backgroundColor: '#eee',
-          color: '#2D2F31',
-          borderRadius: '50%',
-          width: 32,
-          height: 32,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1,
-        }}
-      >
-        <Tooltip title="Example Project">
-          <ImageIcon fontSize="small" />
-        </Tooltip>
-      </Box>
-
       {/* Image */}
       <CardMedia
         component="img"
@@ -80,18 +52,6 @@ const ProjectTile = ({ project }) => {
         <Typography variant="body2" color="text.secondary">
           {project.description}
         </Typography>
-
-        {/* Icons and counts */}
-        <Stack direction="row" spacing={2} alignItems="center" mt={1}>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <ImageIcon fontSize="small" />
-            <Typography variant="caption">{project.images}</Typography>
-          </Stack>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <PersonIcon fontSize="small" />
-            <Typography variant="caption">{project.users}</Typography>
-          </Stack>
-        </Stack>
       </CardContent>
 
       {/* 3-dot menu */}
@@ -106,7 +66,7 @@ const ProjectTile = ({ project }) => {
           <MoreVertIcon fontSize="small" />
         </IconButton>
         <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
-          <MenuItem onClick={handleMenuClose}>View</MenuItem>
+          <MenuItem onClick={viewProject}>View</MenuItem>
           <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
           <MenuItem onClick={handleMenuClose}>Delete</MenuItem>
         </Menu>
@@ -115,4 +75,4 @@ const ProjectTile = ({ project }) => {
   );
 };
 
-export default ProjectTile;
+export default ProjectWorkTile;

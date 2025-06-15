@@ -7,6 +7,9 @@ import FilesHandler from '../views/dashboard/Default/Files/FilesHandler';
 import Projects from '../views/dashboard/Default/Projects/Projects';
 import CreateProjectPage from '../views/dashboard/Default/Projects/CreateProjectPage';
 import ProtectedRoute from '../utils/protectedRoute';
+import ProjectView from '../views/dashboard/Default/Projects/ProjectView';
+import Project from '../views/dashboard/Default/Projects/Project';
+import ProjectWork from '../views/dashboard/Default/ProjectWork/ProjectWork';
 
 // dashboard routing
 const DashboardDefault = Loadable(
@@ -47,10 +50,6 @@ const MainRoutes = {
       element: <FilesHandler />,
     },
     {
-      path: 'project',
-      element: <ProtectedRoute element={Projects} />,
-    },
-    {
       path: 'createProject',
       element: <ProtectedRoute element={CreateProjectPage} />,
     },
@@ -70,6 +69,12 @@ const MainRoutes = {
       path: '/sample-page',
       element: <SamplePage />,
     },
+    { path: '/project/:projectID', element: <Project /> },
+    {
+      path: '/project',
+      element: <ProtectedRoute element={Projects} />,
+    },
+    { path: '/project/:projectID/:projectWorkDayID', element: <ProjectWork /> },
   ],
 };
 

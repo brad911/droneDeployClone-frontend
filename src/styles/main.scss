@@ -1,12 +1,11 @@
-@import '../assets/scss/themes-vars.module';
-@import 'pages/landingPage/header';
-@import 'pages/landingPage/hero';
-@import 'pages/landingPage/companyGroup.scss';
-@import 'pages/landingPage/siteView.scss';
-@import 'pages/landingPage/mainlayoutLandingPage.scss';
-@import 'pages/landingPage/landingPageFooter.scss';
-@import 'pages/landingPage/industryCapture.scss';
-
+@use '../assets/scss/themes-vars.module';
+@use 'pages/landingPage/header';
+@use 'pages/landingPage/hero';
+@use 'pages/landingPage/companyGroup.scss';
+@use 'pages/landingPage/siteView.scss';
+@use 'pages/landingPage/mainlayoutLandingPage.scss';
+@use 'pages/landingPage/landingPageFooter.scss';
+@use 'pages/landingPage/industryCapture.scss';
 @font-face {
   font-family: 'International Mono';
   src: url('../assets/fonts/NB-International-Pro-Regular.woff') format('woff');
