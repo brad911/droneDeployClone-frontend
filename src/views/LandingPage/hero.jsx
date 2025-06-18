@@ -1,30 +1,53 @@
 import heroVideo from '../../assets/videos/hero.mp4';
-import ParticlesBackground from '../../ui-component/ParticlesBackground';
 
 const Hero = () => {
   return (
     <>
       <section className="hero">
-        <ParticlesBackground />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 0,
+          }}
+        >
+          <source src={heroVideo} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            zIndex: 0,
+          }}
+        />
         <div className="hero__overlay">
           <div className="hero__left">
-            <h1 className="hero__title">Leave no site unseen </h1>
+            <h1 className="hero__title">
+              Every corner of your site always in sight
+            </h1>
             <h2 className="hero__running">
-              Capture what matters, before you can’t.
+              See Everything. Control What Matters.
             </h2>
             <p className="hero__description">
-              DroneDeploy delivers robotic capture and real AI for a complete
-              understanding of quality, safety and progress across all your
-              sites.
+              InfraX transforms how you manage your sites— combining real-time
+              progress tracking, quality control, and safety oversight in one
+              place.
             </p>
-            <div className="hero__buttons">
-              <button className="hero__btn">Get Started</button>
-              <button className="hero__btn hero__btn--secondary">
-                Learn More
-              </button>
-            </div>
           </div>
-          <div className="hero__right">
+          {/* <div className="hero__right">
             <div className="video-wrapper">
               <video
                 src={heroVideo}
@@ -35,7 +58,7 @@ const Hero = () => {
                 className="hero__video"
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
     </>

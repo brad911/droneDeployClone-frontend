@@ -12,6 +12,9 @@ const LandingPageHeader = () => {
     setHideHeader(currentScrollY > lastScrollY && currentScrollY > 50);
     setLastScrollY(currentScrollY);
   };
+  const handleScrollToSection = (id) => {
+    document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
@@ -29,10 +32,45 @@ const LandingPageHeader = () => {
       </div>
 
       <div className="header-main">
-        <Logo />
-        <button onClick={() => navigate('/login')} className="login-btn">
-          Log In
-        </button>
+        <div className="header-main-left">
+          <div className="header-main-left-logo">
+            <Logo />
+          </div>
+          <div className="header-main-left-tabs">
+            <button
+              onClick={() => handleScrollToSection('.hero')}
+              className="button-tabs"
+            >
+              Platform
+            </button>
+            <button
+              onClick={() => handleScrollToSection('.company-group')}
+              className="button-tabs"
+            >
+              Industries
+            </button>
+            <button
+              onClick={() => handleScrollToSection('.simple-tabs-container')}
+              className="button-tabs"
+            >
+              Solutions
+            </button>
+            <button
+              onClick={() => handleScrollToSection('.footer')}
+              className="button-tabs"
+            >
+              Contact Us
+            </button>
+          </div>
+        </div>
+        <div className="header-main-right">
+          <button onClick={() => navigate('/register')} className="login-btn">
+            Get Started
+          </button>
+          <button onClick={() => navigate('/login')} className="login-btn">
+            Log In
+          </button>
+        </div>
       </div>
     </header>
   );

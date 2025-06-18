@@ -1,9 +1,21 @@
 .footer {
-  background-color: #000;
   color: #fff;
   padding: 4rem 6rem 2rem;
-
+  position: relative;
+  z-index: -1;
+  #tsparticles {
+    position: absolute;
+    background-color: white;
+    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
   &__main {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -67,7 +79,8 @@
     border-top: 1px solid #333;
     padding-top: 1rem;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
     text-align: center;
 

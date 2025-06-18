@@ -8,6 +8,16 @@
   padding: 2rem 12rem;
   color: #fff;
 
+  &-background-video {
+    position: 'absolute';
+    top: 0;
+    left: 0;
+    width: '100%';
+    height: '100%';
+    object-fit: 'cover';
+    z-index: 0;
+  }
+
   #tsparticles {
     position: absolute;
     top: 0;
@@ -32,15 +42,16 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-
+    text-align: center;
+    justify-content: center;
+    align-items: center;
     .hero__title {
       font-size: 6rem;
-      font-weight: 400;
+      font-weight: 300;
       margin-bottom: 1rem;
       line-height: 1;
       word-wrap: break-word;
       overflow-wrap: break-word;
-      max-width: 90%;
     }
 
     .hero__running {
@@ -53,7 +64,7 @@
     .hero__description {
       font-size: 1.25rem;
       margin-bottom: 2rem;
-      max-width: 500px;
+      max-width: 600px;
       line-height: 1.6;
     }
 

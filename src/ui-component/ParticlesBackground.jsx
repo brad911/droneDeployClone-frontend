@@ -4,9 +4,7 @@ import Particles from 'react-particles';
 import { loadSlim } from 'tsparticles-slim';
 
 const ParticlesBackground = () => {
-  console.log('ParticlesBackground component rendered');
   const particlesInit = useCallback(async (engine) => {
-    console.log('particlesInit called'); // ✅ This should log now
     await loadSlim(engine); // Load everything (recommended)
   }, []);
   return (
@@ -22,6 +20,7 @@ const ParticlesBackground = () => {
         fullScreen: {
           enable: false,
         },
+        fpsLimit: 120,
         particles: {
           number: {
             value: 120,
@@ -31,18 +30,18 @@ const ParticlesBackground = () => {
             },
           },
           color: {
-            value: '#66ccff', // Neon light blue
+            value: '#2563EB', // Neon light blue
           },
           links: {
             enable: true,
-            color: '#66ccff',
+            color: '#2563EB',
             distance: 130,
-            opacity: 0.3,
+            opacity: 0.5,
             width: 1,
           },
           move: {
             enable: true,
-            speed: 1.8,
+            speed: 2,
             direction: 'none',
             outModes: {
               default: 'bounce',
@@ -71,10 +70,10 @@ const ParticlesBackground = () => {
         },
         interactivity: {
           events: {
-            // onHover: {
-            //   enable: true,
-            //   mode: 'repulse', // Pulls away from mouse
-            // },
+            onHover: {
+              enable: true,
+              mode: 'repulse', // Pulls away from mouse
+            },
             onClick: {
               enable: true,
               mode: 'push', // Add more particles
@@ -83,7 +82,7 @@ const ParticlesBackground = () => {
           },
           modes: {
             repulse: {
-              distance: 100,
+              distance: 50,
               duration: 0.4,
             },
             push: {

@@ -2,12 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import heroVideo from '../../assets/videos/hero.mp4';
 
 const tabItems = [
-  'Pre-Construction',
-  'Earthworks',
-  'Underground utilities',
-  'Exterior',
-  'Interior',
-  'CloseOut',
+  'Orthomosaic Viewer ',
+  'Comparison Slider',
+  ' Automated Customized Reporting',
+  'Issue Tagging & coordination ',
+  ' 360 Virtual Tour',
 ];
 
 export default function SimpleTabs() {
@@ -31,11 +30,10 @@ export default function SimpleTabs() {
     <div className="simple-tabs-container">
       {/* Headings */}
       <div className="headings">
-        <h4 className="small-heading">
-          Don’t just trust that work is going to plan
-        </h4>
+        <h4 className="small-heading">Visualize your site like never before</h4>
         <h1 className="big-heading">
-          Get an unbiased view of all your sites at any phase
+          All in one platform to visualize, track, and manage every site
+          throughout entire project lifecycle
         </h1>
       </div>
 

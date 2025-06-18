@@ -1,3 +1,4 @@
+@use '../../../assets/scss/themes-vars.module' as *;
 .transparent-header {
   position: fixed;
   top: 0;
@@ -6,11 +7,11 @@
   transition: top 0.3s ease;
 
   &.hide {
-    top: -100px;
+    top: -120px;
   }
 
   .ribbon {
-    background-color: #578fca;
+    background-color: $primaryMain;
     color: white;
     overflow: hidden;
     height: 2rem;
@@ -61,22 +62,58 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    // background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(3px);
+    background: #ffff;
     padding: 1rem 2rem;
 
-    .login-btn {
-      background-color: transparent;
-      color: white;
-      border: 1px solid white;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    &-left {
+      display: flex;
+      gap: 32px;
+      height: 40px;
+      justify-content: center;
+      align-items: center;
 
-      &:hover {
-        background-color: white;
-        color: black;
+      &-tabs {
+        display: flex;
+        gap: 16px;
+      }
+      .button-tabs {
+        background-color: transparent;
+        // color: white;
+        color: $primaryMain;
+        font-weight: 600;
+        // background-color: $primaryMain;
+        border: 1px solid white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: $primaryMain;
+          color: white;
+          border-color: $primaryMain;
+        }
+      }
+    }
+
+    &-right {
+      display: flex;
+      gap: 8px;
+      .login-btn {
+        background-color: transparent;
+        color: white;
+        background-color: $primaryMain;
+        border: 1px solid white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: white;
+          color: $primaryMain;
+          border-color: $primaryMain;
+        }
       }
     }
   }

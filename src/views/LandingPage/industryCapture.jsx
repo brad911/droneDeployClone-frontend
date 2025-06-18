@@ -7,22 +7,27 @@ import img4 from '../../assets/images/landing_page_industry_capture/4.jpg';
 const boxes = [
   {
     id: 1,
-    text: 'Construction',
+    text: 'Construction & Infrastructure ',
     image: img1,
   },
   {
     id: 2,
-    text: 'Owners',
+    text: 'Energy, Utilities & Industrial ',
     image: img2,
   },
   {
     id: 3,
-    text: 'Oil & Gas',
+    text: 'Heritage & Conservation',
     image: img3,
   },
   {
     id: 4,
-    text: 'Agriculture',
+    text: 'Agriculture & Forest',
+    image: img4,
+  },
+  {
+    id: 5,
+    text: 'Surveying & land development',
     image: img4,
   },
 ];
@@ -32,8 +37,7 @@ const FeatureBoxes = () => {
     <div className="feature-section">
       <div className="content">
         <h2 className="section-heading">
-          <span className="section-heading-span"> Don’t get left behind.</span>
-          See how your industry is capturing.
+          Explore the Industries embracing the innovation.
         </h2>
         <div className="boxes">
           {boxes.map(({ id, text, image }) => (
@@ -43,7 +47,6 @@ const FeatureBoxes = () => {
               style={{ backgroundImage: `url(${image})` }}
             >
               <span className="box-text">{text}</span>
-              <IconCircleArrowRightFilled className="arrow-icon" />
             </div>
           ))}
         </div>

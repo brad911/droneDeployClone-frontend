@@ -12,9 +12,9 @@ function LandingPage() {
       <MainLayout>
         <LandingPageHeader />
         <Hero />
-        <CompanyGroup />
-        <IndustryCapture />
         <SiteView />
+        <IndustryCapture />
+        <CompanyGroup />
         <LandingPageFooter />
       </MainLayout>
     </>

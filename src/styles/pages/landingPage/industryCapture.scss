@@ -1,8 +1,9 @@
 @use '../../../assets/scss/themes-vars.module' as *;
 
 .feature-section {
-  background: linear-gradient(to bottom, #000 65%, #fff 35%);
-  padding: 2rem 12rem;
+  // background: linear-gradient(to bottom, #000 65%, #fff 35%);
+  background-color: white;
+  padding: 4rem 12rem;
 
   .content {
     margin: 0 auto;
@@ -10,25 +11,23 @@
     text-align: center;
 
     .section-heading {
-      color: white;
+      color: $primaryMain;
       line-height: 1.5;
       font-size: 2rem;
       padding-bottom: 2rem;
-      &-span {
-        color: $primaryMain;
-      }
+      text-transform: uppercase;
     }
 
     .boxes {
       display: flex;
-      flex-wrap: wrap;
+      // flex-wrap: wrap;
       justify-content: center;
       gap: 2rem;
 
       .box {
         position: relative;
-        width: 15rem;
-        height: 16rem;
+        width: 18rem;
+        height: 19rem;
         background-size: cover;
         background-position: center;
         border-radius: 12px;
@@ -41,7 +40,7 @@
           content: '';
           position: absolute;
           inset: 0;
-          background: rgba(0, 0, 0, 0.4); // dark overlay
+          background: rgba(0, 0, 0, 0.6); // dark overlay
           z-index: 1;
         }
 
@@ -49,10 +48,11 @@
           position: absolute;
           bottom: 20px;
           left: 20px;
+          line-height: 1;
           z-index: 2;
           color: white;
-          font-size: 1.5rem;
-          font-weight: 600;
+          font-size: 1.2rem;
+          font-weight: 300;
         }
 
         .arrow-icon {
