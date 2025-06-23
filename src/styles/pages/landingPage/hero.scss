@@ -39,6 +39,10 @@
   }
 
   &__left {
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+    will-change: opacity, transform;
     flex: 1;
     display: flex;
     flex-direction: column;

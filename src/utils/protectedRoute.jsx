@@ -10,7 +10,6 @@ const isAuthenticated = () => {
 
 const ProtectedRoute = ({ element: Component, isBoth = false, ...rest }) => {
   const access = isAuthenticated();
-  console.log(access, '<==== access');
   return access || isBoth ? <Component {...rest} /> : <Navigate to="/" />;
 };
 
