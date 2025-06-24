@@ -21,6 +21,11 @@ export default function Login() {
   const theme = useTheme();
   const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
+  const handleGoogleLogin = () => {
+    console.log('Trigger Google Login');
+    // You can integrate Firebase or a backend endpoint here
+  };
+
   return (
     <AuthWrapper1>
       <Grid
@@ -85,6 +90,33 @@ export default function Login() {
                   </Grid>
                   <Grid size={12}>
                     <AuthLogin />
+                    <Grid sx={{ mt: 4 }} item xs={12}>
+                      <Stack direction="row" justifyContent="center">
+                        <button
+                          onClick={handleGoogleLogin}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: '10px 20px',
+                            border: '1px solid #ccc',
+                            borderRadius: '8px',
+                            backgroundColor: '#fff',
+                            cursor: 'pointer',
+                            fontWeight: 500,
+                            fontSize: '14px',
+                          }}
+                        >
+                          <img
+                            src="https://developers.google.com/identity/images/g-logo.png"
+                            alt="Google logo"
+                            style={{ width: 20, height: 20, marginRight: 10 }}
+                          />
+                          Login with Google
+                        </button>
+                      </Stack>
+                    </Grid>
                   </Grid>
                   <Grid size={12}>
                     <Divider />

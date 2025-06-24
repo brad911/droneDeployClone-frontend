@@ -70,8 +70,8 @@ export default function AuthLogin() {
   };
   const formik = useFormik({
     initialValues: {
-      email: '',
-      password: '',
+      email: 'bilalfire97@gmail.com',
+      password: 'Abc123!@#',
       keepLoggedIn: true,
     },
     validationSchema: Yup.object({
@@ -156,7 +156,7 @@ export default function AuthLogin() {
                 color="primary"
               />
             }
-            label="Keep me logged in"
+            label="Remember me"
           />
         </Grid>
         <Grid item>

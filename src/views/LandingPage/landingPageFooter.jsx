@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import { useSnackbar } from 'notistack';
 import Logo from '../../ui-component/Logo';
 import axios from '../../utils/axios.config';
+import { countryList } from '../utilities/countries';
 
 const handleScrollToSection = (id) => {
   document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -18,21 +19,23 @@ const handleScrollToSection = (id) => {
 export default function LandingPageFooter() {
   const { enqueueSnackbar } = useSnackbar();
   const contactSchema = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
+    firstName: Yup.string().required('First name is required'),
+    lastName: Yup.string().required('Last name is required'),
     email: Yup.string().email('Invalid email').required('Email is required'),
     phone: Yup.string(),
     company: Yup.string(),
-    designation: Yup.string(),
+    country: Yup.string().required('Country is required'),
     message: Yup.string().required('Message is required'),
   });
 
   const formik = useFormik({
     initialValues: {
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       phone: '',
       company: '',
-      designation: '',
+      country: '',
       message: '',
     },
     validationSchema: contactSchema,
@@ -65,16 +68,29 @@ export default function LandingPageFooter() {
         </div>
         <div className="footer__column">
           <form className="contact-form" onSubmit={formik.handleSubmit}>
-            <input
-              type="text"
-              name="name"
-              placeholder="Name"
-              value={formik.values.name}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.name && formik.errors.name && (
-              <small className="form-error">{formik.errors.name}</small>
+            <div className="form-row">
+              <input
+                type="text"
+                name="firstName"
+                placeholder="First Name"
+                value={formik.values.firstName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              <input
+                type="text"
+                name="lastName"
+                placeholder="Last Name"
+                value={formik.values.lastName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+            </div>
+            {formik.touched.firstName && formik.errors.firstName && (
+              <small className="form-error">{formik.errors.firstName}</small>
+            )}
+            {formik.touched.lastName && formik.errors.lastName && (
+              <small className="form-error">{formik.errors.lastName}</small>
             )}
 
             <input
@@ -105,13 +121,20 @@ export default function LandingPageFooter() {
               onChange={formik.handleChange}
             />
 
-            <input
-              type="text"
-              name="designation"
-              placeholder="Designation"
-              value={formik.values.designation}
+            <select
+              name="country"
+              value={formik.values.country}
               onChange={formik.handleChange}
-            />
+              onBlur={formik.handleBlur}
+            >
+              <option value={''}>Select Country</option>
+              {countryList.map((item) => (
+                <option value={item}>{item}</option>
+              ))}
+            </select>
+            {formik.touched.country && formik.errors.country && (
+              <small className="form-error">{formik.errors.country}</small>
+            )}
 
             <textarea
               name="message"
@@ -138,28 +161,46 @@ export default function LandingPageFooter() {
         </div>
         <div className="footer__column">
           <h4 onClick={() => handleScrollToSection('.hero')}>Platform</h4>
-          <a href="#">About Us</a>
-          <a href="#">Careers</a>
-          <a href="#">Blog</a>
-          <a href="#">Press</a>
         </div>
         <div className="footer__column">
           <h4 onClick={() => handleScrollToSection('.feature-section')}>
-            Industry
+            Industries
           </h4>
-          <a href="#">Construction</a>
-          <a href="#">Energy</a>
-          <a href="#">Surveying</a>
-          <a href="#">Agriculture</a>
+          <a onClick={() => handleScrollToSection('.feature-section')}>
+            Construction & infrastucture
+          </a>
+          <a onClick={() => handleScrollToSection('.feature-section')}>
+            Energy, Utilities & Industrial
+          </a>
+          <a onClick={() => handleScrollToSection('.feature-section')}>
+            Heritage & construction
+          </a>
+          <a onClick={() => handleScrollToSection('.feature-section')}>
+            Agriculture & forest
+          </a>
+          <a onClick={() => handleScrollToSection('.feature-section')}>
+            Surveying & Land Developement
+          </a>
         </div>
         <div className="footer__column">
           <h4 onClick={() => handleScrollToSection('.simple-tabs-container')}>
-            Solutions & Features
+            Solutions
           </h4>
-          <a href="#">Help Center</a>
-          <a href="#">Documentation</a>
-          <a href="#">Community</a>
-          <a href="#">Support</a>
+          <a onClick={() => handleScrollToSection('.simple-tabs-container')}>
+            Orthomosaic Viewer
+          </a>
+          <a onClick={() => handleScrollToSection('.simple-tabs-container')}>
+            Comparision Slider
+          </a>
+          <a onClick={() => handleScrollToSection('.simple-tabs-container')}>
+            Automated Customized Reporting
+          </a>
+          <a onClick={() => handleScrollToSection('.simple-tabs-container')}>
+            Issue Tagging & Coordination
+          </a>
+          <a onClick={() => handleScrollToSection('.simple-tabs-container')}>
+            360 Virtual Tour
+          </a>
         </div>
       </div>
 

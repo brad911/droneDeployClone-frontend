@@ -44,7 +44,7 @@ const LandingPageHeader = () => {
               Platform
             </button>
             <button
-              onClick={() => handleScrollToSection('.company-group')}
+              onClick={() => handleScrollToSection('.feature-section')}
               className="button-tabs"
             >
               Industries

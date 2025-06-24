@@ -1,7 +1,20 @@
-import { Box, Typography, Button, Grid } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
+  TextField,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  OutlinedInput,
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ProjectTile from './ProjectTile';
 import { useNavigate } from 'react-router';
+import { useState } from 'react';
+import { useTheme } from '@emotion/react';
 
 const projectData = [
   {
@@ -35,32 +48,105 @@ const projectData = [
 ];
 
 function Projects() {
+  const theme = useTheme();
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('');
+  const [filteredProjects, setFilteredProjects] = useState(projectData);
+
+  const handleSearch = () => {
+    let result = [...projectData];
+
+    if (searchTerm) {
+      result = result.filter((proj) =>
+        proj.title.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+    }
+
+    if (sortBy === 'name') {
+      result.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortBy === 'images') {
+      result.sort((a, b) => b.images - a.images);
+    }
+
+    setFilteredProjects(result);
+  };
+
   return (
     <Box p={3}>
-      {/* Header */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
+      {/* Header and Controls */}
+      <Grid
+        container
+        spacing={2}
         alignItems="center"
+        justifyContent="space-between"
         mb={3}
       >
-        <Typography variant="h5" fontWeight={600}>
-          All Projects
-        </Typography>
-        <Button
-          variant="contained"
-          onClick={() => navigate('/createProject')}
-          startIcon={<AddIcon />}
-          color="secondary"
-        >
-          Create New Project
-        </Button>
-      </Box>
+        <Grid item xs={12} md={3}>
+          <Typography variant="h2" fontWeight={600}>
+            All Projects
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Grid
+            container
+            justifyContent={'center'}
+            alignItems={'center'}
+            spacing={2}
+          >
+            <Grid item xs={12} sm={6}>
+              <FormControl sx={{ ...theme.typography.customInput }}>
+                <InputLabel>Search By Name</InputLabel>
+                <OutlinedInput
+                  label="Search by Name"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl
+                sx={{ ...theme.typography.customSelect, minWidth: '100px' }}
+                fullWidth
+              >
+                <InputLabel>Sort By</InputLabel>
+                <Select
+                  value={sortBy}
+                  label="Sort By"
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <MenuItem value="name">Name</MenuItem>
+                  <MenuItem value="images">Images</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={2}>
+              <Button variant="contained" fullWidth onClick={handleSearch}>
+                Search
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid item xs={12} md={3} textAlign={{ xs: 'left', md: 'right' }}>
+          <Button
+            variant="contained"
+            onClick={() => navigate('/createProject')}
+            startIcon={<AddIcon />}
+            color="secondary"
+          >
+            Create New Project
+          </Button>
+        </Grid>
+      </Grid>
 
       {/* Project Grid */}
       <Grid container spacing={3}>
-        {projectData.map((project, index) => (
+        {filteredProjects.map((project, index) => (
           <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
             <ProjectTile project={project} />
           </Grid>

@@ -11,6 +11,7 @@ export default function AuthCardWrapper({ children, ...other }) {
   return (
     <MainCard
       sx={{
+        boxShadow: 6,
         maxWidth: { xs: 400, lg: 475 },
         // margin: { xs: 2.5, md: 3 },
         '& > *': {
