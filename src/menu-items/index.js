@@ -1,13 +1,14 @@
-import dashboard from './dashboard';
-import pages from './pages';
-import utilities from './utilities';
-import other from './other';
+// import dashboard from './dashboard';
+// import pages from './pages';
+import platform from './platformList';
+// import other from './other';
 import AdminDashboard from './superAdminList';
+import managementList from './managementList';
 
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-  items: [AdminDashboard, other, utilities],
+  items: [AdminDashboard, platform, managementList],
 };
 
 export default menuItems;

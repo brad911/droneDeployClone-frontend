@@ -18,52 +18,6 @@ const CreateProjectPage = () => {
         justifyContent: 'center',
       }}
     >
-      {/* Left Image Section */}
-      <Grid
-        item
-        xs={12}
-        md={12}
-        sx={{
-          backgroundImage: `url(${teamImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'relative',
-          color: 'white',
-        }}
-      >
-        {/* Overlay */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            height: '100%',
-            width: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}
-        />
-        {/* Text on Image */}
-        <Box
-          sx={{
-            position: 'relative',
-            zIndex: 2,
-            height: '100%',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            p: 4,
-          }}
-        >
-          <Typography variant="h3" fontWeight="bold" gutterBottom color="white">
-            Build Your Dream Project
-          </Typography>
-          <Typography variant="h6" color="white">
-            Invite your team, share files, and collaborate seamlessly.
-          </Typography>
-        </Box>
-      </Grid>
-
       {/* Right Form Section */}
       <Grid
         item

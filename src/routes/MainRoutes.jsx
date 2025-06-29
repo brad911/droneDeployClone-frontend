@@ -36,44 +36,23 @@ const MainRoutes = {
       path: '/dashboard',
       element: <ProtectedRoute element={DashboardDefault} />,
     },
-    // {
-    //   path: 'dashboard',
-    //   children: [
-    //     {
-    //       path: 'default',
-    //       element: <DashboardDefault />
-    //     }
-    //   ]
-    // },
-    {
-      path: 'file',
-      element: <FilesHandler />,
-    },
     {
       path: 'createProject',
       element: <ProtectedRoute element={CreateProjectPage} />,
     },
     {
-      path: 'typography',
-      element: <UtilsTypography />,
-    },
-    {
-      path: 'color',
-      element: <UtilsColor />,
-    },
-    {
-      path: 'shadow',
-      element: <UtilsShadow />,
-    },
-    {
-      path: '/sample-page',
-      element: <SamplePage />,
-    },
-    { path: '/project/:projectID', element: <Project /> },
-    {
       path: '/project',
       element: <ProtectedRoute element={Projects} />,
     },
+    {
+      path: '/project/:id/viewer',
+      element: <ProtectedRoute element={Projects} />,
+    },
+    {
+      path: '/project/:id/compare',
+      element: <ProtectedRoute element={Projects} />,
+    },
+    { path: '/project/:projectID', element: <Project /> },
     { path: '/project/:projectID/:projectWorkDayID', element: <ProjectWork /> },
   ],
 };

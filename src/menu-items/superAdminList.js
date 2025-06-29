@@ -30,14 +30,14 @@ const superAdminList = {
       icon: icons.IconDroneOff,
       breadcrumbs: false,
     },
-    {
-      id: 'files',
-      title: 'Files',
-      type: 'item',
-      url: '/file',
-      icon: icons.IconPalette,
-      breadcrumbs: false,
-    },
+    // {
+    //   id: 'files',
+    //   title: 'Files',
+    //   type: 'item',
+    //   url: '/file',
+    //   icon: icons.IconPalette,
+    //   breadcrumbs: false,
+    // },
     // {
     //   id: 'options',
     //   title: 'Option 3',

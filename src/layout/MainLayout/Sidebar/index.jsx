@@ -19,6 +19,7 @@ import useConfig from 'hooks/useConfig';
 import { drawerWidth } from 'store/constant';
 
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
+import { Avatar, Typography } from '@mui/material';
 
 // ==============================|| SIDEBAR DRAWER ||============================== //
 
@@ -43,11 +44,44 @@ function Sidebar() {
     const drawerContent = (
       <>
         <MenuCard />
-        <Stack direction="row" sx={{ justifyContent: 'center', mb: 2 }}>
+        <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 2 }}>
           <Chip
-            label={import.meta.env.VITE_APP_VERSION}
-            size="small"
-            color="default"
+            avatar={
+              <Avatar
+                sx={{
+                  bgcolor: 'text.primary',
+                  width: 32,
+                  height: 32,
+                  fontSize: 8,
+                }}
+              >
+                F L
+              </Avatar>
+            }
+            label={
+              <Box display="flex" flexDirection="column" lineHeight={1.2}>
+                <Typography variant="body1" fontWeight="500">
+                  {'FirstName  LastName'}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Designation
+                </Typography>
+              </Box>
+            }
+            variant="outlined"
+            sx={{
+              border: 'none',
+              height: '100%',
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              gap: 2,
+              '& .MuiChip-label': {
+                display: 'flex',
+                flexDirection: 'column',
+                padding: 0,
+              },
+            }}
           />
         </Stack>
       </>
