@@ -15,8 +15,8 @@ import {
   Divider,
 } from '@mui/material';
 
-mapboxgl.accessToken =
-  'pk.eyJ1IjoiaGlyYWtyYWoiLCJhIjoiY21icXd5eHRnMDNtaTJxczcxd2RmbTZwOCJ9.P6kpsuLMDdeK2DIMJZMrmw';
+// Use Mapbox API key from environment variable
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
 
 export default function ViewTab() {
   const mapContainer = useRef(null);
@@ -30,6 +30,11 @@ export default function ViewTab() {
   });
 
   useEffect(() => {
+    if (!mapboxgl.accessToken) {
+      // eslint-disable-next-line no-console
+      console.error('Mapbox API key is not set. Please define VITE_MAPBOX_API_KEY in your .env file.');
+      return;
+    }
     const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',

@@ -11,6 +11,9 @@ import ProjectView from '../views/dashboard/Default/Projects/ProjectView';
 import Project from '../views/dashboard/Default/Projects/Project';
 import ProjectWork from '../views/dashboard/Default/ProjectWork/ProjectWork';
 import CompareProject from '../views/dashboard/Default/Projects/CompareProject';
+import DprForm from 'views/dashboard/Default/Projects/Project/DprForm';
+import IssueReport from 'views/dashboard/Default/Projects/Project/issueReport';
+import FilesTab from '../views/dashboard/Default/Projects/Project/tabs/FileTab';
 
 // dashboard routing
 const DashboardDefault = Loadable(
@@ -53,7 +56,11 @@ const MainRoutes = {
       path: '/project/:id/compare',
       element: <ProtectedRoute element={CompareProject} />,
     },
+    { path: '/project/:projectID/issue', element: <IssueReport /> },
+    { path: '/project/:projectID/dpr', element: <DprForm /> },
     { path: '/project/:projectID', element: <Project /> },
+    { path: '/project/:projectID/files', element: <FilesTab /> },
+    
     { path: '/project/:projectID/:projectWorkDayID', element: <ProjectWork /> },
   ],
 };

@@ -8,6 +8,9 @@ import {
   Paper,
   Stack,
   useTheme,
+  Switch,
+  FormControlLabel,
+  FormGroup,
 } from '@mui/material';
 import {
   IconFile,
@@ -50,6 +53,8 @@ export default function FilesTab() {
     { name: 'data-sheet.xlsx', uploadedAt: getCurrentDateString() },
   ]);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [showPdf, setShowPdf] = useState(false);
+  const [showDoc, setShowDoc] = useState(false);
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -82,8 +87,31 @@ export default function FilesTab() {
     }, 1500);
   };
 
+  // Filtering logic
+  const filteredFiles = files.filter((file) => {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (showPdf && showDoc) {
+      return ext === 'pdf' || ext === 'doc' || ext === 'docx';
+    } else if (showPdf) {
+      return ext === 'pdf';
+    } else if (showDoc) {
+      return ext === 'doc' || ext === 'docx';
+    }
+    return true; // If both switches are off, show all
+  });
+
   return (
     <Box sx={{ px: 3, py: 2 }}>
+      <FormGroup row sx={{ mb: 2 }}>
+        <FormControlLabel
+          control={<Switch checked={showPdf} onChange={() => setShowPdf((v) => !v)} />}
+          label="Show PDF Files"
+        />
+        <FormControlLabel
+          control={<Switch checked={showDoc} onChange={() => setShowDoc((v) => !v)} />}
+          label="Show DOC/DOCX Files"
+        />
+      </FormGroup>
       <Typography variant="h4" mb={2}>
         Upload Files
       </Typography>
@@ -106,7 +134,7 @@ export default function FilesTab() {
       </Typography>
 
       <Grid container spacing={2}>
-        {files.map((file, idx) => (
+        {filteredFiles.map((file, idx) => (
           <Grid item xs={12} sm={6} md={4} key={idx}>
             <Paper
               elevation={3}
