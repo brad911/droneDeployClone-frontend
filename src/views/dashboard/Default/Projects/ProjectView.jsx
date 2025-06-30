@@ -51,7 +51,7 @@ const ProjectView = () => {
 
   return (
     <Box sx={{ position: 'relative', width: '100%', height: '100vh' }}>
-      <Box ref={mapContainerRef} sx={{ width: '100%', height: '100%' }} />
+      {/* <Box ref={mapContainerRef} sx={{ width: '100%', height: '100%' }} />
 
       <Stack
         direction="row"
@@ -86,7 +86,7 @@ const ProjectView = () => {
         >
           Delete
         </Button>
-      </Stack>
+      </Stack> */}
     </Box>
   );
 };

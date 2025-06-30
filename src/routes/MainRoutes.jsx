@@ -10,6 +10,7 @@ import ProtectedRoute from '../utils/protectedRoute';
 import ProjectView from '../views/dashboard/Default/Projects/ProjectView';
 import Project from '../views/dashboard/Default/Projects/Project';
 import ProjectWork from '../views/dashboard/Default/ProjectWork/ProjectWork';
+import CompareProject from '../views/dashboard/Default/Projects/CompareProject';
 
 // dashboard routing
 const DashboardDefault = Loadable(
@@ -50,7 +51,7 @@ const MainRoutes = {
     },
     {
       path: '/project/:id/compare',
-      element: <ProtectedRoute element={Projects} />,
+      element: <ProtectedRoute element={CompareProject} />,
     },
     { path: '/project/:projectID', element: <Project /> },
     { path: '/project/:projectID/:projectWorkDayID', element: <ProjectWork /> },

@@ -4,13 +4,15 @@ import {
   Typography,
   Box,
   Stack,
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Avatar,
-  Divider,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
   useTheme,
+  Divider,
 } from '@mui/material';
 
 mapboxgl.accessToken =
@@ -19,11 +21,13 @@ mapboxgl.accessToken =
 export default function ViewTab() {
   const mapContainer = useRef(null);
   const theme = useTheme();
-  const [comment, setComment] = useState('');
-  const [comments, setComments] = useState([
-    { user: 'User I', text: 'Initial survey completed.', time: 'Just now' },
-    { user: 'User II', text: 'Awaiting GIS data upload.', time: '2 hours ago' },
-  ]);
+  const [selectedDate, setSelectedDate] = useState('2024-03-01');
+  const [layers, setLayers] = useState({
+    orthomosaic: true,
+    asBuiltOverlay: false,
+    annotations: false,
+    measurements: false,
+  });
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -36,80 +40,110 @@ export default function ViewTab() {
     return () => map.remove();
   }, []);
 
-  const handlePost = () => {
-    if (!comment.trim()) return;
-    const newComment = {
-      user: 'You',
-      text: comment.trim(),
-      time: 'Just now',
-    };
-    setComments([newComment, ...comments]);
-    setComment('');
+  const handleLayerChange = (event) => {
+    setLayers((prev) => ({
+      ...prev,
+      [event.target.name]: event.target.checked,
+    }));
   };
 
   return (
-    <Box sx={{ px: 3, py: 2 }}>
-      <Typography variant="h4" mb={2}>
-        Project Map View
-      </Typography>
+    <Box sx={{ display: 'flex', height: 'calc(100vh - 100px)', px: 3, py: 2 }}>
+      {/* Left Panel */}
+      <Box sx={{ width: '30%', pr: 3, overflowY: 'auto' }}>
+        <Typography variant="h5" mb={2}>
+          Project Details
+        </Typography>
 
+        <Stack spacing={1} mb={3}>
+          <Typography>
+            <strong>Name:</strong> City Drainage Phase 1
+          </Typography>
+          <Typography>
+            <strong>Capture Date:</strong> 2025-06-25
+          </Typography>
+          <Typography>
+            <strong>Area:</strong> 3.2 sq km
+          </Typography>
+        </Stack>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Layers */}
+        <Typography variant="subtitle1" gutterBottom>
+          Layers
+        </Typography>
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={layers.orthomosaic}
+                onChange={handleLayerChange}
+                name="orthomosaic"
+              />
+            }
+            label="Orthomosaic"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={layers.asBuiltOverlay}
+                onChange={handleLayerChange}
+                name="asBuiltOverlay"
+              />
+            }
+            label="As-Built Overlay"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={layers.annotations}
+                onChange={handleLayerChange}
+                name="annotations"
+              />
+            }
+            label="Annotations"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={layers.measurements}
+                onChange={handleLayerChange}
+                name="measurements"
+              />
+            }
+            label="Measurements"
+          />
+        </FormGroup>
+
+        {/* Historical Data */}
+        <Box mt={3}>
+          <FormControl fullWidth>
+            <InputLabel id="historical-label">Historical Data</InputLabel>
+            <Select
+              labelId="historical-label"
+              value={selectedDate}
+              label="Historical Data"
+              onChange={(e) => setSelectedDate(e.target.value)}
+            >
+              <MenuItem value="2024-03-01">March 1, 2024</MenuItem>
+              <MenuItem value="2024-06-15">June 15, 2024</MenuItem>
+              <MenuItem value="2025-01-05">January 5, 2025</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </Box>
+
+      {/* Right Panel - Map */}
       <Box
         ref={mapContainer}
-        sx={{ height: '60vh', borderRadius: 2, overflow: 'hidden', mb: 4 }}
+        sx={{
+          width: '70%',
+          borderRadius: 2,
+          overflow: 'hidden',
+          height: '100%',
+        }}
       />
-
-      <Typography variant="h5" gutterBottom>
-        Comments
-      </Typography>
-
-      <Stack
-        direction="row"
-        justifyContent={'center'}
-        spacing={2}
-        alignItems="center"
-        mb={2}
-      >
-        <TextField
-          fullWidth
-          multiline
-          minRows={1}
-          placeholder="Add a comment..."
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          sx={{
-            backgroundColor: theme.palette.background.paper,
-            borderRadius: 2,
-          }}
-        />
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handlePost}
-          sx={{ height: 'fit-content', mt: 1 }}
-        >
-          Post
-        </Button>
-      </Stack>
-
-      <Stack spacing={2}>
-        {comments.map((c, i) => (
-          <Card key={i} elevation={1} sx={{ borderRadius: 2 }}>
-            <CardContent>
-              <Stack direction="row" spacing={2} alignItems="center" mb={1}>
-                <Avatar>{c.user.charAt(0)}</Avatar>
-                <Stack>
-                  <Typography fontWeight={600}>{c.user}</Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {c.time}
-                  </Typography>
-                </Stack>
-              </Stack>
-              <Divider sx={{ my: 1 }} />
-              <Typography color="text.primary">{c.text}</Typography>
-            </CardContent>
-          </Card>
-        ))}
-      </Stack>
     </Box>
   );
 }

@@ -1,116 +1,128 @@
 import React from 'react';
 import {
   Card,
-  CardContent,
   CardMedia,
-  IconButton,
+  CardContent,
   Typography,
   Box,
-  Menu,
-  MenuItem,
   Stack,
+  Button,
+  LinearProgress,
   Tooltip,
 } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ImageIcon from '@mui/icons-material/PhotoLibrary';
 import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from 'react-router';
+import { formatDistanceToNow } from 'date-fns';
 
 const ProjectTile = ({ project }) => {
   const navigate = useNavigate();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-
-  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
 
   const handleView = () => {
-    navigate('/project/1');
+    navigate(`/project/${project.id}`);
   };
+
   return (
     <Card
       elevation={3}
-      onClick={() => handleView(1)}
       sx={{
         position: 'relative',
-        width: 250,
+        width: 320,
         borderRadius: 3,
         overflow: 'hidden',
         cursor: 'pointer',
         transition: '0.3s',
         '&:hover': { boxShadow: 6 },
       }}
+      onClick={handleView}
     >
-      {/* Status Bubble */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 8,
-          right: 8,
-          backgroundColor: '#eee',
-          color: '#2D2F31',
-          borderRadius: '50%',
-          width: 32,
-          height: 32,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1,
-        }}
-      >
-        <Tooltip title="Example Project">
-          <ImageIcon fontSize="small" />
-        </Tooltip>
+      {/* Image with overlay */}
+      <Box sx={{ position: 'relative', height: 140 }}>
+        <CardMedia
+          component="img"
+          height="140"
+          image={project.image}
+          alt={project.title}
+          sx={{
+            objectFit: 'cover',
+            filter: 'brightness(60%)',
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            px: 2,
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight={700} color="white" noWrap>
+            {project.title}
+          </Typography>
+        </Box>
       </Box>
 
-      {/* Image */}
-      <CardMedia
-        component="img"
-        height="140"
-        image={project.image}
-        alt={project.title}
-        sx={{ objectFit: 'cover' }}
-      />
+      {/* Progress Bar */}
+      <Box px={2} py={1}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={0.5}
+        >
+          <Typography variant="caption" color="text.secondary">
+            {project.progress}% completed
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary">
+              {project.createdAt
+                ? formatDistanceToNow(new Date(), {
+                    addSuffix: true,
+                  })
+                : 'Time unknown'}
+            </Typography>
+          </Typography>
+        </Stack>
+        <LinearProgress
+          variant="determinate"
+          value={project.progress}
+          sx={{ height: 6, borderRadius: 10 }}
+        />
+      </Box>
 
-      {/* Content */}
-      <CardContent sx={{ paddingBottom: '8px !important' }}>
-        <Typography variant="subtitle1" fontWeight={600}>
-          {project.title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {project.description}
-        </Typography>
-
-        {/* Icons and counts */}
-        <Stack direction="row" spacing={2} alignItems="center" mt={1}>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <ImageIcon fontSize="small" />
-            <Typography variant="caption">{project.images}</Typography>
+      {/* Footer with Icons and View Button */}
+      <CardContent sx={{ pt: 1, pb: 1 }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              <ImageIcon fontSize="small" />
+              <Typography variant="caption">{project.images}</Typography>
+            </Stack>
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              <PersonIcon fontSize="small" />
+              <Typography variant="caption">{project.users}</Typography>
+            </Stack>
           </Stack>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <PersonIcon fontSize="small" />
-            <Typography variant="caption">{project.users}</Typography>
-          </Stack>
+          <Button
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleView();
+            }}
+          >
+            View
+          </Button>
         </Stack>
       </CardContent>
-
-      {/* 3-dot menu */}
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: 8,
-          right: 8,
-        }}
-      >
-        <IconButton onClick={handleMenuOpen}>
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
-        <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
-          <MenuItem onClick={handleMenuClose}>View</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Delete</MenuItem>
-        </Menu>
-      </Box>
     </Card>
   );
 };

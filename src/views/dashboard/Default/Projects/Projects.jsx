@@ -15,35 +15,48 @@ import ProjectTile from './ProjectTile';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import { useTheme } from '@emotion/react';
+import { progress } from 'framer-motion';
 
 const projectData = [
   {
+    id: 1,
     title: 'Road Inspection',
     description: 'Track changes over time',
     image: 'https://picsum.photos/200/300?1',
     images: 45,
     users: 2,
+    progress: 70,
+    createdAt: "2025-06-28T12:00:00Z'",
   },
   {
+    id: 2,
     title: 'Bridge Survey',
     description: 'High-res structural analysis',
     image: 'https://picsum.photos/200/300?2',
     images: 30,
     users: 3,
+    progress: 10,
+    createdAt: "2025-06-27T12:00:00Z'",
   },
   {
+    id: 3,
     title: 'Pipeline Monitoring',
     description: 'View weekly updates',
     image: 'https://picsum.photos/200/300?3',
     images: 15,
     users: 1,
+    progress: 50,
+    createdAt: "2025-06-28T12:00:00Z'",
   },
   {
+    id: 4,
     title: 'Agricultural Plot',
     description: 'Growth tracking with NDVI',
     image: 'https://picsum.photos/200/300?4',
     images: 50,
     users: 4,
+    progress: 90,
+    createdAt: "2025-06-28T12:00:00Z'",
   },
 ];
 
@@ -137,7 +150,7 @@ function Projects() {
             variant="contained"
             onClick={() => navigate('/createProject')}
             startIcon={<AddIcon />}
-            color="secondary"
+            color="primary"
           >
             Create New Project
           </Button>
