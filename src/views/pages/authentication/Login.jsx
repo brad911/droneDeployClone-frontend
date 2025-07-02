@@ -49,8 +49,12 @@ export default function Login() {
                   spacing={2}
                   sx={{ alignItems: 'center', justifyContent: 'center' }}
                 >
-                  <Grid sx={{ mb: 3 }}>
-                    <Link to="#" aria-label="logo">
+                  <Grid sx={{ mb: 3, textDecoration: 'none' }}>
+                    <Link
+                      style={{ textDecoration: 'none' }}
+                      to="/"
+                      aria-label="logo"
+                    >
                       <Logo />
                     </Link>
                   </Grid>

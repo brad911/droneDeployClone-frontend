@@ -8,18 +8,22 @@ import {
   Paper,
   Stack,
   useTheme,
-  Switch,
-  FormControlLabel,
-  FormGroup,
+  TextField,
+  MenuItem,
+  Divider,
 } from '@mui/material';
 import {
+  IconBuildingCog,
+  IconDroneOff,
   IconFile,
+  IconFiles,
   IconFileSpreadsheet,
   IconFileText,
   IconFileTypePdf,
   IconFileWord,
 } from '@tabler/icons-react';
 import { useSnackbar } from 'notistack';
+import Breadcrumbs from '../../../../../../ui-component/extended/Breadcrumbs';
 
 const getFileIcon = (filename) => {
   const ext = filename.split('.').pop().toLowerCase();
@@ -53,8 +57,8 @@ export default function FilesTab() {
     { name: 'data-sheet.xlsx', uploadedAt: getCurrentDateString() },
   ]);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [showPdf, setShowPdf] = useState(false);
-  const [showDoc, setShowDoc] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('latest');
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -87,34 +91,67 @@ export default function FilesTab() {
     }, 1500);
   };
 
-  // Filtering logic
-  const filteredFiles = files.filter((file) => {
-    const ext = file.name.split('.').pop().toLowerCase();
-    if (showPdf && showDoc) {
-      return ext === 'pdf' || ext === 'doc' || ext === 'docx';
-    } else if (showPdf) {
-      return ext === 'pdf';
-    } else if (showDoc) {
-      return ext === 'doc' || ext === 'docx';
-    }
-    return true; // If both switches are off, show all
-  });
+  // Filtering & Sorting
+  const filteredFiles = files
+    .filter((file) =>
+      file.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
+    .sort((a, b) => {
+      if (sortBy === 'az') return a.name.localeCompare(b.name);
+      if (sortBy === 'za') return b.name.localeCompare(a.name);
+      return 0; // 'latest' keeps default (most recent at end)
+    });
+  const pageLinks = [
+    { title: 'Projects', to: '/project', icon: IconDroneOff },
+    { title: 'Project Name', to: '/project/1', icon: IconBuildingCog },
+    { title: 'Othomosaic Viewer', icon: IconFiles }, // No `to` makes it the current page
+  ];
 
   return (
-    <Box sx={{ px: 3, py: 2 }}>
-      <FormGroup row sx={{ mb: 2 }}>
-        <FormControlLabel
-          control={<Switch checked={showPdf} onChange={() => setShowPdf((v) => !v)} />}
-          label="Show PDF Files"
-        />
-        <FormControlLabel
-          control={<Switch checked={showDoc} onChange={() => setShowDoc((v) => !v)} />}
-          label="Show DOC/DOCX Files"
-        />
-      </FormGroup>
-      <Typography variant="h4" mb={2}>
+    <Box>
+      <Typography variant="h1" gutterBottom>
         Upload Files
       </Typography>
+      <Breadcrumbs
+        sx={{ mt: 3 }}
+        links={pageLinks}
+        card={true}
+        custom={true}
+        rightAlign={false}
+      />
+      <Divider sx={{ my: 1.5 }} />
+
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={2}
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ mb: 3 }}
+      >
+        <TextField
+          label="Search files..."
+          variant="outlined"
+          size="small"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{ width: { xs: '100%', sm: 300 } }}
+        />
+
+        <TextField
+          select
+          label="Sort By"
+          variant="outlined"
+          size="small"
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          sx={{ width: 150 }}
+        >
+          <MenuItem value="latest">Latest</MenuItem>
+          <MenuItem value="extension">Extension</MenuItem>
+          <MenuItem value="az">A–Z</MenuItem>
+          <MenuItem value="za">Z–A</MenuItem>
+        </TextField>
+      </Stack>
 
       <Button variant="contained" component="label" sx={{ mb: 2 }}>
         Choose File

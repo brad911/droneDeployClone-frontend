@@ -18,6 +18,16 @@ export default function Logo() {
 
   return (
     // <img src={theme.palette.mode === ThemeMode.DARK ? logoDark : logo} alt="Berry" width="100" />
-    <img src={logo} alt="Infra-X-Logo" width="50" />
+    // <img src={logo} alt="Infra-X-Logo" width="50" />
+    <p
+      style={{
+        color: 'black',
+        fontFamily: 'BlackGold',
+        fontSize: '24px',
+        textDecoration: 'none',
+      }}
+    >
+      INFRA<span style={{ color: ' #2563EB' }}>X</span>
+    </p>
   );
 }

@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 // Future logos
 import f1 from '../../assets/images/logos/future/1.png';
-import f2 from '../../assets/images/logos/future/2.avif';
-import f3 from '../../assets/images/logos/future/3.avif';
-import f4 from '../../assets/images/logos/future/4.avif';
-import f5 from '../../assets/images/logos/future/5.avif';
+// import f2 from '../../assets/images/logos/future/1.svg';
+// import f3 from '../../assets/images/logos/future/3.png';
+// import f4 from '../../assets/images/logos/future/4.avif';
+// import f5 from '../../assets/images/logos/future/5.avif';
 // import f6 from '../../assets/images/logos/future/6.avif';
 // import f7 from '../../assets/images/logos/future/7.avif';
 // import f8 from '../../assets/images/logos/future/8.avif';
@@ -41,7 +41,7 @@ const variants = [
     prefix: ' Trusted by Industry Leaders.',
     word: '',
     suffix: '',
-    logos: [f1, f2, f3, f4, f5],
+    logos: [f1, f1, f1, f1, f1],
   },
   //   {
   //     prefix: 'Trusted by the people who ',
@@ -88,7 +88,7 @@ export const CompanyGroup = () => {
       <div className="company-group__logos">
         {logos.map((src, i) => (
           <img
-            key={src}
+            key={i}
             src={src}
             alt={`Logo ${i + 1}`}
             className="company-group__logo"

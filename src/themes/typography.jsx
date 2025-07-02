@@ -136,6 +136,14 @@ export default function Typography(theme, borderRadius, fontFamily) {
         top: 0,
       },
     },
+    customSelect2: {
+      '& .MuiInputLabel-root': {
+        top: '-6px', // <-- shifts label up a bit
+        '&[data-shrink="false"]': {
+          top: '-8px',
+        },
+      },
+    },
     mainContent: {
       backgroundColor: theme.palette.grey[100],
       width: '100%',

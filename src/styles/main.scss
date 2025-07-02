@@ -6,10 +6,19 @@
 @use 'pages/landingPage/mainlayoutLandingPage.scss';
 @use 'pages/landingPage/landingPageFooter.scss';
 @use 'pages/landingPage/industryCapture.scss';
+@use '../../src/assets/scss/reactBigCalender.scss';
 
 @font-face {
   font-family: 'Inter';
   src: url('../assets/fonts/Inter/Inter-Regular.otf') format('otf');
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BlackGold';
+  src: url('../assets/fonts/blackgold/Blackgold-qGAl.otf') format('otf');
   font-style: normal;
   font-weight: 300;
   font-display: swap;

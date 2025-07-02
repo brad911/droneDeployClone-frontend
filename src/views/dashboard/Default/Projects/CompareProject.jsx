@@ -13,6 +13,13 @@ import { ReactCompareSlider } from 'react-compare-slider';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import mapboxgl from 'mapbox-gl';
+import Breadcrumbs from '../../../../ui-component/extended/Breadcrumbs';
+import {
+  IconBuildingCog,
+  IconDroneOff,
+  IconGitCompare,
+  IconLiveViewFilled,
+} from '@tabler/icons-react';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiaGlyYWtyYWoiLCJhIjoiY21icXd5eHRnMDNtaTJxczcxd2RmbTZwOCJ9.P6kpsuLMDdeK2DIMJZMrmw';
@@ -60,13 +67,33 @@ export default function CompareProject() {
     tablet: { breakpoint: { max: 1024, min: 640 }, items: 3 },
     mobile: { breakpoint: { max: 640, min: 0 }, items: 2 },
   };
+  const pageLinks = [
+    { title: 'Projects', to: '/project', icon: IconDroneOff },
+    { title: 'Project Name', to: '/project/1', icon: IconBuildingCog },
+    { title: 'Progress Comparison', icon: IconGitCompare }, // No `to` makes it the current page
+  ];
 
   return (
-    <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        Project Name - Comparision Slider
-      </Typography>
-
+    <Box>
+      <Box
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <Typography variant="h1" gutterBottom>
+          Progress Comparison
+        </Typography>
+      </Box>
+      <Box justifyContent={'left'}>
+        <Breadcrumbs
+          sx={{ mt: 3 }}
+          links={pageLinks}
+          card={true}
+          custom={true}
+          rightAlign={false}
+        />
+      </Box>
       {/* Selection Inputs */}
       <Box display="flex" gap={2} mb={3}>
         <FormControl fullWidth>

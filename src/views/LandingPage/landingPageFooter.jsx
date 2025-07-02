@@ -128,8 +128,10 @@ export default function LandingPageFooter() {
               onBlur={formik.handleBlur}
             >
               <option value={''}>Select Country</option>
-              {countryList.map((item) => (
-                <option value={item}>{item}</option>
+              {countryList.map((item, index) => (
+                <option key={index} value={item}>
+                  {item}
+                </option>
               ))}
             </select>
             {formik.touched.country && formik.errors.country && (
@@ -167,13 +169,13 @@ export default function LandingPageFooter() {
             Industries
           </h4>
           <a onClick={() => handleScrollToSection('.feature-section')}>
-            Construction & infrastucture
+            Construction & Infrastucture
           </a>
           <a onClick={() => handleScrollToSection('.feature-section')}>
             Energy, Utilities & Industrial
           </a>
           <a onClick={() => handleScrollToSection('.feature-section')}>
-            Heritage & construction
+            Heritage & Conservation
           </a>
           <a onClick={() => handleScrollToSection('.feature-section')}>
             Agriculture & forest

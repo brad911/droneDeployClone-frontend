@@ -55,13 +55,13 @@ function Sidebar() {
                   fontSize: 8,
                 }}
               >
-                F L
+                JD
               </Avatar>
             }
             label={
               <Box display="flex" flexDirection="column" lineHeight={1.2}>
                 <Typography variant="body1" fontWeight="500">
-                  {'FirstName  LastName'}
+                  {'John Doe'}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   Designation

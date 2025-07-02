@@ -15,9 +15,21 @@ import {
   Divider,
   Button,
 } from '@mui/material';
+import Breadcrumbs from '../../../../ui-component/extended/Breadcrumbs';
+import {
+  IconBuildingCog,
+  IconDroneOff,
+  IconLiveViewFilled,
+} from '@tabler/icons-react';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiaGlyYWtyYWoiLCJhIjoiY21icXd5eHRnMDNtaTJxczcxd2RmbTZwOCJ9.P6kpsuLMDdeK2DIMJZMrmw';
+
+const pageLinks = [
+  { title: 'Projects', to: '/project', icon: IconDroneOff },
+  { title: 'Project Name', to: '/project/1', icon: IconBuildingCog },
+  { title: 'Othomosaic Viewer', icon: IconLiveViewFilled }, // No `to` makes it the current page
+];
 
 export default function ViewTab() {
   const mapContainer = useRef(null);
@@ -49,7 +61,7 @@ export default function ViewTab() {
   };
 
   return (
-    <Box sx={{ px: 3, py: 2 }}>
+    <Box>
       {/* Header Section */}
       <Box
         sx={{
@@ -60,10 +72,7 @@ export default function ViewTab() {
         }}
       >
         {/* Breadcrumb */}
-        <Typography variant="body2" color="text.secondary">
-          Dashboard / Projects / <strong>City Drainage Phase 1</strong>
-        </Typography>
-
+        <Typography variant="h1">Orthomosaic Viewer</Typography>
         {/* Upload + Status */}
         <Stack direction="row" spacing={3} alignItems="center">
           <Button variant="contained" color="primary">
@@ -76,7 +85,6 @@ export default function ViewTab() {
                 width: 10,
                 height: 10,
                 borderRadius: '50%',
-                backgroundColor: 'orange', // Update color based on actual status
               }}
             />
             <Typography variant="body2" color="text.secondary">
@@ -85,15 +93,28 @@ export default function ViewTab() {
           </Stack>
         </Stack>
       </Box>
+      <Breadcrumbs
+        links={pageLinks}
+        card={true}
+        custom={true}
+        rightAlign={false}
+      />
+      <Divider sx={{ my: 2 }} />
 
       {/* Main Layout */}
-      <Box sx={{ display: 'flex', height: 'calc(100vh - 150px)' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          height: 'calc(100vh - 150px)',
+          maxHeight: '100%',
+        }}
+      >
         {/* Left Panel */}
-        <Box sx={{ width: '30%', pr: 3, overflowY: 'auto' }}>
-          <Typography variant="h5" mb={2}>
+        <Box sx={{ width: '30%', pr: 3, overflowY: 'auto', height: '100%' }}>
+          <Typography variant="h2" mb={2}>
             Project Details
           </Typography>
-
+          <Divider sx={{ my: 1 }} />
           <Stack spacing={1} mb={3}>
             <Typography>
               <strong>Name:</strong> City Drainage Phase 1
@@ -109,7 +130,7 @@ export default function ViewTab() {
           <Divider sx={{ my: 2 }} />
 
           {/* Layers */}
-          <Typography variant="subtitle1" gutterBottom>
+          <Typography variant="h3" gutterBottom>
             Layers
           </Typography>
           <FormGroup>
@@ -154,7 +175,7 @@ export default function ViewTab() {
               label="Measurements"
             />
           </FormGroup>
-
+          <Divider sx={{ my: 1 }} />
           {/* Historical Data */}
           <Box mt={3}>
             <FormControl fullWidth>

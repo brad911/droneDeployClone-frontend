@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import { useTheme } from '@emotion/react';
 import { progress } from 'framer-motion';
+import { IconBuildingCog, IconDroneOff } from '@tabler/icons-react';
 
 const projectData = [
   {
@@ -109,25 +110,23 @@ function Projects() {
             spacing={2}
           >
             <Grid item xs={12} sm={6}>
-              <FormControl sx={{ ...theme.typography.customInput }}>
-                <InputLabel>Search By Name</InputLabel>
-                <OutlinedInput
-                  label="Search by Name"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </FormControl>
+              <TextField
+                label="Search by Name"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl
-                sx={{ ...theme.typography.customSelect, minWidth: '100px' }}
+                sx={{ ...theme.typography.customSelect2, minWidth: '100px' }}
                 fullWidth
               >
                 <InputLabel>Sort By</InputLabel>
                 <Select
+                  size="small"
                   value={sortBy}
                   label="Sort By"
                   onChange={(e) => setSortBy(e.target.value)}

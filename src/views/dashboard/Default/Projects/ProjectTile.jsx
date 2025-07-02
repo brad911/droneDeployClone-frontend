@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import {
   Card,
   CardMedia,
@@ -7,13 +7,13 @@ import {
   Box,
   Stack,
   Button,
-  LinearProgress,
-  Tooltip,
+  // LinearProgress,
+  // Tooltip,
 } from '@mui/material';
 import ImageIcon from '@mui/icons-material/PhotoLibrary';
 import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from 'react-router';
-import { formatDistanceToNow } from 'date-fns';
+// import { formatDistanceToNow } from 'date-fns';
 
 const ProjectTile = ({ project }) => {
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ const ProjectTile = ({ project }) => {
       </Box>
 
       {/* Progress Bar */}
-      <Box px={2} py={1}>
+      {/* <Box px={2} py={1}>
         <Stack
           direction="row"
           justifyContent="space-between"
@@ -76,7 +76,7 @@ const ProjectTile = ({ project }) => {
           mb={0.5}
         >
           <Typography variant="caption" color="text.secondary">
-            {project.progress}% completed
+            {project.progress}% 
           </Typography>
           <Typography variant="caption" color="text.secondary">
             <Typography variant="caption" color="text.secondary">
@@ -93,7 +93,7 @@ const ProjectTile = ({ project }) => {
           value={project.progress}
           sx={{ height: 6, borderRadius: 10 }}
         />
-      </Box>
+      </Box> */}
 
       {/* Footer with Icons and View Button */}
       <CardContent sx={{ pt: 1, pb: 1 }}>

@@ -1,13 +1,13 @@
 .company-group {
-  background-color: black;
+  background-color: white;
   text-align: center;
-  padding: 8rem 12rem;
+  padding: 4rem 12rem;
 
   &__heading {
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 2rem;
-    color: white;
+    // color: white;
     line-height: 1.4;
 
     .highlight {
@@ -37,7 +37,6 @@
     gap: 2rem;
     justify-items: center;
     padding: 0 1rem;
-    min-height: 150px;
 
     .company-group__logo {
       width: 100px;
@@ -77,6 +76,9 @@
 }
 
 @media (max-width: 768px) {
+  .company-group {
+    padding: 2rem 3rem;
+  }
   .company-group__logos {
     grid-template-columns: repeat(5, 1fr);
     gap: 1.2rem;

@@ -23,13 +23,13 @@ const LandingPageHeader = () => {
 
   return (
     <header className={`transparent-header ${hideHeader ? 'hide' : ''}`}>
-      <div className="ribbon">
+      {/* <div className="ribbon">
         <div className="marquee">
           <div className="marquee__inner">
             <span>🚀 Welcome to our platform — Explore what's new!</span>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="header-main">
         <div className="header-main-left">

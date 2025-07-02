@@ -80,21 +80,21 @@
 
   // ✅ Responsive adjustments
   @media (max-width: 1024px) {
-    background: linear-gradient(to bottom, #000 65%, #fff 35%);
-    padding: 4rem 3rem;
+    // background: black;
+    padding: 2rem 3rem;
 
     .content {
       .section-heading {
-        font-size: 4rem;
+        font-size: 2rem;
         line-height: 1.5;
       }
 
       .boxes {
         .box {
-          width: 20rem;
-          height: 20rem;
+          width: 10rem;
+          height: 10rem;
           .box-text {
-            font-size: 2rem;
+            font-size: 1rem;
           }
         }
       }
@@ -102,23 +102,21 @@
   }
 
   @media (max-width: 768px) {
-    padding: 1rem 1rem;
-    background: linear-gradient(to bottom, #000 66%, #fff 34%);
-    min-height: 800px;
+    padding: 3rem 2rem;
     .content {
       .section-heading {
         line-height: 1.5;
-        font-size: 3rem;
+        font-size: 2rem;
       }
 
       .boxes {
         gap: 1.5rem;
 
         .box {
-          width: 15rem;
-          height: 15rem;
+          width: 10rem;
+          height: 10rem;
           .box-text {
-            font-size: 1.5rem;
+            font-size: 0.75rem;
           }
         }
       }

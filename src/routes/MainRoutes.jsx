@@ -12,7 +12,7 @@ import Project from '../views/dashboard/Default/Projects/Project';
 import ProjectWork from '../views/dashboard/Default/ProjectWork/ProjectWork';
 import CompareProject from '../views/dashboard/Default/Projects/CompareProject';
 import DprForm from 'views/dashboard/Default/Projects/Project/DprForm';
-import IssueReport from 'views/dashboard/Default/Projects/Project/issueReport';
+import IssueReport from 'views/dashboard/Default/issues/IssuesReport.jsx';
 import FilesTab from '../views/dashboard/Default/Projects/Project/tabs/FileTab';
 
 // dashboard routing
@@ -21,14 +21,14 @@ const DashboardDefault = Loadable(
 );
 
 // utilities routing
-const UtilsTypography = Loadable(
-  lazy(() => import('views/utilities/Typography')),
-);
-const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
-const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
+// const UtilsTypography = Loadable(
+//   lazy(() => import('views/utilities/Typography')),
+// );
+// const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
+// const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
 
-// sample page routing
-const SamplePage = Loadable(lazy(() => import('views/sample-page')));
+// // sample page routing
+// const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
