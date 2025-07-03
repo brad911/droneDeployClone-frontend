@@ -62,7 +62,7 @@ const IssueForm = ({ open = false, onClose, onSave }) => {
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
-            label="Date"
+            label="Scheduled Date"
             type="date"
             value={form.date}
             onChange={(e) => handleFormChange('date', e.target.value)}

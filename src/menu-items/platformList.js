@@ -57,7 +57,7 @@ const platform = {
     },
     {
       id: 'projectFiles',
-      title: 'ProjectFiles',
+      title: 'Project Files',
       type: 'item',
       url: '/project/1/files',
       icon: IconFiles,

@@ -27,7 +27,7 @@ const projectData = [
     images: 45,
     users: 2,
     progress: 70,
-    createdAt: "2025-06-28T12:00:00Z'",
+    createdAt: '2025-06-28T12:00:00Z',
   },
   {
     id: 2,
@@ -37,7 +37,7 @@ const projectData = [
     images: 30,
     users: 3,
     progress: 10,
-    createdAt: "2025-06-27T12:00:00Z'",
+    createdAt: '2025-05-27T12:00:00Z',
   },
   {
     id: 3,
@@ -47,7 +47,7 @@ const projectData = [
     images: 15,
     users: 1,
     progress: 50,
-    createdAt: "2025-06-28T12:00:00Z'",
+    createdAt: '2024-06-28T12:00:00Z',
   },
   {
     id: 4,
@@ -57,7 +57,7 @@ const projectData = [
     images: 50,
     users: 4,
     progress: 90,
-    createdAt: "2025-06-28T12:00:00Z'",
+    createdAt: '2025-06-28T12:00:00Z',
   },
 ];
 
@@ -132,7 +132,7 @@ function Projects() {
                   onChange={(e) => setSortBy(e.target.value)}
                 >
                   <MenuItem value="name">Name</MenuItem>
-                  <MenuItem value="images">Images</MenuItem>
+                  <MenuItem value="images">Date</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

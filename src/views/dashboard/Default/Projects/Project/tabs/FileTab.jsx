@@ -103,7 +103,7 @@ export default function FilesTab() {
     });
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
-    { title: 'Project Name', to: '/project/1', icon: IconBuildingCog },
+    { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
     { title: 'Othomosaic Viewer', icon: IconFiles }, // No `to` makes it the current page
   ];
 

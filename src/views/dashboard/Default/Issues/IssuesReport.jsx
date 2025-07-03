@@ -99,7 +99,7 @@ export default function IssueReport() {
   }, []);
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
-    { title: 'Project Name', to: '/project/1', icon: IconBuildingCog },
+    { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
     { title: ' Issue Tagging & Coordination', icon: IconTagStarred }, // No `to` makes it the current page
   ];
 

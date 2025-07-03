@@ -24,12 +24,24 @@ import {
 mapboxgl.accessToken =
   'pk.eyJ1IjoiaGlyYWtyYWoiLCJhIjoiY21icXd5eHRnMDNtaTJxczcxd2RmbTZwOCJ9.P6kpsuLMDdeK2DIMJZMrmw';
 
-const mockMapSnapshots = new Array(10).fill(null).map((_, i) => ({
-  id: i,
-  label: `Day ${i + 1}`,
-  center: [72.5714 + i * 0.1, 23.0225 + i * 0.1],
-  zoom: 10 + (i % 3),
-}));
+function getRandomDate(start, end) {
+  return new Date(
+    start.getTime() + Math.random() * (end.getTime() - start.getTime()),
+  );
+}
+
+const startDate = new Date(2024, 0, 1); // Jan 1, 2024
+const endDate = new Date(2025, 0, 1); // Jan 1, 2025
+
+const mockMapSnapshots = new Array(10).fill(null).map((_, i) => {
+  const randomDate = getRandomDate(startDate, endDate);
+  return {
+    id: i,
+    label: randomDate.toDateString(), // or .toLocaleDateString() if you prefer
+    center: [72.5714 + i * 0.1, 23.0225 + i * 0.1],
+    zoom: 10 + (i % 3),
+  };
+});
 
 const MapBoxInstance = ({ center, zoom, mapStyle }) => {
   const containerRef = useRef(null);
@@ -69,7 +81,7 @@ export default function CompareProject() {
   };
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
-    { title: 'Project Name', to: '/project/1', icon: IconBuildingCog },
+    { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
     { title: 'Progress Comparison', icon: IconGitCompare }, // No `to` makes it the current page
   ];
 

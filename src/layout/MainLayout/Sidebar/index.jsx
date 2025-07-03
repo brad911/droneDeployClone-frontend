@@ -64,7 +64,7 @@ function Sidebar() {
                   {'John Doe'}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Designation
+                  Site Engineer
                 </Typography>
               </Box>
             }

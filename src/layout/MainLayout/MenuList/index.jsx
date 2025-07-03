@@ -3,11 +3,15 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import { useLocation } from 'react-router-dom';
 
 // project imports
 import NavItem from './NavItem';
 import NavGroup from './NavGroup';
 import menuItems from 'menu-items';
+import platform from 'menu-items/platformList';
+import AdminDashboard from 'menu-items/superAdminList';
+import managementList from 'menu-items/managementList';
 
 import { useGetMenuMaster } from 'api/menu';
 
@@ -16,20 +20,26 @@ import { useGetMenuMaster } from 'api/menu';
 function MenuList() {
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
-
   const [selectedID, setSelectedID] = useState('');
-
   const lastItem = null;
+  const location = useLocation();
 
-  let lastItemIndex = menuItems.items.length - 1;
+  // Always build items in the order: AdminDashboard, platform (conditionally), managementList
+  let items = [AdminDashboard];
+  if (/^\/project\/1\//.test(location.pathname)) {
+    items.push(platform);
+  }
+  items.push(managementList);
+
+  let lastItemIndex = items.length - 1;
   let remItems = [];
   let lastItemId;
 
-  if (lastItem && lastItem < menuItems.items.length) {
-    lastItemId = menuItems.items[lastItem - 1].id;
+  if (lastItem && lastItem < items.length) {
+    lastItemId = items[lastItem - 1].id;
     lastItemIndex = lastItem - 1;
-    remItems = menuItems.items
-      .slice(lastItem - 1, menuItems.items.length)
+    remItems = items
+      .slice(lastItem - 1, items.length)
       .map((item) => ({
         title: item.title,
         elements: item.children,
@@ -40,7 +50,7 @@ function MenuList() {
       }));
   }
 
-  const navItems = menuItems.items
+  const navItems = items
     .slice(0, lastItemIndex + 1)
     .map((item, index) => {
       switch (item.type) {

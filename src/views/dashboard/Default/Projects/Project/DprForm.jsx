@@ -20,6 +20,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import FormControlSelect from 'ui-component/extended/Form/FormControlSelect';
 import Breadcrumbs from '../../../../../ui-component/extended/Breadcrumbs';
 import { IconBuildingCog, IconDroneOff, IconReport } from '@tabler/icons-react';
+import Paper from '@mui/material/Paper';
+import Avatar from '@mui/material/Avatar';
 
 const weatherOptions = [
   { value: 'sunny', label: 'Sunny' },
@@ -56,7 +58,9 @@ const DprForm = () => {
   ]);
   const [issues, setIssues] = useState('');
   const [milestones, setMilestones] = useState('');
-  const [remarks, setRemarks] = useState('');
+  const [qualityObservations, setQualityObservations] = useState('');
+  const [safetyRemarks, setSafetyRemarks] = useState('');
+  const [photos, setPhotos] = useState([]);
   const [newField, setNewField] = useState('');
   const [fields, setFields] = useState([]);
 
@@ -75,10 +79,15 @@ const DprForm = () => {
       setNewField('');
     }
   };
+  // Handler for photo upload
+  const handlePhotoUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setPhotos((prev) => [...prev, ...files]);
+  };
 
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
-    { title: 'Project Name', to: '/project/1', icon: IconBuildingCog },
+    { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
     { title: 'Progress Report', icon: IconReport }, // No `to` makes it the current page
   ];
   return (
@@ -103,18 +112,25 @@ const DprForm = () => {
         <Grid
           container
           spacing={2}
-          sx={{ mb: 2, border: '1px solid #e0e0e0', borderRadius: 2, p: 2 }}
+          sx={{
+            mb: 2,
+            border: '1px solid #e0e0e0',
+            borderRadius: 2,
+            p: 2,
+            flexWrap: 'nowrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4} sx={{ width: '20%' }}>
             <TextField
               label="Project"
               value={project.name}
-              fullWidth
-              InputProps={{ readOnly: true }}
               sx={{ mb: 1 }}
+              fullWidth
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4} sx={{ width: '20%' }}>
             <TextField
               label="Project Location"
               value={project.location}
@@ -122,7 +138,7 @@ const DprForm = () => {
               sx={{ mb: 1 }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4} sx={{ width: '20%' }}>
             <TextField
               label="Contract ID/Project number"
               value={project.contractId}
@@ -130,8 +146,8 @@ const DprForm = () => {
               sx={{ mb: 1 }}
             />
           </Grid>
-          {/* Swapped Position: Date comes before Team */}
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={6} sx={{ width: '20%' }}>
             <TextField
               label="Date"
               type="date"
@@ -139,10 +155,14 @@ const DprForm = () => {
               onChange={(e) => setDate(e.target.value)}
               fullWidth
               sx={{ mb: 1 }}
+              InputLabelProps={{
+                shrink: true, // Ensures date label doesn't overlap
+              }}
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <FormControl fullWidth sx={{ mb: 1, width: 220 }}>
+
+          <Grid item xs={12} md={6} sx={{ width: '20%' }}>
+            <FormControl fullWidth sx={{ mb: 1 }}>
               <InputLabel id="project-team-label">Project Team</InputLabel>
               <Select
                 labelId="project-team-label"
@@ -160,17 +180,49 @@ const DprForm = () => {
                 <MenuItem value="dave@example.com">dave@example.com</MenuItem>
               </Select>
             </FormControl>
-
-            {/* Show selected team members below */}
-            {project.team.length > 0 && (
-              <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
-                {project.team.map((member, idx) => (
-                  <Chip key={idx} label={member} />
-                ))}
-              </Stack>
-            )}
           </Grid>
         </Grid>
+        {project.team.length > 0 && (
+          <Paper
+            spacing={2}
+            sx={{
+              mt: 2,
+              mb: 2,
+              p: 2,
+              border: '1px solid #e0e0e0',
+              borderRadius: 2,
+              width: '100%',
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 1, color: 'text.secondary' }}
+            >
+              Project Team Members
+            </Typography>
+            <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
+              {project.team.map((member, idx) => (
+                <Chip
+                  key={idx}
+                  label={member}
+                  avatar={
+                    <Avatar
+                      sx={{
+                        bgcolor: 'primary.main',
+                        width: 24,
+                        height: 24,
+                        fontSize: 14,
+                      }}
+                    >
+                      {member[0]?.toUpperCase()}
+                    </Avatar>
+                  }
+                  sx={{ mb: 1 }}
+                />
+              ))}
+            </Stack>
+          </Paper>
+        )}
 
         {/* Weather Conditions */}
         <Box sx={{ mb: 2 }}>
@@ -187,8 +239,12 @@ const DprForm = () => {
         </Box>
 
         {/* Manpower, Material, Machinery */}
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} md={4}>
+        <Grid
+          container
+          justifyContent={'space-between'}
+          sx={{ mb: 2, flexWrap: 'nowrap', borderRadius: 2 }}
+        >
+          <Grid item xs={12} md={4} sx={{ width: '33%' }}>
             <TextField
               label="Manpower"
               value={manpower}
@@ -196,7 +252,7 @@ const DprForm = () => {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4} sx={{ width: '33%' }}>
             <TextField
               label="Material"
               value={material}
@@ -204,7 +260,7 @@ const DprForm = () => {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4} sx={{ width: '33%' }}>
             <TextField
               label="Machinery"
               value={machinery}
@@ -298,9 +354,22 @@ const DprForm = () => {
           />
         </Box>
 
-        {/* Key Milestones & Remarks */}
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} md={6}>
+        {/* Key Milestones, Quality Observations, Safety Remarks in a single row */}
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            mb: 2,
+            borderRadius: 2,
+            border: '1px solid #e0e0e0',
+            flexWrap: 'nowrap',
+          }}
+        >
+          <Grid
+            item
+            xs={12}
+            sx={{ display: 'flex', flexDirection: 'column', width: '33%' }}
+          >
             <TextField
               label="Key Milestones Achieved"
               value={milestones}
@@ -308,23 +377,61 @@ const DprForm = () => {
               fullWidth
               multiline
               minRows={2}
-              InputProps={{
-                endAdornment: <Button size="small">add Photo options</Button>,
-              }}
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4} sx={{ width: '33%' }}>
             <TextField
-              label="Observation or Remarks"
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
+              label="Quality Observations"
+              value={qualityObservations}
+              onChange={(e) => setQualityObservations(e.target.value)}
+              fullWidth
+              multiline
+              minRows={2}
+            />
+          </Grid>
+          <Grid item xs={12} md={4} sx={{ width: '33%' }}>
+            <TextField
+              label="Safety Remarks"
+              value={safetyRemarks}
+              onChange={(e) => setSafetyRemarks(e.target.value)}
               fullWidth
               multiline
               minRows={2}
             />
           </Grid>
         </Grid>
-
+        <Button variant="outlined" component="label" sx={{ mt: 1, mb: 2 }}>
+          Add Photos
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            onChange={handlePhotoUpload}
+          />
+        </Button>
+        {/* List uploaded images below */}
+        {photos.length > 0 && (
+          <Box sx={{ mt: 1 }}>
+            <Grid container spacing={1}>
+              {photos.map((photo, idx) => (
+                <Grid item key={idx}>
+                  <img
+                    src={URL.createObjectURL(photo)}
+                    alt={`uploaded-${idx}`}
+                    style={{
+                      width: 60,
+                      height: 60,
+                      objectFit: 'cover',
+                      borderRadius: 4,
+                      border: '1px solid #ccc',
+                    }}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
         {/* Create New Field */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <TextField

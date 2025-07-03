@@ -10,6 +10,7 @@ import {
   InputLabel,
   OutlinedInput,
   TextField,
+  Paper,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -73,8 +74,8 @@ const CreateProjectForm = ({ onSubmit }) => {
   });
 
   return (
-    <Box sx={{ p: 5, maxWidth: 500 }}>
-      <Typography variant="h3" mb={2}>
+    <Paper sx={{ p: 5, maxWidth: 500 }}>
+      <Typography variant="h2" mb={2}>
         Create New Project
       </Typography>
       <Formik
@@ -87,40 +88,29 @@ const CreateProjectForm = ({ onSubmit }) => {
       >
         {({ values, errors, touched, setFieldValue }) => (
           <Form>
-            {/* Project Name */}
-            <FormControl
+            <TextField
+              sx={{ mb: 2 }}
               fullWidth
-              sx={{ ...theme.typography.customInput, mb: 2 }}
-            >
-              <InputLabel>Project Name</InputLabel>
-              <OutlinedInput
-                fullWidth
-                name="name"
-                label="Project Name"
-                value={values.name}
-                onChange={(e) => setFieldValue('name', e.target.value)}
-                error={touched.name && Boolean(errors.name)}
-              />
-              {touched.name && errors.name && (
-                <Typography color="error" variant="caption">
-                  {errors.name}
-                </Typography>
-              )}
-            </FormControl>
-            {/* Project Location */}
-            <FormControl
+              name="name"
+              label="Project Name"
+              value={values.name}
+              onChange={(e) => setFieldValue('name', e.target.value)}
+              error={touched.name && Boolean(errors.name)}
+            />
+            {touched.name && errors.name && (
+              <Typography color="error" variant="caption">
+                {errors.name}
+              </Typography>
+            )}
+
+            <TextField
+              sx={{ mb: 2 }}
               fullWidth
-              sx={{ ...theme.typography.customInput, mb: 2 }}
-            >
-              <InputLabel>Project Location</InputLabel>
-              <OutlinedInput
-                fullWidth
-                name="location"
-                label="Project Location"
-                value={values.location || ''}
-                onChange={(e) => setFieldValue('location', e.target.value)}
-              />
-            </FormControl>
+              name="location"
+              label="Project Location"
+              value={values.location || ''}
+              onChange={(e) => setFieldValue('location', e.target.value)}
+            />
 
             {/* Start & End Date */}
             <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -130,12 +120,16 @@ const CreateProjectForm = ({ onSubmit }) => {
                   value={values.startDate}
                   onChange={(val) => setFieldValue('startDate', val)}
                   renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      fullWidth
-                      error={touched.startDate && Boolean(errors.startDate)}
-                      helperText={touched.startDate && errors.startDate}
-                    />
+                    <Box
+                      sx={{ '& .MuiInputBase-root': { borderRadius: '30px' } }}
+                    >
+                      <TextField
+                        {...params}
+                        fullWidth
+                        error={touched.startDate && Boolean(errors.startDate)}
+                        helperText={touched.startDate && errors.startDate}
+                      />
+                    </Box>
                   )}
                 />
                 <DatePicker
@@ -154,24 +148,30 @@ const CreateProjectForm = ({ onSubmit }) => {
               </Stack>
             </LocalizationProvider>
 
+            <TextField
+              sx={{ mb: 2 }}
+              fullWidth
+              name="location"
+              label="Project Location"
+              value={values.location || ''}
+              onChange={(e) => setFieldValue('location', e.target.value)}
+            />
+
             {/* Team Input */}
-            <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-              <InputLabel>Invite Team Member (press Enter to add)</InputLabel>
-              <OutlinedInput
-                fullWidth
-                label="Invite Team Member (press Enter to add)"
-                value={emailInput}
-                onChange={(e) => setEmailInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && emailInput) {
-                    e.preventDefault();
-                    setFieldValue('team', [...values.team, emailInput]);
-                    setEmailInput('');
-                  }
-                }}
-                sx={{ mb: 1 }}
-              />
-            </FormControl>
+            <TextField
+              sx={{ mb: 2 }}
+              fullWidth
+              label="Invite Team Member (press Enter to add)"
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && emailInput) {
+                  e.preventDefault();
+                  setFieldValue('team', [...values.team, emailInput]);
+                  setEmailInput('');
+                }
+              }}
+            />
             <Stack direction="row" spacing={1} flexWrap="wrap" mb={2}>
               {values.team.map((email, index) => (
                 <Chip
@@ -185,22 +185,6 @@ const CreateProjectForm = ({ onSubmit }) => {
                 />
               ))}
             </Stack>
-
-            {/* File Dropzone */}
-            {/* Project Location */}
-            <FormControl
-              fullWidth
-              sx={{ ...theme.typography.customInput, mb: 2 }}
-            >
-              <InputLabel>Project Location</InputLabel>
-              <OutlinedInput
-                fullWidth
-                name="location"
-                label="Project Location"
-                value={values.location || ''}
-                onChange={(e) => setFieldValue('location', e.target.value)}
-              />
-            </FormControl>
 
             {/* Enhanced Dropzone */}
             <Box
@@ -239,18 +223,13 @@ const CreateProjectForm = ({ onSubmit }) => {
             </Box>
 
             {/* Submit */}
-            <Button
-              color="secondary"
-              variant="contained"
-              type="submit"
-              fullWidth
-            >
+            <Button color="primary" variant="contained" type="submit" fullWidth>
               Create Project
             </Button>
           </Form>
         )}
       </Formik>
-    </Box>
+    </Paper>
   );
 };
 

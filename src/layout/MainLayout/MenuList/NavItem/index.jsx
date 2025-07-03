@@ -167,12 +167,13 @@ export default function NavItem({
                 <Typography
                   ref={ref}
                   noWrap
-                  variant={isSelected ? 'h5' : 'body1'}
+                  // variant={isSelected ? 'h6' : 'h6'}
                   color="inherit"
                   sx={{
+                    fontSize: isSelected ? '13px' : '12px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    width: 102,
+                    width: 200,
                   }}
                 >
                   {item.title}

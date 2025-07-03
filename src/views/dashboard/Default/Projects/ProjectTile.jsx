@@ -7,19 +7,17 @@ import {
   Box,
   Stack,
   Button,
-  // LinearProgress,
-  // Tooltip,
 } from '@mui/material';
 import ImageIcon from '@mui/icons-material/PhotoLibrary';
 import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from 'react-router';
-// import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 
 const ProjectTile = ({ project }) => {
   const navigate = useNavigate();
 
   const handleView = () => {
-    navigate(`/project/${project.id}`);
+    navigate(`/project/1/View`);
   };
 
   return (
@@ -76,17 +74,9 @@ const ProjectTile = ({ project }) => {
           mb={0.5}
         >
           <Typography variant="caption" color="text.secondary">
-            {project.progress}% 
+            {project.progress}%
           </Typography>
-          <Typography variant="caption" color="text.secondary">
-            <Typography variant="caption" color="text.secondary">
-              {project.createdAt
-                ? formatDistanceToNow(new Date(), {
-                    addSuffix: true,
-                  })
-                : 'Time unknown'}
-            </Typography>
-          </Typography>
+          <Typography variant="caption" color="text.secondary"></Typography>
         </Stack>
         <LinearProgress
           variant="determinate"
@@ -110,6 +100,19 @@ const ProjectTile = ({ project }) => {
             <Stack direction="row" spacing={0.5} alignItems="center">
               <PersonIcon fontSize="small" />
               <Typography variant="caption">{project.users}</Typography>
+            </Stack>
+            <Stack>
+              <Typography
+                variant="caption"
+                fontSize={10}
+                color="text.secondary"
+              >
+                {project.createdAt
+                  ? formatDistanceToNow(project.createdAt, {
+                      addSuffix: true,
+                    })
+                  : 'Time unknown'}
+              </Typography>
             </Stack>
           </Stack>
           <Button

@@ -27,7 +27,7 @@ mapboxgl.accessToken =
 
 const pageLinks = [
   { title: 'Projects', to: '/project', icon: IconDroneOff },
-  { title: 'Project Name', to: '/project/1', icon: IconBuildingCog },
+  { title: 'Project Name', icon: IconBuildingCog },
   { title: 'Othomosaic Viewer', icon: IconLiveViewFilled }, // No `to` makes it the current page
 ];
 
@@ -110,7 +110,7 @@ export default function ViewTab() {
         }}
       >
         {/* Left Panel */}
-        <Box sx={{ width: '30%', pr: 3, overflowY: 'auto', height: '100%' }}>
+        <Box sx={{ width: '15%', pr: 3, overflowY: 'auto', height: '100%' }}>
           <Typography variant="h2" mb={2}>
             Project Details
           </Typography>
@@ -198,7 +198,7 @@ export default function ViewTab() {
         <Box
           ref={mapContainer}
           sx={{
-            width: '70%',
+            width: '85%',
             borderRadius: 2,
             overflow: 'hidden',
             height: '80%',
