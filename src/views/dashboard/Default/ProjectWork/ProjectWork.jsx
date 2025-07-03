@@ -110,7 +110,7 @@ export default function ViewTab() {
         }}
       >
         {/* Left Panel */}
-        <Box sx={{ width: '15%', pr: 3, overflowY: 'auto', height: '100%' }}>
+        <Box sx={{ width: '20%', pr: 3, overflowY: 'auto', height: '100%' }}>
           <Typography variant="h2" mb={2}>
             Project Details
           </Typography>
@@ -198,7 +198,7 @@ export default function ViewTab() {
         <Box
           ref={mapContainer}
           sx={{
-            width: '85%',
+            width: '80%',
             borderRadius: 2,
             overflow: 'hidden',
             height: '80%',

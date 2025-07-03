@@ -13,10 +13,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CategoryIcon from '@mui/icons-material/Category';
 
-export default function IssueDetailsPanel({
-  sampleIssue,
-  placeholderImages,
-}) {
+export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
   return (
     <Paper
       sx={{
@@ -62,16 +59,30 @@ export default function IssueDetailsPanel({
         <Grid item xs={6}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <PriorityHighIcon fontSize="small" color="error" sx={{ mr: 1 }} />
-            <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mr: 0.5 }}
+            >
               Priority
             </Typography>
-            <Typography variant="body2" fontWeight={500} color={sampleIssue.priority === 'High' ? 'error.main' : 'text.primary'}>
+            <Typography
+              variant="body2"
+              fontWeight={500}
+              color={
+                sampleIssue.priority === 'High' ? 'error.main' : 'text.primary'
+              }
+            >
               {sampleIssue.priority}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <CategoryIcon fontSize="small" color="action" sx={{ mr: 1 }} />
-            <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mr: 0.5 }}
+            >
               Category
             </Typography>
             <Typography variant="body2" fontWeight={500}>
@@ -82,7 +93,11 @@ export default function IssueDetailsPanel({
         <Grid item xs={6}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <PersonIcon fontSize="small" color="action" sx={{ mr: 1 }} />
-            <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mr: 0.5 }}
+            >
               Assignee
             </Typography>
             <Typography variant="body2" fontWeight={500}>
@@ -91,7 +106,11 @@ export default function IssueDetailsPanel({
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <CalendarTodayIcon fontSize="small" color="action" sx={{ mr: 1 }} />
-            <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mr: 0.5 }}
+            >
               Created
             </Typography>
             <Typography variant="body2" fontWeight={500}>
@@ -106,16 +125,9 @@ export default function IssueDetailsPanel({
           Due Date
         </Typography>
         <Typography variant="body2" fontWeight={500}>
-          {sampleIssue.dueDate||"N/A"}
+          {sampleIssue.dueDate || 'N/A'}
         </Typography>
       </Box>
-      <Divider sx={{ my: 1 }} />
-      <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
-        Linked to Scheduled Work
-      </Typography>
-      <Typography variant="body2" fontWeight={500} sx={{ mb: 2 }}>
-        {sampleIssue.linkedWork}
-      </Typography>
       <Divider sx={{ my: 1 }} />
       <Typography variant="subtitle2" sx={{ mb: 1 }}>
         Photos
