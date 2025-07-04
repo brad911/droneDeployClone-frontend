@@ -6,6 +6,7 @@ import {
   IconTagStarred,
   IconView360Number,
   IconFiles,
+  IconUsers,
 } from '@tabler/icons-react';
 
 // ==============================|| UTILITIES MENU ITEMS ||============================== //
@@ -17,7 +18,7 @@ const platform = {
   children: [
     {
       id: 'util-typography',
-      title: 'Orthomosaic Viewer',
+      title: 'Exterior (Map View)',
       type: 'item',
       url: '/project/1/View',
       icon: IconLiveViewFilled,
@@ -25,7 +26,7 @@ const platform = {
     },
     {
       id: 'util-color',
-      title: 'Progress Comparison',
+      title: 'Compare View',
       type: 'item',
       url: '/project/1/compare',
       icon: IconGitCompare,
@@ -41,7 +42,7 @@ const platform = {
     },
     {
       id: 'issueTaggingAndCoordination',
-      title: 'Issue Tagging & Coordination',
+      title: 'Coordination Logs',
       type: 'item',
       url: '/project/1/issue',
       icon: IconTagStarred,
@@ -49,9 +50,9 @@ const platform = {
     },
     {
       id: '360viewer',
-      title: '360 Viewer (Interior)',
+      title: 'Interior (360 View) ',
       type: 'item',
-      url: '/project/1/report',
+      url: '/project/1/360view',
       icon: IconView360Number,
       breadcrumbs: false,
     },
@@ -61,6 +62,14 @@ const platform = {
       type: 'item',
       url: '/project/1/files',
       icon: IconFiles,
+      breadcrumbs: false,
+    },
+    {
+      id: 'projectTeam',
+      title: 'Project Team',
+      type: 'item',
+      url: '/project/1/team',
+      icon: IconUsers,
       breadcrumbs: false,
     },
   ],

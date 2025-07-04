@@ -261,7 +261,7 @@ export default function ProfileSection() {
                           '& .MuiListItemButton-root': { mt: 0.5 },
                         }}
                       >
-                        <ListItemButton
+                        {/* <ListItemButton
                           sx={{ borderRadius: `${borderRadius}px` }}
                           selected={selectedIndex === 0}
                         >
@@ -275,7 +275,7 @@ export default function ProfileSection() {
                               </Typography>
                             }
                           />
-                        </ListItemButton>
+                        </ListItemButton> */}
                         {/* <ListItemButton
                           sx={{ borderRadius: `${borderRadius}px` }}
                           selected={selectedIndex === 1}

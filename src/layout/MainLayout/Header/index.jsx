@@ -34,9 +34,10 @@ export default function Header() {
         >
           <LogoSection />
         </Box>
-        {/* <Avatar
+        <Avatar
           variant="rounded"
           sx={{
+            mt: 2,
             ...theme.typography.commonAvatar,
             ...theme.typography.mediumAvatar,
             overflow: 'hidden',
@@ -52,7 +53,7 @@ export default function Header() {
           color="inherit"
         >
           <IconMenu2 stroke={1.5} size="20px" />
-        </Avatar> */}
+        </Avatar>
       </Box>
 
       {/* header search */}

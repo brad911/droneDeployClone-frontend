@@ -45,16 +45,21 @@ const DprForm = () => {
     contractId: '',
     team: [],
   });
-  const [date, setDate] = useState(() => {
+  const [from, setFrom] = useState(() => {
     const today = new Date();
     return today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  });
+  const [to, setTo] = useState(() => {
+    const today = new Date();
+    today.setDate(today.getDate() + 1); // add one day
+    return today.toISOString().split('T')[0]; // format: "YYYY-MM-DD"
   });
   const [weather, setWeather] = useState('');
   const [manpower, setManpower] = useState('');
   const [material, setMaterial] = useState('');
   const [machinery, setMachinery] = useState('');
   const [activities, setActivities] = useState([
-    { name: '', quantity: '', status: '' },
+    { name: '', quantity: '', unit: '', status: '' },
   ]);
   const [issues, setIssues] = useState('');
   const [milestones, setMilestones] = useState('');
@@ -71,7 +76,10 @@ const DprForm = () => {
     setActivities(updated);
   };
   const handleAddActivity = () => {
-    setActivities([...activities, { name: '', quantity: '', status: '' }]);
+    setActivities([
+      ...activities,
+      { name: '', quantity: '', unit: '', status: '' },
+    ]);
   };
   const handleAddField = () => {
     if (newField.trim()) {
@@ -149,15 +157,22 @@ const DprForm = () => {
 
           <Grid item xs={12} md={6} sx={{ width: '20%' }}>
             <TextField
-              label="Date"
+              label="From"
               type="date"
-              value={date}
+              value={from}
               onChange={(e) => setDate(e.target.value)}
               fullWidth
               sx={{ mb: 1 }}
-              InputLabelProps={{
-                shrink: true, // Ensures date label doesn't overlap
-              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6} sx={{ width: '20%' }}>
+            <TextField
+              label="To"
+              type="date"
+              value={to}
+              onChange={(e) => setDate(e.target.value)}
+              fullWidth
+              sx={{ mb: 1 }}
             />
           </Grid>
 
@@ -298,6 +313,17 @@ const DprForm = () => {
                   type="number"
                 />
               </Grid>
+              <Grid item xs={12} md={3}>
+                <TextField
+                  label="Unit"
+                  value={activity.unit}
+                  onChange={(e) =>
+                    handleActivityChange(idx, 'quantity', e.target.value)
+                  }
+                  fullWidth
+                  type="text"
+                />
+              </Grid>
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
                   <InputLabel>Status</InputLabel>
@@ -344,7 +370,7 @@ const DprForm = () => {
         {/* Issues & Challenges */}
         <Box sx={{ mb: 2 }}>
           <TextField
-            label="Issues & Challenges"
+            label="Hindrances and Challenges"
             value={issues}
             onChange={(e) => setIssues(e.target.value)}
             fullWidth
@@ -470,7 +496,7 @@ const DprForm = () => {
 
         {/* Submit Button */}
         <Button variant="contained" color="primary" fullWidth>
-          Submit Daily Progress Report
+          Submit
         </Button>
       </Box>
     </MainCard>

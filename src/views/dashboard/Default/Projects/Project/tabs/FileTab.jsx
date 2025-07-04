@@ -154,7 +154,7 @@ export default function FilesTab() {
       </Stack>
 
       <Button variant="contained" component="label" sx={{ mb: 2 }}>
-        Choose File
+        Upload Files
         <input type="file" hidden onChange={handleUpload} />
       </Button>
 
