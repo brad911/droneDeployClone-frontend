@@ -24,6 +24,13 @@ import {
 } from '@tabler/icons-react';
 import { useSnackbar } from 'notistack';
 import Breadcrumbs from '../../../../../../ui-component/extended/Breadcrumbs';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FolderIcon from '@mui/icons-material/Folder';
 
 const getFileIcon = (filename) => {
   const ext = filename.split('.').pop().toLowerCase();
@@ -56,11 +63,20 @@ export default function FilesTab() {
     { name: 'site-notes.docx', uploadedAt: getCurrentDateString() },
     { name: 'data-sheet.xlsx', uploadedAt: getCurrentDateString() },
   ]);
+  // Folder state
+  const [folders, setFolders] = useState([
+    { name: 'Sample Folder', createdAt: getCurrentDateString() },
+  ]);
+  const [createFolderOpen, setCreateFolderOpen] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('latest');
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
+  // Add state for delete confirmation dialog
+  const [deleteFolderDialogOpen, setDeleteFolderDialogOpen] = useState(false);
+  const [folderToDelete, setFolderToDelete] = useState(null);
 
   const handleUpload = (event) => {
     const uploadedFile = event.target.files[0];
@@ -91,6 +107,28 @@ export default function FilesTab() {
     }, 1500);
   };
 
+  // Folder handlers
+  const handleCreateFolder = () => {
+    if (newFolderName.trim() && !folders.find(f => f.name === newFolderName.trim())) {
+      setFolders([...folders, { name: newFolderName.trim(), createdAt: getCurrentDateString() }]);
+      setNewFolderName('');
+      setCreateFolderOpen(false);
+    }
+  };
+  const handleDeleteFolder = (name) => {
+    setFolderToDelete(name);
+    setDeleteFolderDialogOpen(true);
+  };
+  const confirmDeleteFolder = () => {
+    setFolders(folders.filter(f => f.name !== folderToDelete));
+    setFolderToDelete(null);
+    setDeleteFolderDialogOpen(false);
+  };
+  const cancelDeleteFolder = () => {
+    setFolderToDelete(null);
+    setDeleteFolderDialogOpen(false);
+  };
+
   // Filtering & Sorting
   const filteredFiles = files
     .filter((file) =>
@@ -104,13 +142,13 @@ export default function FilesTab() {
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
     { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
-    { title: 'Othomosaic Viewer', icon: IconFiles }, // No `to` makes it the current page
+    { title: 'Project Files', icon: IconFiles }, // No `to` makes it the current page
   ];
 
   return (
     <Box>
       <Typography variant="h1" gutterBottom>
-        Upload Files
+        Project Files
       </Typography>
       <Breadcrumbs
         sx={{ mt: 3 }}
@@ -120,6 +158,26 @@ export default function FilesTab() {
         rightAlign={false}
       />
       <Divider sx={{ my: 1.5 }} />
+      {/* Create Folder Dialog */}
+      <Dialog open={createFolderOpen} onClose={() => setCreateFolderOpen(false)}>
+        <DialogTitle>Create New Folder</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Folder Name"
+            fullWidth
+            value={newFolderName}
+            onChange={e => setNewFolderName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') handleCreateFolder(); }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCreateFolderOpen(false)}>Cancel</Button>
+          <Button onClick={handleCreateFolder} variant="contained">Create</Button>
+        </DialogActions>
+      </Dialog>
+      {/* End Explorer UI */}
 
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
@@ -152,12 +210,16 @@ export default function FilesTab() {
           <MenuItem value="za">Z–A</MenuItem>
         </TextField>
       </Stack>
-
-      <Button variant="contained" component="label" sx={{ mb: 2 }}>
-        Upload Files
-        <input type="file" hidden onChange={handleUpload} />
-      </Button>
-
+      {/* Buttons: Create Folder and Upload Files */}
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+        <Button variant="outlined" startIcon={<FolderIcon />} onClick={() => setCreateFolderOpen(true)}>
+          Create Folder
+        </Button>
+        <Button variant="contained" component="label">
+          Upload Files
+          <input type="file" hidden onChange={handleUpload} />
+        </Button>
+      </Stack>
       {uploadProgress > 0 && uploadProgress < 100 && (
         <LinearProgress
           variant="determinate"
@@ -165,14 +227,59 @@ export default function FilesTab() {
           sx={{ mb: 3, borderRadius: 2 }}
         />
       )}
-
+      {/* Explorer: Folders and Files together */}
       <Typography variant="h5" gutterBottom>
-        Uploaded Files
+        Explorer
       </Typography>
-
-      <Grid container spacing={2}>
-        {filteredFiles.map((file, idx) => (
-          <Grid item xs={12} sm={6} md={4} key={idx}>
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        {/* Folders first */}
+        {folders.map((folder) => (
+          <Grid item xs={12} sm={6} md={4} key={"folder-" + folder.name}>
+            <Paper
+              elevation={2}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Stack direction="row" spacing={2} alignItems="center">
+                <FolderIcon color="primary" />
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {folder.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Created on: {folder.createdAt}
+                  </Typography>
+                </Box>
+              </Stack>
+              <IconButton aria-label="delete" onClick={() => handleDeleteFolder(folder.name)}>
+                <DeleteIcon color="error" />
+              </IconButton>
+            </Paper>
+          </Grid>
+        ))}
+        {/* Folder delete confirmation dialog */}
+        <Dialog open={deleteFolderDialogOpen} onClose={cancelDeleteFolder}>
+          <DialogTitle>Delete Folder?</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete the folder <b>{folderToDelete}</b>?<br/>
+              <br/>
+              <b>All files in this folder will be deleted.</b>
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={cancelDeleteFolder}>Cancel</Button>
+            <Button onClick={confirmDeleteFolder} color="error" variant="contained">Delete</Button>
+          </DialogActions>
+        </Dialog>
+        {/* Files after folders */}
+        {filteredFiles.map((file) => (
+          <Grid item xs={12} sm={6} md={4} key={"file-" + file.name}>
             <Paper
               elevation={3}
               onClick={() => handleFileClick(file)}

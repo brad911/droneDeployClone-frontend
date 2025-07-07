@@ -28,7 +28,7 @@ mapboxgl.accessToken =
 const pageLinks = [
   { title: 'Projects', to: '/project', icon: IconDroneOff },
   { title: 'Project Name', icon: IconBuildingCog },
-  { title: 'Othomosaic Viewer', icon: IconLiveViewFilled }, // No `to` makes it the current page
+  { title: 'Exterior (Map View)', icon: IconLiveViewFilled }, // No `to` makes it the current page
 ];
 
 export default function ViewTab() {
@@ -72,7 +72,7 @@ export default function ViewTab() {
         }}
       >
         {/* Breadcrumb */}
-        <Typography variant="h1">Orthomosaic Viewer</Typography>
+        <Typography variant="h1">Exterior (Map View)</Typography>
         {/* Upload + Status */}
         <Stack direction="row" spacing={3} alignItems="center">
           <Button variant="contained" color="primary">

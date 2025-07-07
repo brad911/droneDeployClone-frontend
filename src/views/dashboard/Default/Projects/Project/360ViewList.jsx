@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
+import Breadcrumbs from '../../../../../ui-component/extended/Breadcrumbs';
+import { IconBuildingCog, IconDroneOff, IconView360Number } from '@tabler/icons-react';
 
 const mockData = Array.from({ length: 23 }, (_, i) => ({
   serial: i + 1,
@@ -59,6 +61,21 @@ const AllDirectionViewList = () => {
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', bgcolor: theme.palette.background.paper }}>
+         <Typography variant="h1" sx={{ml:1,mt:1}} gutterBottom>
+          Interior (360 View)
+        </Typography>
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        sx={{ m: 2 }}
+        links={[
+          { title: 'Projects', to: '/project', icon: IconDroneOff },
+          { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
+          { title: 'Interior (360 View)', icon: IconView360Number }, // No `to` makes it the current page
+        ]}
+        card={false}
+        custom={true}
+        rightAlign={false}
+      />
       <Box sx={{ display: 'flex', alignItems: 'center', p: 2, pb: 1, gap: 2 }}>
         <Typography variant="h6" sx={{ flex: 1, color: theme.palette.primary.main }}>
           360° View List

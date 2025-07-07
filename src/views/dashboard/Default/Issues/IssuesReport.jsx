@@ -100,7 +100,7 @@ export default function IssueReport() {
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
     { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
-    { title: ' Issue Tagging & Coordination', icon: IconTagStarred }, // No `to` makes it the current page
+    { title: 'Coordination Logs', icon: IconTagStarred }, // No `to` makes it the current page
   ];
 
   return (
@@ -119,7 +119,7 @@ export default function IssueReport() {
       >
         <Box>
           <Typography variant="h1" gutterBottom>
-            Issue Tagging & Coordination
+            Coordination Logs
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>

@@ -19,6 +19,7 @@ const IssueForm = ({ open = false, onClose, onSave }) => {
     assignee: '',
     photos: [],
   });
+  const logType = ['Issue', 'Task'];
 
   const teamMembers = [
     'John Smith',
@@ -57,21 +58,34 @@ const IssueForm = ({ open = false, onClose, onSave }) => {
         }}
       >
         <Typography variant="h3" sx={{ mb: 2 }}>
-          New Issue
+          New Log
         </Typography>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
-            label="Scheduled Date"
+            select
+            label="Type"
+            value={form.assignee}
+            onChange={(e) => handleFormChange('assignee', e.target.value)}
+            fullWidth
+            size="small"
+          >
+            {logType.map((m) => (
+              <MenuItem key={m} value={m}>
+                {m}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label="Due Date"
             type="date"
             value={form.date}
             onChange={(e) => handleFormChange('date', e.target.value)}
             fullWidth
             size="small"
-            InputLabelProps={{ shrink: true }}
           />
           <TextField
-            label="Issue Title"
+            label="Title"
             value={form.title}
             onChange={(e) => handleFormChange('title', e.target.value)}
             fullWidth
@@ -147,7 +161,7 @@ const IssueForm = ({ open = false, onClose, onSave }) => {
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
             <Button onClick={onClose}>Cancel</Button>
             <Button variant="contained" onClick={handleSubmit}>
-              Save Issue
+              Save Log
             </Button>
           </Box>
         </Box>

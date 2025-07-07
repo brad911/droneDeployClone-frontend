@@ -75,7 +75,7 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
         p: 2,
         display: 'flex',
         flexDirection: 'column',
-        gap: 1.5,
+        gap: .5,
         borderRadius: 2,
         boxShadow: 1,
         border: '1px solid #f0f0f0',
@@ -83,9 +83,15 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
         overflow: 'auto',
       }}
     >
-      <Typography variant="h3" fontWeight={600} sx={{ mb: 0.5 }}>
-        Issue Details
-      </Typography>
+      {/* Breadcrumbs */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+        <Typography variant="h3" fontWeight={600}>
+          Issue Details
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+          {sampleIssue.createdAt.toLocaleDateString()} {/* Show createdAt here */}
+        </Typography>
+      </Box>
       <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
         Information about the selected issue
       </Typography>
@@ -147,22 +153,6 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
                 {sampleIssue.assignee}
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-              <CalendarTodayIcon
-                fontSize="small"
-                color="action"
-                sx={{ mr: 0.5 }}
-              />
-              <Typography variant="caption" fontWeight={500}>
-                {sampleIssue.createdAt.toLocaleDateString()}
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
-
-        {/* Row 2 - Last item full width, align start */}
-        <Grid gap={13} justifyContent={'space-evenly'} container item>
-          <Grid item xs={12}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <CalendarTodayIcon
                 fontSize="small"
@@ -173,48 +163,48 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
                 {sampleIssue.dueDate || new Date().toLocaleDateString()}
               </Typography>
             </Box>
+            {/* Removed createdAt from here */}
           </Grid>
-          <Grid></Grid>
         </Grid>
       </Grid>
 
       <Divider sx={{ my: 0.5 }} />
-      <Typography variant="caption" fontWeight={600} sx={{ mb: 0.5 }}>
+      <Typography variant="caption" fontWeight={600} >
         Photos
       </Typography>
-      <Grid container spacing={0.5} sx={{ mb: 1 }}>
+      {/* Images in a horizontal scrollable row */}
+      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, overflowX: 'auto'}}>
         {placeholderImages.map((img, idx) => (
-          <Grid item xs={4} key={idx}>
-            <Box
-              sx={{
-                width: '100%',
-                height: 40,
-                bgcolor: '#f3f3f3',
-                borderRadius: 0.5,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-              }}
-            >
-              <img
-                src={img}
-                alt={`placeholder-${idx}`}
-                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-              />
-            </Box>
-          </Grid>
+          <Box
+            key={idx}
+            sx={{
+              minWidth: 60,
+              height: 40,
+              bgcolor: '#f3f3f3',
+              borderRadius: 0.5,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+            }}
+          >
+            <img
+              src={img}
+              alt={`placeholder-${idx}`}
+              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+            />
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       {/* Comments Section */}
-      <Divider sx={{ my: 0.5 }} />
-      <Typography variant="h5" fontWeight={600} sx={{ mb: 0.5 }}>
+      <Divider sx={{mb:1 }} />
+      <Typography variant="h5" fontWeight={600} sx={{mb:1 }} >
         Comments ({comments.length})
       </Typography>
 
       {/* Comments List */}
-      <Box sx={{ maxHeight: 140, overflow: 'auto', mb: 1 }}>
+      <Box sx={{ maxHeight: 320,minHeight:220, overflow: 'auto', mb: 1 }}>
         <List dense sx={{ p: 0 }}>
           {comments.map((comment) => (
             <ListItem

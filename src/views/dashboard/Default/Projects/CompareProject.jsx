@@ -82,7 +82,7 @@ export default function CompareProject() {
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
     { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
-    { title: 'Progress Comparison', icon: IconGitCompare }, // No `to` makes it the current page
+    { title: 'Comapre View', icon: IconGitCompare }, // No `to` makes it the current page
   ];
 
   return (
@@ -94,7 +94,7 @@ export default function CompareProject() {
         }}
       >
         <Typography variant="h1" gutterBottom>
-          Progress Comparison
+          Compare View
         </Typography>
       </Box>
       <Box justifyContent={'left'}>

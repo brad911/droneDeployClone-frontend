@@ -76,7 +76,7 @@ export default function NavItem({
 
   const itemHandler = () => {
     // Close drawer when any item is clicked
-    handlerDrawerOpen(false);
+    // handlerDrawerOpen(false);
 
     if (isParents && setSelectedID) {
       setSelectedID();

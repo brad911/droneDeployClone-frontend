@@ -1,7 +1,7 @@
 export const DASHBOARD_PATH = '/sample-page';
 
 const config = {
-  fontFamily: `International Mono`,
+  fontFamily: `Inter`,
   borderRadius: 8,
 };
 
