@@ -21,7 +21,7 @@ import {
   IconDroneOff,
   IconLiveViewFilled,
 } from '@tabler/icons-react';
-
+import MainCard from 'ui-component/cards/MainCard';
 mapboxgl.accessToken =
   'pk.eyJ1IjoiaGlyYWtyYWoiLCJhIjoiY21icXd5eHRnMDNtaTJxczcxd2RmbTZwOCJ9.P6kpsuLMDdeK2DIMJZMrmw';
 
@@ -61,18 +61,19 @@ export default function ViewTab() {
   };
 
   return (
-    <Box>
+    <MainCard>
       {/* Header Section */}
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          mb: 3,
         }}
       >
         {/* Breadcrumb */}
-        <Typography variant="h1">Exterior (Map View)</Typography>
+        <Typography variant="h1" gutterBottom>
+          Exterior (Map View)
+        </Typography>
         {/* Upload + Status */}
         <Stack direction="row" spacing={3} alignItems="center">
           <Button variant="contained" color="primary">
@@ -205,6 +206,6 @@ export default function ViewTab() {
           }}
         />
       </Box>
-    </Box>
+    </MainCard>
   );
 }

@@ -17,73 +17,47 @@ import { useState } from 'react';
 import { useTheme } from '@emotion/react';
 import { progress } from 'framer-motion';
 import { IconBuildingCog, IconDroneOff } from '@tabler/icons-react';
-
-const projectData = [
-  {
-    id: 1,
-    title: 'Road Inspection',
-    description: 'Track changes over time',
-    image: 'https://picsum.photos/200/300?1',
-    images: 45,
-    users: 2,
-    progress: 70,
-    createdAt: '2025-06-28T12:00:00Z',
-  },
-  {
-    id: 2,
-    title: 'Bridge Survey',
-    description: 'High-res structural analysis',
-    image: 'https://picsum.photos/200/300?2',
-    images: 30,
-    users: 3,
-    progress: 10,
-    createdAt: '2025-05-27T12:00:00Z',
-  },
-  {
-    id: 3,
-    title: 'Pipeline Monitoring',
-    description: 'View weekly updates',
-    image: 'https://picsum.photos/200/300?3',
-    images: 15,
-    users: 1,
-    progress: 50,
-    createdAt: '2024-06-28T12:00:00Z',
-  },
-  {
-    id: 4,
-    title: 'Agricultural Plot',
-    description: 'Growth tracking with NDVI',
-    image: 'https://picsum.photos/200/300?4',
-    images: 50,
-    users: 4,
-    progress: 90,
-    createdAt: '2025-06-28T12:00:00Z',
-  },
-];
+import { useSelector } from 'react-redux';
+import axiosInstance from '../../../../utils/axios.config';
+import { useEffect } from 'react';
 
 function Projects() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('');
-  const [filteredProjects, setFilteredProjects] = useState(projectData);
+  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const user = useSelector((state) => state.auth);
+  const fetchProjects = async (search = '', sort = '') => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = {};
+      if (search) params.search = search;
+      if (sort) params.sortBy = sort;
+      params.email = user.user.email;
+      params.status = 'active';
+      const response = await axiosInstance.get('/project-members', {
+        params,
+        headers: { Authorization: user.token },
+      });
+      console.log(response.data?.data?.results, '<====');
+      setFilteredProjects(response.data?.data?.results || response.data || []);
+    } catch (err) {
+      setError(err.message || 'Failed to fetch projects');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   const handleSearch = () => {
-    let result = [...projectData];
-
-    if (searchTerm) {
-      result = result.filter((proj) =>
-        proj.title.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
-    }
-
-    if (sortBy === 'name') {
-      result.sort((a, b) => a.title.localeCompare(b.title));
-    } else if (sortBy === 'images') {
-      result.sort((a, b) => b.images - a.images);
-    }
-
-    setFilteredProjects(result);
+    fetchProjects(searchTerm, sortBy);
   };
 
   return (
@@ -157,13 +131,22 @@ function Projects() {
       </Grid>
 
       {/* Project Grid */}
-      <Grid container spacing={3}>
-        {filteredProjects.map((project, index) => (
-          <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-            <ProjectTile project={project} />
-          </Grid>
-        ))}
-      </Grid>
+      {loading ? (
+        <Typography variant="body1">Loading projects...</Typography>
+      ) : error ? (
+        <Typography color="error">{error}</Typography>
+      ) : (
+        <Grid container spacing={3}>
+          {filteredProjects?.map((project, index) => (
+            <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+              <ProjectTile
+                project={project.projectId}
+                count={project.memberCount}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Box>
   );
 }

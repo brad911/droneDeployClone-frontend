@@ -8,10 +8,10 @@ import {
   IconFiles,
   IconUsers,
 } from '@tabler/icons-react';
+import { useSelector } from 'react-redux';
 
 // ==============================|| UTILITIES MENU ITEMS ||============================== //
-
-const platform = {
+const getPlatformMenu = (projectId) => ({
   id: 'platform',
   title: 'Platform',
   type: 'group',
@@ -20,7 +20,7 @@ const platform = {
       id: 'util-typography',
       title: 'Exterior (Map View)',
       type: 'item',
-      url: '/project/1/View',
+      url: `/project/${projectId}/View`,
       icon: IconLiveViewFilled,
       breadcrumbs: false,
     },
@@ -28,7 +28,7 @@ const platform = {
       id: 'util-color',
       title: 'Compare View',
       type: 'item',
-      url: '/project/1/compare',
+      url: `/project/${projectId}/compare`,
       icon: IconGitCompare,
       breadcrumbs: false,
     },
@@ -36,7 +36,7 @@ const platform = {
       id: 'progressReport',
       title: 'Progress Report',
       type: 'item',
-      url: '/project/1/dpr',
+      url: `/project/${projectId}/dpr`,
       icon: IconReport,
       breadcrumbs: false,
     },
@@ -44,7 +44,7 @@ const platform = {
       id: 'issueTaggingAndCoordination',
       title: 'Coordination Logs',
       type: 'item',
-      url: '/project/1/issue',
+      url: `/project/${projectId}/issue`,
       icon: IconTagStarred,
       breadcrumbs: false,
     },
@@ -52,7 +52,7 @@ const platform = {
       id: '360viewer',
       title: 'Interior (360 View) ',
       type: 'item',
-      url: '/project/1/360view',
+      url: `/project/${projectId}/360view`,
       icon: IconView360Number,
       breadcrumbs: false,
     },
@@ -60,7 +60,7 @@ const platform = {
       id: 'projectFiles',
       title: 'Project Files',
       type: 'item',
-      url: '/project/1/files',
+      url: `/project/${projectId}/files`,
       icon: IconFiles,
       breadcrumbs: false,
     },
@@ -68,11 +68,11 @@ const platform = {
       id: 'projectTeam',
       title: 'Project Team',
       type: 'item',
-      url: '/project/1/team',
+      url: `/project/${projectId}/team`,
       icon: IconUsers,
       breadcrumbs: false,
     },
   ],
-};
+});
 
-export default platform;
+export default getPlatformMenu;

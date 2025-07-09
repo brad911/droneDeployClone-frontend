@@ -9,11 +9,12 @@ import { useLocation } from 'react-router-dom';
 import NavItem from './NavItem';
 import NavGroup from './NavGroup';
 import menuItems from 'menu-items';
-import platform from 'menu-items/platformList';
+import getPlatformMenu from 'menu-items/platformList';
 import AdminDashboard from 'menu-items/superAdminList';
 import managementList from 'menu-items/managementList';
 
 import { useGetMenuMaster } from 'api/menu';
+import { useSelector } from 'react-redux';
 
 // ==============================|| SIDEBAR MENU LIST ||============================== //
 
@@ -23,11 +24,13 @@ function MenuList() {
   const [selectedID, setSelectedID] = useState('');
   const lastItem = null;
   const location = useLocation();
-
+  const selectedProjectId = useSelector(
+    (state) => state.project.selectedProjectId,
+  );
   // Always build items in the order: AdminDashboard, platform (conditionally), managementList
   let items = [AdminDashboard];
-  if (/^\/project\/1\//.test(location.pathname)) {
-    items.push(platform);
+  if (/^\/project\/*\//.test(location.pathname)) {
+    items.push(getPlatformMenu(selectedProjectId));
   }
   items.push(managementList);
 
@@ -38,56 +41,52 @@ function MenuList() {
   if (lastItem && lastItem < items.length) {
     lastItemId = items[lastItem - 1].id;
     lastItemIndex = lastItem - 1;
-    remItems = items
-      .slice(lastItem - 1, items.length)
-      .map((item) => ({
-        title: item.title,
-        elements: item.children,
-        icon: item.icon,
-        ...(item.url && {
-          url: item.url,
-        }),
-      }));
+    remItems = items.slice(lastItem - 1, items.length).map((item) => ({
+      title: item.title,
+      elements: item.children,
+      icon: item.icon,
+      ...(item.url && {
+        url: item.url,
+      }),
+    }));
   }
 
-  const navItems = items
-    .slice(0, lastItemIndex + 1)
-    .map((item, index) => {
-      switch (item.type) {
-        case 'group':
-          if (item.url && item.id !== lastItemId) {
-            return (
-              <List key={item.id}>
-                <NavItem
-                  item={item}
-                  level={1}
-                  isParents
-                  setSelectedID={() => setSelectedID('')}
-                />
-                {index !== 0 && <Divider sx={{ py: 0.5 }} />}
-              </List>
-            );
-          }
+  const navItems = items.slice(0, lastItemIndex + 1).map((item, index) => {
+    switch (item.type) {
+      case 'group':
+        if (item.url && item.id !== lastItemId) {
+          return (
+            <List key={item.id}>
+              <NavItem
+                item={item}
+                level={1}
+                isParents
+                setSelectedID={() => setSelectedID('')}
+              />
+              {index !== 0 && <Divider sx={{ py: 0.5 }} />}
+            </List>
+          );
+        }
 
-          return (
-            <NavGroup
-              key={item.id}
-              setSelectedID={setSelectedID}
-              selectedID={selectedID}
-              item={item}
-              lastItem={lastItem}
-              remItems={remItems}
-              lastItemId={lastItemId}
-            />
-          );
-        default:
-          return (
-            <Typography key={item.id} variant="h6" color="error" align="center">
-              Menu Items Error
-            </Typography>
-          );
-      }
-    });
+        return (
+          <NavGroup
+            key={item.id}
+            setSelectedID={setSelectedID}
+            selectedID={selectedID}
+            item={item}
+            lastItem={lastItem}
+            remItems={remItems}
+            lastItemId={lastItemId}
+          />
+        );
+      default:
+        return (
+          <Typography key={item.id} variant="h6" color="error" align="center">
+            Menu Items Error
+          </Typography>
+        );
+    }
+  });
 
   return <Box {...(drawerOpen && { sx: { mt: 1.5 } })}>{navItems}</Box>;
 }

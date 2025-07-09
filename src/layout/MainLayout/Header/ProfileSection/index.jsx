@@ -111,7 +111,7 @@ export default function ProfileSection() {
             color="inherit"
           />
         }
-        label={<IconSettings stroke={1.5} size="24px" />}
+        // label={<IconSettings stroke={1.5} size="24px" />}
         ref={anchorRef}
         aria-controls={open ? 'menu-list-grow' : undefined}
         aria-haspopup="true"
@@ -164,7 +164,7 @@ export default function ProfileSection() {
                           </Typography>
                         </Stack>
                         <Typography variant="subtitle2">
-                          {user?.role}
+                          {user?.designation}
                         </Typography>
                       </Stack>
                       {/* <OutlinedInput

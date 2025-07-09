@@ -12,6 +12,7 @@ import {
   IconDroneOff,
   IconTagStarred,
 } from '@tabler/icons-react';
+import MainCard from 'ui-component/cards/MainCard';
 
 const TABS = [
   { label: 'Map View', value: 'map' },
@@ -104,12 +105,7 @@ export default function IssueReport() {
   ];
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <MainCard>
       <Box
         sx={{
           display: 'flex',
@@ -124,12 +120,11 @@ export default function IssueReport() {
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button variant="contained" onClick={() => setShowForm(true)}>
-            + New Issue
+            + New Log
           </Button>
         </Box>
       </Box>
       <Breadcrumbs
-        sx={{ mt: 2 }}
         links={pageLinks}
         card={true}
         custom={true}
@@ -174,6 +169,6 @@ export default function IssueReport() {
           setShowForm(false);
         }}
       />
-    </Box>
+    </MainCard>
   );
 }

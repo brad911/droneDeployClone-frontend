@@ -75,7 +75,7 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
         p: 2,
         display: 'flex',
         flexDirection: 'column',
-        gap: .5,
+        gap: 0.5,
         borderRadius: 2,
         boxShadow: 1,
         border: '1px solid #f0f0f0',
@@ -84,12 +84,20 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
       }}
     >
       {/* Breadcrumbs */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mb: 0.5,
+        }}
+      >
         <Typography variant="h3" fontWeight={600}>
-          Issue Details
+          Log Details
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-          {sampleIssue.createdAt.toLocaleDateString()} {/* Show createdAt here */}
+          {sampleIssue.createdAt.toLocaleDateString()}{' '}
+          {/* Show createdAt here */}
         </Typography>
       </Box>
       <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
@@ -169,11 +177,18 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
       </Grid>
 
       <Divider sx={{ my: 0.5 }} />
-      <Typography variant="caption" fontWeight={600} >
+      <Typography variant="caption" fontWeight={600}>
         Photos
       </Typography>
       {/* Images in a horizontal scrollable row */}
-      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1, overflowX: 'auto'}}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: 1,
+          overflowX: 'auto',
+        }}
+      >
         {placeholderImages.map((img, idx) => (
           <Box
             key={idx}
@@ -198,13 +213,13 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
       </Box>
 
       {/* Comments Section */}
-      <Divider sx={{mb:1 }} />
-      <Typography variant="h5" fontWeight={600} sx={{mb:1 }} >
+      <Divider sx={{ mb: 1 }} />
+      <Typography variant="h5" fontWeight={600} sx={{ mb: 1 }}>
         Comments ({comments.length})
       </Typography>
 
       {/* Comments List */}
-      <Box sx={{ maxHeight: 320,minHeight:220, overflow: 'auto', mb: 1 }}>
+      <Box sx={{ maxHeight: 320, minHeight: 220, overflow: 'auto', mb: 1 }}>
         <List dense sx={{ p: 0 }}>
           {comments.map((comment) => (
             <ListItem

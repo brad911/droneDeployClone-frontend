@@ -20,11 +20,13 @@ import { drawerWidth } from 'store/constant';
 
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 import { Avatar, Typography } from '@mui/material';
+import { useSelector } from 'react-redux';
 
 // ==============================|| SIDEBAR DRAWER ||============================== //
 
 function Sidebar() {
   const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
+  const user = useSelector((state) => state.auth.user);
 
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
@@ -48,23 +50,24 @@ function Sidebar() {
           <Chip
             avatar={
               <Avatar
+                alt={`${user.firstName} ${user.lastName}`}
                 sx={{
-                  bgcolor: 'text.primary',
+                  bgcolor: 'text.secondary',
                   width: 32,
                   height: 32,
-                  fontSize: 8,
+                  fontSize: 10,
                 }}
               >
-                JD
+                {`${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`}
               </Avatar>
             }
             label={
               <Box display="flex" flexDirection="column" lineHeight={1.2}>
                 <Typography variant="body1" fontWeight="500">
-                  {'John Doe'}
+                  {user.firstName} {user.lastName}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Site Engineer
+                  {user.designation}
                 </Typography>
               </Box>
             }

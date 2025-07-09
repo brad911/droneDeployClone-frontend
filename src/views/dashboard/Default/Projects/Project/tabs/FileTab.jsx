@@ -31,6 +31,7 @@ import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FolderIcon from '@mui/icons-material/Folder';
+import MainCard from 'ui-component/cards/MainCard';
 
 const getFileIcon = (filename) => {
   const ext = filename.split('.').pop().toLowerCase();
@@ -109,8 +110,14 @@ export default function FilesTab() {
 
   // Folder handlers
   const handleCreateFolder = () => {
-    if (newFolderName.trim() && !folders.find(f => f.name === newFolderName.trim())) {
-      setFolders([...folders, { name: newFolderName.trim(), createdAt: getCurrentDateString() }]);
+    if (
+      newFolderName.trim() &&
+      !folders.find((f) => f.name === newFolderName.trim())
+    ) {
+      setFolders([
+        ...folders,
+        { name: newFolderName.trim(), createdAt: getCurrentDateString() },
+      ]);
       setNewFolderName('');
       setCreateFolderOpen(false);
     }
@@ -120,7 +127,7 @@ export default function FilesTab() {
     setDeleteFolderDialogOpen(true);
   };
   const confirmDeleteFolder = () => {
-    setFolders(folders.filter(f => f.name !== folderToDelete));
+    setFolders(folders.filter((f) => f.name !== folderToDelete));
     setFolderToDelete(null);
     setDeleteFolderDialogOpen(false);
   };
@@ -146,20 +153,24 @@ export default function FilesTab() {
   ];
 
   return (
-    <Box>
-      <Typography variant="h1" gutterBottom>
-        Project Files
-      </Typography>
-      <Breadcrumbs
-        sx={{ mt: 3 }}
-        links={pageLinks}
-        card={true}
-        custom={true}
-        rightAlign={false}
-      />
-      <Divider sx={{ my: 1.5 }} />
+    <MainCard>
+      <Box>
+        <Typography variant="h1" gutterBottom>
+          Project Files
+        </Typography>
+        <Breadcrumbs
+          links={pageLinks}
+          card={true}
+          custom={true}
+          rightAlign={false}
+        />
+      </Box>
+
       {/* Create Folder Dialog */}
-      <Dialog open={createFolderOpen} onClose={() => setCreateFolderOpen(false)}>
+      <Dialog
+        open={createFolderOpen}
+        onClose={() => setCreateFolderOpen(false)}
+      >
         <DialogTitle>Create New Folder</DialogTitle>
         <DialogContent>
           <TextField
@@ -168,13 +179,17 @@ export default function FilesTab() {
             label="Folder Name"
             fullWidth
             value={newFolderName}
-            onChange={e => setNewFolderName(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') handleCreateFolder(); }}
+            onChange={(e) => setNewFolderName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleCreateFolder();
+            }}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCreateFolderOpen(false)}>Cancel</Button>
-          <Button onClick={handleCreateFolder} variant="contained">Create</Button>
+          <Button onClick={handleCreateFolder} variant="contained">
+            Create
+          </Button>
         </DialogActions>
       </Dialog>
       {/* End Explorer UI */}
@@ -212,7 +227,11 @@ export default function FilesTab() {
       </Stack>
       {/* Buttons: Create Folder and Upload Files */}
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <Button variant="outlined" startIcon={<FolderIcon />} onClick={() => setCreateFolderOpen(true)}>
+        <Button
+          variant="contained"
+          startIcon={<FolderIcon />}
+          onClick={() => setCreateFolderOpen(true)}
+        >
           Create Folder
         </Button>
         <Button variant="contained" component="label">
@@ -234,7 +253,7 @@ export default function FilesTab() {
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {/* Folders first */}
         {folders.map((folder) => (
-          <Grid item xs={12} sm={6} md={4} key={"folder-" + folder.name}>
+          <Grid item xs={12} sm={6} md={4} key={'folder-' + folder.name}>
             <Paper
               elevation={2}
               sx={{
@@ -256,7 +275,10 @@ export default function FilesTab() {
                   </Typography>
                 </Box>
               </Stack>
-              <IconButton aria-label="delete" onClick={() => handleDeleteFolder(folder.name)}>
+              <IconButton
+                aria-label="delete"
+                onClick={() => handleDeleteFolder(folder.name)}
+              >
                 <DeleteIcon color="error" />
               </IconButton>
             </Paper>
@@ -267,19 +289,26 @@ export default function FilesTab() {
           <DialogTitle>Delete Folder?</DialogTitle>
           <DialogContent>
             <Typography>
-              Are you sure you want to delete the folder <b>{folderToDelete}</b>?<br/>
-              <br/>
+              Are you sure you want to delete the folder <b>{folderToDelete}</b>
+              ?<br />
+              <br />
               <b>All files in this folder will be deleted.</b>
             </Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={cancelDeleteFolder}>Cancel</Button>
-            <Button onClick={confirmDeleteFolder} color="error" variant="contained">Delete</Button>
+            <Button
+              onClick={confirmDeleteFolder}
+              color="error"
+              variant="contained"
+            >
+              Delete
+            </Button>
           </DialogActions>
         </Dialog>
         {/* Files after folders */}
         {filteredFiles.map((file) => (
-          <Grid item xs={12} sm={6} md={4} key={"file-" + file.name}>
+          <Grid item xs={12} sm={6} md={4} key={'file-' + file.name}>
             <Paper
               elevation={3}
               onClick={() => handleFileClick(file)}
@@ -308,6 +337,6 @@ export default function FilesTab() {
           </Grid>
         ))}
       </Grid>
-    </Box>
+    </MainCard>
   );
 }

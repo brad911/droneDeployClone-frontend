@@ -27,7 +27,14 @@ const IssueForm = ({ open = false, onClose, onSave }) => {
     'Alex Lee',
     'Priya Patel',
   ];
-  const categories = ['Architecture', 'Structure', 'MEPF', 'Safety', 'Quality'];
+  const categories = [
+    'Architecture',
+    'Structure',
+    'MEPF',
+    'Safety',
+    'Quality',
+    'Other',
+  ];
   const priorities = ['Low', 'Medium', 'High'];
 
   const handleFormChange = (field, value) => {

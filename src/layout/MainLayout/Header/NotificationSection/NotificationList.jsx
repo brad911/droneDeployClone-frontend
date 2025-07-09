@@ -22,6 +22,7 @@ import {
   IconPhoto,
 } from '@tabler/icons-react';
 import User1 from 'assets/images/users/user-round.svg';
+import { useSelector } from 'react-redux';
 
 function ListItemWrapper({ children }) {
   const theme = useTheme();
@@ -47,6 +48,7 @@ function ListItemWrapper({ children }) {
 
 export default function NotificationList() {
   const containerSX = { pl: 7 };
+  const user = useSelector((state) => state.auth.user);
 
   return (
     <List sx={{ width: '100%', maxWidth: { xs: 300, md: 330 }, py: 0 }}>
@@ -187,10 +189,14 @@ export default function NotificationList() {
           }
         >
           <ListItemAvatar>
-            <Avatar alt="John Doe" src={User1} />
+            <Avatar alt={user.firstName + '' + user.lastName} src={User1} />
           </ListItemAvatar>
           <ListItemText
-            primary={<Typography variant="subtitle1">John Doe</Typography>}
+            primary={
+              <Typography variant="subtitle1">
+                {user.firstName + '' + user.lastName}
+              </Typography>
+            }
           />
         </ListItem>
         <Stack spacing={2} sx={containerSX}>

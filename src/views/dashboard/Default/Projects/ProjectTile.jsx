@@ -12,12 +12,18 @@ import ImageIcon from '@mui/icons-material/PhotoLibrary';
 import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from 'react-router';
 import { formatDistanceToNow } from 'date-fns';
+import { useDispatch } from 'react-redux';
+import { setSelectedProjectId } from '../../../../store/slices/projectSlice';
 
-const ProjectTile = ({ project }) => {
+const ProjectTile = ({ project, count }) => {
+  console.log(project, '<=== wow');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleView = () => {
-    navigate(`/project/1/View`);
+    const id = project._id || project.id;
+    dispatch(setSelectedProjectId(id));
+    navigate(`/project/${id}/View`);
   };
 
   return (
@@ -39,8 +45,8 @@ const ProjectTile = ({ project }) => {
         <CardMedia
           component="img"
           height="140"
-          image={project.image}
-          alt={project.title}
+          image={'https://picsum.photos/200/300?2'}
+          alt={project.name}
           sx={{
             objectFit: 'cover',
             filter: 'brightness(60%)',
@@ -60,7 +66,7 @@ const ProjectTile = ({ project }) => {
           }}
         >
           <Typography variant="subtitle1" fontWeight={700} color="white" noWrap>
-            {project.title}
+            {project.name}
           </Typography>
         </Box>
       </Box>
@@ -95,11 +101,11 @@ const ProjectTile = ({ project }) => {
           <Stack direction="row" spacing={2} alignItems="center">
             <Stack direction="row" spacing={0.5} alignItems="center">
               <ImageIcon fontSize="small" />
-              <Typography variant="caption">{project.images}</Typography>
+              <Typography variant="caption">{project.description}</Typography>
             </Stack>
             <Stack direction="row" spacing={0.5} alignItems="center">
               <PersonIcon fontSize="small" />
-              <Typography variant="caption">{project.users}</Typography>
+              <Typography variant="caption">{count}</Typography>
             </Stack>
             <Stack>
               <Typography
@@ -108,9 +114,7 @@ const ProjectTile = ({ project }) => {
                 color="text.secondary"
               >
                 {project.createdAt
-                  ? formatDistanceToNow(project.createdAt, {
-                      addSuffix: true,
-                    })
+                  ? `${formatDistanceToNow(new Date(project.createdAt), { addSuffix: true })}`
                   : 'Time unknown'}
               </Typography>
             </Stack>

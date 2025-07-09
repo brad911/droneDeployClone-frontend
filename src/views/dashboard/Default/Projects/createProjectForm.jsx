@@ -19,6 +19,8 @@ import { useTheme } from '@emotion/react';
 import { useNavigate } from 'react-router';
 import { useDropzone } from 'react-dropzone';
 import { IconCloudUpload } from '@tabler/icons-react';
+import axiosInstance from '../../../../utils/axios.config';
+import { useSelector } from 'react-redux';
 
 const ProjectSchema = Yup.object().shape({
   name: Yup.string().required('Project name is required'),
@@ -59,9 +61,11 @@ const ProjectSchema = Yup.object().shape({
 const CreateProjectForm = ({ onSubmit }) => {
   const [emailInput, setEmailInput] = useState('');
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const theme = useTheme();
   const navigate = useNavigate();
-
+  const token = useSelector((state) => state.auth.token);
   const onDrop = (acceptedFiles) => {
     if (acceptedFiles.length) {
       setFile(acceptedFiles[0]);
@@ -73,18 +77,59 @@ const CreateProjectForm = ({ onSubmit }) => {
     multiple: false,
   });
 
+  const handleSubmit = async (values) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('name', values.name);
+      formData.append('location', values.location || '');
+      formData.append('description', values.location || ''); // adjust if you want a separate description
+      formData.append('startDate', values.startDate || '');
+      formData.append('endDate', values.endDate || '');
+      if (file) formData.append('file', file);
+      values.team.forEach((email, idx) =>
+        formData.append(`team[${idx}]`, email),
+      );
+      const response = await axiosInstance.post('/project', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: token,
+        },
+      });
+      const newProjectId = response.data?.data?._id || response.data?._id;
+      if (newProjectId) {
+        navigate(`/project/${newProjectId}/View`);
+      } else {
+        navigate('/project');
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to create project',
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Paper sx={{ p: 5, maxWidth: 500 }}>
       <Typography variant="h2" mb={2}>
         Create New Project
       </Typography>
       <Formik
-        initialValues={{ name: '', team: [], startDate: null, endDate: null }}
-        validationSchema={ProjectSchema}
-        onSubmit={(values) => {
-          onSubmit({ ...values, file });
-          navigate('/project/1');
+        initialValues={{
+          name: '',
+          team: [],
+          startDate: null,
+          endDate: null,
+          description: '',
+          location: '',
         }}
+        validationSchema={ProjectSchema}
+        onSubmit={handleSubmit}
       >
         {({ values, errors, touched, setFieldValue }) => (
           <Form>
@@ -151,10 +196,10 @@ const CreateProjectForm = ({ onSubmit }) => {
             <TextField
               sx={{ mb: 2 }}
               fullWidth
-              name="location"
-              label="Project Location"
-              value={values.location || ''}
-              onChange={(e) => setFieldValue('location', e.target.value)}
+              name="description"
+              label="Project Description"
+              value={values.description || ''}
+              onChange={(e) => setFieldValue('description', e.target.value)}
             />
 
             {/* Team Input */}
@@ -223,8 +268,19 @@ const CreateProjectForm = ({ onSubmit }) => {
             </Box>
 
             {/* Submit */}
-            <Button color="primary" variant="contained" type="submit" fullWidth>
-              Create Project
+            {error && (
+              <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+                {error}
+              </Typography>
+            )}
+            <Button
+              color="primary"
+              variant="contained"
+              type="submit"
+              fullWidth
+              disabled={loading}
+            >
+              {loading ? 'Creating...' : 'Create Project'}
             </Button>
           </Form>
         )}

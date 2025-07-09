@@ -14,6 +14,7 @@ import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import mapboxgl from 'mapbox-gl';
 import Breadcrumbs from '../../../../ui-component/extended/Breadcrumbs';
+import MainCard from 'ui-component/cards/MainCard';
 import {
   IconBuildingCog,
   IconDroneOff,
@@ -86,7 +87,7 @@ export default function CompareProject() {
   ];
 
   return (
-    <Box>
+    <MainCard>
       <Box
         sx={{
           justifyContent: 'space-between',
@@ -99,7 +100,6 @@ export default function CompareProject() {
       </Box>
       <Box justifyContent={'left'}>
         <Breadcrumbs
-          sx={{ mt: 3 }}
           links={pageLinks}
           card={true}
           custom={true}
@@ -161,6 +161,6 @@ export default function CompareProject() {
       </Box>
 
       {/* Snapshot Carousel */}
-    </Box>
+    </MainCard>
   );
 }

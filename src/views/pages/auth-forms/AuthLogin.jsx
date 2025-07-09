@@ -56,7 +56,7 @@ export default function AuthLogin() {
         );
         localStorage.setItem('token', response.data.data.tokens.access.token);
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate('/project');
         }, 500);
       }
     } catch (error) {
