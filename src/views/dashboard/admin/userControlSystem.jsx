@@ -143,23 +143,26 @@ const UserControlSystem = () => {
                   <TableCell>Organization</TableCell>
                   <TableCell>Gender</TableCell>
                   <TableCell>Role</TableCell>
+                  <TableCell>Type</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {users
-                  .filter((user) => user.role !== 'admin')
+                  // .filter((user) => user.role !== 'admin')
                   .map((user) => (
-                    <TableRow key={user._id}>
+                    <TableRow key={user.id}>
                       <TableCell>
-                        {user.firstName} {user.lastName}
+                        {user?.firstName} {user?.lastName}
                       </TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.designation}</TableCell>
-                      <TableCell>{user.organization}</TableCell>
-                      <TableCell>{user.gender}</TableCell>
-                      <TableCell>{user.role}</TableCell>
+                      <TableCell>{user?.email}</TableCell>
+                      <TableCell>{user?.designation}</TableCell>
+                      <TableCell>{user?.organization}</TableCell>
+                      <TableCell>{user?.gender}</TableCell>
+                      <TableCell>{user?.role}</TableCell>
+                      <TableCell>{user?.type}</TableCell>
+
                       <TableCell>
                         <Chip
                           label={user.status}

@@ -27,9 +27,9 @@ function MenuList() {
   const selectedProjectId = useSelector(
     (state) => state.project.selectedProjectId,
   );
-  const userRole = useSelector((state) => state.auth.user.role);
+  const userType = useSelector((state) => state.auth.user.type);
   // Always build items in the order: AdminDashboard, platform (conditionally), managementList
-  let items = [AdminDashboard(userRole)];
+  let items = [AdminDashboard(userType)];
   if (/^\/project\/*\//.test(location.pathname)) {
     items.push(getPlatformMenu(selectedProjectId));
   }
