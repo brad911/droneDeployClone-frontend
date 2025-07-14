@@ -59,7 +59,7 @@ const DprForm = () => {
   const [material, setMaterial] = useState('');
   const [machinery, setMachinery] = useState('');
   const [activities, setActivities] = useState([
-    { name: '', quantity: '', unit: '', status: '' },
+    { name: '', quantity: '', unit: '', status: '', cost: '' },
   ]);
   const [issues, setIssues] = useState('');
   const [milestones, setMilestones] = useState('');
@@ -78,7 +78,7 @@ const DprForm = () => {
   const handleAddActivity = () => {
     setActivities([
       ...activities,
-      { name: '', quantity: '', unit: '', status: '' },
+      { name: '', quantity: '', unit: '', status: '', cost: '' },
     ]);
   };
   const handleAddField = () => {
@@ -318,7 +318,7 @@ const DprForm = () => {
                   label="Unit"
                   value={activity.unit}
                   onChange={(e) =>
-                    handleActivityChange(idx, 'quantity', e.target.value)
+                    handleActivityChange(idx, 'unit', e.target.value)
                   }
                   fullWidth
                   type="text"
@@ -354,6 +354,17 @@ const DprForm = () => {
                     )}
                   />
                 </FormControl>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <TextField
+                  label="Cost"
+                  value={activity.cost}
+                  onChange={(e) =>
+                    handleActivityChange(idx, 'cost', e.target.value)
+                  }
+                  fullWidth
+                  type="text"
+                />
               </Grid>
             </Grid>
           ))}

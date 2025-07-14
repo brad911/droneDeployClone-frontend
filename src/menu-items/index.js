@@ -6,7 +6,7 @@ import AdminDashboard from './superAdminList';
 import managementList from './managementList';
 // ==============================|| MENU ITEMS ||============================== //
 const menuItems = {
-  items: [AdminDashboard, getPlatformMenu(), managementList],
+  items: [AdminDashboard(), getPlatformMenu(), managementList],
 };
 
 export default menuItems;

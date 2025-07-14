@@ -1,24 +1,30 @@
 // src/store.js
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+
 import authReducer from './slices/authSlice';
 import projectReducer from './slices/projectSlice';
-import storage from 'redux-persist/lib/storage'; // defaults to localStorage
 
-// Persist config for auth slice only
-const authPersistConfig = {
-  key: 'lockedByMe',
+const rootReducer = combineReducers({
+  auth: authReducer,
+  project: projectReducer,
+});
+
+const persistConfig = {
+  key: 'InfraXLockedKey',
   storage,
-  whitelist: ['token', 'user'], // which parts of state to persist
+  whitelist: ['auth', 'project'],
 };
 
-const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
-  reducer: {
-    auth: persistedAuthReducer,
-    project: projectReducer,
-  },
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 export const persistor = persistStore(store);

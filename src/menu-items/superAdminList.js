@@ -17,11 +17,8 @@ const icons = {
 };
 // ==============================|| UTILITIES MENU ITEMS ||============================== //
 
-const superAdminList = {
-  id: 'superAdminList',
-  //   title: 'Utilities',
-  type: 'group',
-  children: [
+const getSuperAdminList = (userRole) => {
+  const children = [
     {
       id: 'Projects',
       title: 'Projects',
@@ -30,31 +27,22 @@ const superAdminList = {
       icon: icons.IconDroneOff,
       breadcrumbs: false,
     },
-    // {
-    //   id: 'files',
-    //   title: 'Files',
-    //   type: 'item',
-    //   url: '/file',
-    //   icon: icons.IconPalette,
-    //   breadcrumbs: false,
-    // },
-    // {
-    //   id: 'options',
-    //   title: 'Option 3',
-    //   type: 'item',
-    //   url: '/options4',
-    //   icon: icons.IconShadow,
-    //   breadcrumbs: false
-    // },
-    // {
-    //   id: 'option4',
-    //   title: 'Option 4',
-    //   type: 'item',
-    //   url: '/options4',
-    //   icon: icons.IconShadow,
-    //   breadcrumbs: false
-    // }
-  ],
+  ];
+  if (userRole === 'admin') {
+    children.push({
+      id: 'UserControlPanel',
+      title: 'User Control Panel',
+      type: 'item',
+      url: '/user-control-panel',
+      icon: icons.IconWindmill,
+      breadcrumbs: false,
+    });
+  }
+  return {
+    id: 'superAdminList',
+    type: 'group',
+    children,
+  };
 };
 
-export default superAdminList;
+export default getSuperAdminList;

@@ -16,6 +16,7 @@ import IssueReport from 'views/dashboard/Default/issues/IssuesReport.jsx';
 import FilesTab from '../views/dashboard/Default/Projects/Project/tabs/FileTab';
 import AllDirectionViewList from 'views/dashboard/Default/Projects/Project/360ViewList';
 import TeamSetup from '../views/dashboard/Default/Projects/Project/TeamSetup';
+import UserControlSystem from '../views/dashboard/admin/userControlSystem';
 
 // dashboard routing
 const DashboardDefault = Loadable(
@@ -64,7 +65,7 @@ const MainRoutes = {
     { path: '/project/:projectID/files', element: <FilesTab /> },
     { path: '/project/:projectID/360view', element: <AllDirectionViewList /> },
     { path: '/project/:projectID/team', element: <TeamSetup /> },
-    
+    { path: '/user-control-panel', element: <UserControlSystem /> },
     { path: '/project/:projectID/:projectWorkDayID', element: <ProjectWork /> },
   ],
 };

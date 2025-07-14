@@ -43,7 +43,11 @@ export default function Register() {
                   sx={{ alignItems: 'center', justifyContent: 'center' }}
                 >
                   <Grid sx={{ mb: 3 }}>
-                    <Link to="#" aria-label="theme logo">
+                    <Link
+                      style={{ textDecoration: 'none' }}
+                      to="#"
+                      aria-label="theme logo"
+                    >
                       <Logo />
                     </Link>
                   </Grid>

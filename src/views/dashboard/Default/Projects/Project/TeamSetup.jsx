@@ -153,7 +153,6 @@ const TeamSetup = () => {
         <Paper
           sx={{
             p: 3,
-            maxWidth: 768,
             mx: 'auto',
             mt: 3,
             boxShadow: 4,
@@ -165,7 +164,7 @@ const TeamSetup = () => {
               size="small"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              sx={{ flex: 2 }}
+              sx={{ flex: 1 }}
             />
             <TextField
               select
@@ -196,6 +195,15 @@ const TeamSetup = () => {
                     Email
                   </TableCell>
                   <TableCell sx={{ color: theme.palette.primary.contrastText }}>
+                    Name
+                  </TableCell>
+                  <TableCell sx={{ color: theme.palette.primary.contrastText }}>
+                    Organization
+                  </TableCell>
+                  <TableCell sx={{ color: theme.palette.primary.contrastText }}>
+                    Designation
+                  </TableCell>
+                  <TableCell sx={{ color: theme.palette.primary.contrastText }}>
                     Permission
                   </TableCell>
                   <TableCell sx={{ color: theme.palette.primary.contrastText }}>
@@ -213,6 +221,22 @@ const TeamSetup = () => {
                 {members.map((member) => (
                   <TableRow key={member.id}>
                     <TableCell>{member.email}</TableCell>
+                    <TableCell>
+                      {member.userId
+                        ? member.userId.firstName + ' ' + member.userId.lastName
+                        : 'Not Registered'}
+                    </TableCell>
+                    <TableCell>
+                      {member.userId?.organization
+                        ? member.userId?.organization
+                        : 'Not Registered'}
+                    </TableCell>
+                    <TableCell>
+                      {member.userId?.designation
+                        ? member.userId?.designation
+                        : 'Not Registered'}
+                    </TableCell>
+
                     <TableCell>
                       <Select
                         size="small"
