@@ -37,6 +37,14 @@ const getSuperAdminList = (userRole) => {
       icon: icons.IconWindmill,
       breadcrumbs: false,
     });
+    children.push({
+      id: 'WorkDayList',
+      title: 'Work Days',
+      type: 'item',
+      url: '/work-days',
+      icon: icons.IconPalette,
+      breadcrumbs: false,
+    });
   }
   return {
     id: 'superAdminList',

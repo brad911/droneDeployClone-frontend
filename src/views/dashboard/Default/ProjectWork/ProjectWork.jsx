@@ -22,25 +22,31 @@ import {
   IconLiveViewFilled,
 } from '@tabler/icons-react';
 import MainCard from 'ui-component/cards/MainCard';
+import CreateWorkDayModal from './CreateWorkDayModal';
+import axiosInstance from 'utils/axios.config';
+import { useSelector } from 'react-redux';
 mapboxgl.accessToken =
   'pk.eyJ1IjoiaGlyYWtyYWoiLCJhIjoiY21icXd5eHRnMDNtaTJxczcxd2RmbTZwOCJ9.P6kpsuLMDdeK2DIMJZMrmw';
 
 const pageLinks = [
   { title: 'Projects', to: '/project', icon: IconDroneOff },
   { title: 'Project Name', icon: IconBuildingCog },
-  { title: 'Exterior (Map View)', icon: IconLiveViewFilled }, // No `to` makes it the current page
+  { title: 'Exterior(Map View)', icon: IconLiveViewFilled }, // No `to` makes it the current page
 ];
 
 export default function ViewTab() {
   const mapContainer = useRef(null);
-  const theme = useTheme();
-  const [selectedDate, setSelectedDate] = useState('2024-03-01');
+  const [selectedDate, setSelectedDate] = useState('');
   const [layers, setLayers] = useState({
     orthomosaic: true,
     asBuiltOverlay: false,
     annotations: false,
     measurements: false,
   });
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [historicalDates, setHistoricalDates] = useState([]);
+  const projectId = useSelector((state) => state.project.selectedProjectId);
+  const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -49,15 +55,43 @@ export default function ViewTab() {
       center: [72.5714, 23.0225],
       zoom: 10,
     });
-
     return () => map.remove();
   }, []);
+
+  useEffect(() => {
+    if (!projectId) return;
+    const fetchWorkDays = async () => {
+      try {
+        const res = await axiosInstance.get('/work-day', {
+          params: { projectId, status: 'completed' },
+          headers: { Authorization: token },
+        });
+        const completed = (res.data.data?.results || []).filter(
+          (w) => w.status === 'completed' && (w.projectId === projectId || w.projectId?.id === projectId)
+        );
+        setHistoricalDates(completed.map((w) => w.name));
+        if (completed.length > 0 && !completed.find((w) => w.name === selectedDate)) {
+          setSelectedDate(completed[0].name);
+        }
+      } catch (err) {
+        setHistoricalDates([]);
+      }
+    };
+    fetchWorkDays();
+    // eslint-disable-next-line
+  }, [projectId]);
 
   const handleLayerChange = (event) => {
     setLayers((prev) => ({
       ...prev,
       [event.target.name]: event.target.checked,
     }));
+  };
+
+  const handleUploadSave = (form) => {
+    // For now, just log and close
+    console.log('Upload Zone Data:', form);
+    setUploadModalOpen(false);
   };
 
   return (
@@ -76,7 +110,11 @@ export default function ViewTab() {
         </Typography>
         {/* Upload + Status */}
         <Stack direction="row" spacing={3} alignItems="center">
-          <Button variant="contained" color="primary">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setUploadModalOpen(true)}
+          >
             Upload New
           </Button>
 
@@ -94,6 +132,11 @@ export default function ViewTab() {
           </Stack>
         </Stack>
       </Box>
+      <CreateWorkDayModal
+        open={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        // onSave={handleUploadSave}
+      />
       <Breadcrumbs
         links={pageLinks}
         card={true}
@@ -187,9 +230,15 @@ export default function ViewTab() {
                 label="Historical Data"
                 onChange={(e) => setSelectedDate(e.target.value)}
               >
-                <MenuItem value="2024-03-01">March 1, 2024</MenuItem>
-                <MenuItem value="2024-06-15">June 15, 2024</MenuItem>
-                <MenuItem value="2025-01-05">January 5, 2025</MenuItem>
+                {historicalDates.length === 0 ? (
+                  <MenuItem value="">No Data</MenuItem>
+                ) : (
+                  historicalDates.map((date) => (
+                    <MenuItem key={date} value={date}>
+                      {date}
+                    </MenuItem>
+                  ))
+                )}
               </Select>
             </FormControl>
           </Box>

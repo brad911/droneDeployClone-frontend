@@ -17,6 +17,7 @@ import FilesTab from '../views/dashboard/Default/Projects/Project/tabs/FileTab';
 import AllDirectionViewList from 'views/dashboard/Default/Projects/Project/360ViewList';
 import TeamSetup from '../views/dashboard/Default/Projects/Project/TeamSetup';
 import UserControlSystem from '../views/dashboard/admin/userControlSystem';
+import WorkDayList from '../views/dashboard/admin/WorkDayList';
 
 // dashboard routing
 const DashboardDefault = Loadable(
@@ -66,6 +67,7 @@ const MainRoutes = {
     { path: '/project/:projectID/360view', element: <AllDirectionViewList /> },
     { path: '/project/:projectID/team', element: <TeamSetup /> },
     { path: '/user-control-panel', element: <UserControlSystem /> },
+    { path: '/work-days', element: <ProtectedRoute element={WorkDayList} /> },
     { path: '/project/:projectID/:projectWorkDayID', element: <ProjectWork /> },
   ],
 };
