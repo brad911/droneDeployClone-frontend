@@ -39,7 +39,7 @@ const getSuperAdminList = (userRole) => {
     });
     children.push({
       id: 'WorkDayList',
-      title: 'Work Days',
+      title: 'Data Management',
       type: 'item',
       url: '/work-days',
       icon: icons.IconPalette,

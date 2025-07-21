@@ -250,7 +250,7 @@ const CreateProjectForm = ({ onSubmit }) => {
                 Upload Supporting File
               </Typography>
               <Typography variant="body2" sx={{ mb: 2 }}>
-                Drag & drop a file or click below to browse
+                Drag & drop a .zip file or click below to browse
               </Typography>
               <Button
                 variant="outlined"

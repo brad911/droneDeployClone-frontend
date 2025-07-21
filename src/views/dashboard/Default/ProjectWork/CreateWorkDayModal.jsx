@@ -164,7 +164,7 @@ const CreateWorkDayModal = ({ open = false, onClose, onSave }) => {
         }}
       >
         <Typography variant="h5" sx={{ mb: 2 }}>
-          Create New Historical Data
+          Upload New Capture Into Historical Data
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField

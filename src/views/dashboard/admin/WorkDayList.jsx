@@ -99,15 +99,15 @@ const WorkDayList = () => {
   };
 
   const handleDownload = async (workDay) => {
-    const file = workDay.resultFiles && workDay.resultFiles[0];
-    console.log(file.Key, '<=== =file');
-    if (!file?.key && !file.Key) {
+    const fileKey = workDay.rawFile;
+    console.log(workDay, '<=== wow');
+    if (!fileKey) {
       enqueueSnackbar('No file found to download', { variant: 'warning' });
       return;
     }
     try {
       const res = await axiosInstance.get(
-        `/work-day/get-download-url/${file.key || file.Key}`,
+        `/work-day/get-download-url/${fileKey}`,
         {
           headers: { Authorization: token },
         },
@@ -132,7 +132,6 @@ const WorkDayList = () => {
     enqueueSnackbar('Upload action for ' + (workDay.name || workDay.id), {
       variant: 'info',
     });
-    // Implement upload logic/modal as needed
   };
 
   const handleStatusChange = async (workDay, newStatus) => {
@@ -186,7 +185,7 @@ const WorkDayList = () => {
         alignItems="center"
       >
         <TextField
-          label="Search by Date"
+          label="Search by Project"
           size="small"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -233,7 +232,7 @@ const WorkDayList = () => {
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
                     >
-                      Date
+                      Time Stamp
                     </TableCell>
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
@@ -315,30 +314,38 @@ const WorkDayList = () => {
                             </FormControl>
                           </TableCell>
                           <TableCell>
-                            <Button
-                              variant="outlined"
-                              color="primary"
-                              size="small"
-                              startIcon={<DownloadIcon />}
-                              onClick={() => handleDownload(workDay)}
-                              disabled={
-                                !hasDownload &&
-                                (!workDay.resultFiles ||
-                                  workDay.resultFiles.length === 0)
-                              }
-                              sx={{ mr: 1 }}
-                            >
-                              Download
-                            </Button>
-                            <Button
-                              variant="outlined"
-                              color="secondary"
-                              size="small"
-                              startIcon={<UploadIcon />}
-                              onClick={() => handleUpload(workDay)}
-                            >
-                              Upload
-                            </Button>
+                            <Box>
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                startIcon={<DownloadIcon />}
+                                onClick={() => handleDownload(workDay)}
+                                disabled={!hasDownload && !workDay.rawFile}
+                                sx={{ mr: 1 }}
+                              >
+                                Download
+                              </Button>
+                              <Button
+                                variant="outlined"
+                                color="secondary"
+                                size="small"
+                                startIcon={<UploadIcon />}
+                                sx={{ mr: 1 }}
+                                onClick={() => handleUpload(workDay)}
+                              >
+                                Upload KML
+                              </Button>
+                              <Button
+                                variant="outlined"
+                                color="secondary"
+                                size="small"
+                                startIcon={<UploadIcon />}
+                                onClick={() => handleUpload(workDay)}
+                              >
+                                Upload JPG
+                              </Button>
+                            </Box>
                           </TableCell>
                         </TableRow>
                       );
