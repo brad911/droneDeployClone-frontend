@@ -98,7 +98,7 @@ const CreateWorkDayModal = ({ open = false, onClose, onSave }) => {
         let start = 0;
         while (start < form.file.size) {
           const end = Math.min(start + partSize, form.file.size);
-          chunks.push(form.file.slice(start, end));
+          chunks.push(file.slice(start, end));
           start = end;
         }
         const etags = [];
@@ -168,7 +168,7 @@ const CreateWorkDayModal = ({ open = false, onClose, onSave }) => {
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
-            label="Date"
+            label="Date of Capture"
             type="date"
             value={form.date}
             onChange={(e) => handleFormChange('date', e.target.value)}

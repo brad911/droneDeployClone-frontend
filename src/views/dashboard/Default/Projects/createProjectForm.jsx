@@ -21,6 +21,7 @@ import { useDropzone } from 'react-dropzone';
 import { IconCloudUpload } from '@tabler/icons-react';
 import axiosInstance from '../../../../utils/axios.config';
 import { useSelector } from 'react-redux';
+import { enqueueSnackbar } from 'notistack';
 
 const ProjectSchema = Yup.object().shape({
   name: Yup.string().required('Project name is required'),
@@ -63,6 +64,7 @@ const CreateProjectForm = ({ onSubmit }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const theme = useTheme();
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
@@ -80,29 +82,87 @@ const CreateProjectForm = ({ onSubmit }) => {
   const handleSubmit = async (values) => {
     setLoading(true);
     setError(null);
+    setUploadProgress(0);
+
+    values.file = {
+      filename: file.name,
+      contentType: file.type,
+      size: file.size,
+    };
+
     try {
-      const formData = new FormData();
-      formData.append('name', values.name);
-      formData.append('location', values.location || '');
-      formData.append('description', values.location || ''); // adjust if you want a separate description
-      formData.append('startDate', values.startDate || '');
-      formData.append('endDate', values.endDate || '');
-      if (file) formData.append('file', file);
-      values.team.forEach((email, idx) =>
-        formData.append(`team[${idx}]`, email),
-      );
-      const response = await axiosInstance.post('/project', formData, {
+      const response = await axiosInstance.post('/project', values, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: token,
         },
       });
-      const newProjectId = response.data?.data?._id || response.data?._id;
-      if (newProjectId) {
-        navigate(`/project/${newProjectId}/View`);
-      } else {
-        navigate('/project');
+
+      const uploadResponse = response.data.data;
+      console.log(uploadResponse, '<==== uplaod response');
+      if (uploadResponse.uploadType === 'single') {
+        await axiosInstance.put(uploadResponse.url, file, {
+          headers: {
+            'Content-Type': file.type,
+          },
+          onUploadProgress: (event) => {
+            const percent = Math.round((event.loaded * 100) / event.total);
+            setUploadProgress(percent); // ✅ fixed here
+          },
+        });
+      } else if (uploadResponse.uploadType === 'multipart') {
+        const { parts, uploadId, key, partSize } = uploadResponse;
+        const { id } = uploadResponse.project;
+        let projectId = id;
+        const chunks = [];
+        let start = 0;
+
+        while (start < file.size) {
+          const end = Math.min(start + partSize, file.size);
+          chunks.push(file.slice(start, end));
+          start = end;
+        }
+
+        const etags = [];
+        for (let i = 0; i < parts.length; i++) {
+          const res = await fetch(parts[i].url, {
+            method: 'PUT',
+            body: chunks[i],
+          });
+          const etag = res.headers.get('ETag')?.replace(/"/g, '');
+          etags.push({ PartNumber: parts[i].partNumber, ETag: etag });
+
+          const percent = Math.round(((i + 1) / parts.length) * 100);
+          setUploadProgress(percent); // ✅ fixed here
+        }
+
+        await axiosInstance.post(
+          '/work-day/complete-upload',
+          {
+            projectId: projectId,
+            name: values.name,
+            key,
+            uploadId,
+            parts: etags,
+          },
+          {
+            headers: {
+              Authorization: token, // ✅ fixed here
+            },
+          },
+        );
       }
+
+      enqueueSnackbar('Upload successful!', { variant: 'success' });
+
+      if (uploadResponse.uploadType === 'single') {
+        enqueueSnackbar('Successfully Created Historical Data', {
+          variant: 'success',
+        });
+      }
+
+      // Optional redirect:
+      // const newProjectId = uploadResponse?.projectId || response.data?.data?._id;
+      // navigate(newProjectId ? `/project/${newProjectId}/View` : '/project');
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -239,6 +299,7 @@ const CreateProjectForm = ({ onSubmit }) => {
                 borderRadius: '8px',
                 padding: 4,
                 textAlign: 'center',
+                justifyContent: 'center',
                 cursor: 'pointer',
                 backgroundColor: isDragActive ? '#f0f0f0' : 'transparent',
                 mb: 2,
@@ -252,18 +313,48 @@ const CreateProjectForm = ({ onSubmit }) => {
               <Typography variant="body2" sx={{ mb: 2 }}>
                 Drag & drop a .zip file or click below to browse
               </Typography>
-              <Button
-                variant="outlined"
-                onClick={() =>
-                  document.querySelector('input[type="file"]').click()
-                }
-              >
-                Browse Files
-              </Button>
+              <Button variant="outlined">Browse Files</Button>
               {file && (
                 <Typography variant="body2" sx={{ mt: 1 }}>
                   Selected: {file.name}
                 </Typography>
+              )}
+              {loading && uploadProgress > 0 && (
+                <Box
+                  sx={{
+                    mt: 2,
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography variant="caption">
+                    Uploading... {uploadProgress}%
+                  </Typography>
+                  <Box sx={{ width: '100%' }}>
+                    <Stack spacing={1}>
+                      <Box sx={{ width: '100%' }}>
+                        <Box
+                          sx={{
+                            height: 4,
+                            bgcolor: '#eee',
+                            borderRadius: 2,
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: `${uploadProgress}%`,
+                              height: '100%',
+                              bgcolor: 'primary.main',
+                              transition: 'width 0.2s',
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    </Stack>
+                  </Box>
+                </Box>
               )}
             </Box>
 

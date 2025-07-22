@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Paper,
@@ -9,9 +9,6 @@ import {
   TableHead,
   TableRow,
   Typography,
-  IconButton,
-  useTheme,
-  Chip,
   Button,
   Select,
   MenuItem,
@@ -20,6 +17,7 @@ import {
   Pagination,
   Stack,
   InputLabel,
+  useTheme,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
@@ -56,6 +54,13 @@ const WorkDayList = () => {
   const projectId = useSelector((state) => state.project.selectedProjectId);
   const token = useSelector((state) => state.auth.token);
   const [statusLoading, setStatusLoading] = useState({});
+  const fileInputRef = useRef(null);
+  const [uploadContext, setUploadContext] = useState({
+    type: '',
+    workDay: null,
+  });
+  const [uploadProgress, setUploadProgress] = useState({}); // { [`${workDayId}_${type}`]: percent }
+  const [uploading, setUploading] = useState({}); // { [`${workDayId}_${type}`]: boolean }
 
   useEffect(() => {
     if (!projectId) return;
@@ -64,7 +69,6 @@ const WorkDayList = () => {
       setError(null);
       try {
         const params = {
-          //   projectId,
           page,
           limit,
           sortBy,
@@ -82,7 +86,9 @@ const WorkDayList = () => {
           err.response?.data?.message ||
             err.message ||
             'Failed to fetch work days',
-          { variant: 'error' },
+          {
+            variant: 'error',
+          },
         );
       } finally {
         setLoading(false);
@@ -100,7 +106,6 @@ const WorkDayList = () => {
 
   const handleDownload = async (workDay) => {
     const fileKey = workDay.rawFile;
-    console.log(workDay, '<=== wow');
     if (!fileKey) {
       enqueueSnackbar('No file found to download', { variant: 'warning' });
       return;
@@ -123,15 +128,11 @@ const WorkDayList = () => {
     } catch (err) {
       enqueueSnackbar(
         err.response?.data?.message || err.message || 'Download failed',
-        { variant: 'error' },
+        {
+          variant: 'error',
+        },
       );
     }
-  };
-
-  const handleUpload = (workDay) => {
-    enqueueSnackbar('Upload action for ' + (workDay.name || workDay.id), {
-      variant: 'info',
-    });
   };
 
   const handleStatusChange = async (workDay, newStatus) => {
@@ -156,7 +157,9 @@ const WorkDayList = () => {
     } catch (err) {
       enqueueSnackbar(
         err.response?.data?.message || err.message || 'Failed to update status',
-        { variant: 'error' },
+        {
+          variant: 'error',
+        },
       );
     } finally {
       setStatusLoading((prev) => ({
@@ -169,6 +172,124 @@ const WorkDayList = () => {
   const handleSearch = () => {
     setPage(1);
     setPendingSearch(search);
+  };
+
+  const handleFileInputClick = (workDay, type) => {
+    setUploadContext({ workDay, type });
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file || !uploadContext.type || !uploadContext.workDay) return;
+
+    const { type, workDay } = uploadContext;
+    const extension = file.name.split('.').pop().toLowerCase();
+    const key = `${workDay.id || workDay._id}_${type}`;
+
+    if (
+      (type === 'kml' && extension !== 'kml') ||
+      (type === 'jpg' && extension !== 'jpg' && extension !== 'jpeg')
+    ) {
+      enqueueSnackbar(`Only .${type.toUpperCase()} files are allowed`, {
+        variant: 'error',
+      });
+      return;
+    }
+
+    setUploading((prev) => ({ ...prev, [key]: true }));
+    setUploadProgress((prev) => ({ ...prev, [key]: 0 }));
+
+    try {
+      // 60MB in bytes
+      const MAX_SINGLE_UPLOAD = 20 * 1024 * 1024;
+      // Step 1: Get upload URL(s)
+      const res = await axiosInstance.post(
+        '/work-day/upload-resultFile',
+        {
+          workDayId: workDay.id || workDay._id,
+          type,
+          filename: file.name,
+          contentType: file.type,
+          size: file.size,
+        },
+        {
+          headers: { Authorization: token },
+        },
+      );
+      const uploadResponse = res.data.data;
+
+      if (
+        type === 'kml' ||
+        (type === 'jpg' && file.size <= MAX_SINGLE_UPLOAD)
+      ) {
+        // Single PUT upload
+        await axiosInstance.put(uploadResponse.url, file, {
+          headers: {
+            'Content-Type': file.type,
+          },
+          onUploadProgress: (event) => {
+            const percent = Math.round((event.loaded * 100) / event.total);
+            setUploadProgress((prev) => ({ ...prev, [key]: percent }));
+          },
+        });
+        enqueueSnackbar(`${type.toUpperCase()} uploaded successfully`, {
+          variant: 'success',
+        });
+      } else if (type === 'jpg' && file.size > MAX_SINGLE_UPLOAD) {
+        // Multipart upload
+        const { parts, uploadId, key: s3Key, partSize } = uploadResponse;
+        const chunks = [];
+        let start = 0;
+        while (start < file.size) {
+          const end = Math.min(start + partSize, file.size);
+          chunks.push(file.slice(start, end));
+          start = end;
+        }
+        const etags = [];
+        for (let i = 0; i < parts.length; i++) {
+          const partRes = await fetch(parts[i].url, {
+            method: 'PUT',
+            body: chunks[i],
+          });
+          const etag = partRes.headers.get('ETag')?.replace(/"/g, '');
+          etags.push({ PartNumber: parts[i].partNumber, ETag: etag });
+          const percent = Math.round(((i + 1) / parts.length) * 100);
+          setUploadProgress((prev) => ({ ...prev, [key]: percent }));
+        }
+        // Complete upload
+        await axiosInstance.post(
+          '/work-day/complete-upload',
+          {
+            workDayId: workDay.id || workDay._id,
+            type,
+            key: s3Key,
+            uploadId,
+            parts: etags,
+          },
+          {
+            headers: { Authorization: token },
+          },
+        );
+        enqueueSnackbar('JPG uploaded successfully (multipart)', {
+          variant: 'success',
+        });
+      }
+    } catch (err) {
+      enqueueSnackbar(
+        err.response?.data?.message || err.message || 'Upload failed',
+        {
+          variant: 'error',
+        },
+      );
+    } finally {
+      setUploading((prev) => ({ ...prev, [key]: false }));
+      setTimeout(() => {
+        setUploadProgress((prev) => ({ ...prev, [key]: 0 }));
+      }, 2000);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setUploadContext({ type: '', workDay: null });
+    }
   };
 
   return (
@@ -218,6 +339,7 @@ const WorkDayList = () => {
           </Select>
         </FormControl>
       </Stack>
+
       {loading ? (
         <Typography variant="body1">Loading work days...</Typography>
       ) : error ? (
@@ -262,6 +384,16 @@ const WorkDayList = () => {
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
                     >
+                      OrthoImage
+                    </TableCell>
+                    <TableCell
+                      sx={{ color: theme.palette.primary.contrastText }}
+                    >
+                      KML File
+                    </TableCell>
+                    <TableCell
+                      sx={{ color: theme.palette.primary.contrastText }}
+                    >
                       Action
                     </TableCell>
                   </TableRow>
@@ -275,12 +407,12 @@ const WorkDayList = () => {
                     </TableRow>
                   ) : (
                     workDays.map((workDay) => {
-                      const file =
-                        workDay.resultFiles && workDay.resultFiles[0];
+                      const file = workDay.resultFiles?.[0];
                       const hasDownload = !!getDownloadUrl(file);
                       const id = workDay._id || workDay.id;
                       const project = workDay.projectId || {};
                       const owner = project.owner || {};
+
                       return (
                         <TableRow key={id}>
                           <TableCell>
@@ -314,6 +446,17 @@ const WorkDayList = () => {
                             </FormControl>
                           </TableCell>
                           <TableCell>
+                            {workDay.orthoImage
+                              ? workDay.orthoImage.split('-')[5]
+                              : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {' '}
+                            {workDay.kmlFile
+                              ? workDay.kmlFile.split('-')[5]
+                              : '-'}
+                          </TableCell>
+                          <TableCell>
                             <Box>
                               <Button
                                 variant="outlined"
@@ -322,29 +465,108 @@ const WorkDayList = () => {
                                 startIcon={<DownloadIcon />}
                                 onClick={() => handleDownload(workDay)}
                                 disabled={!hasDownload && !workDay.rawFile}
-                                sx={{ mr: 1 }}
+                                sx={{ mr: 1, mb: 1, minWidth: 20 }}
                               >
                                 Download
                               </Button>
-                              <Button
-                                variant="outlined"
-                                color="secondary"
-                                size="small"
-                                startIcon={<UploadIcon />}
-                                sx={{ mr: 1 }}
-                                onClick={() => handleUpload(workDay)}
+                              <Box
+                                sx={{ display: 'inline-block', mr: 1, mb: 1 }}
                               >
-                                Upload KML
-                              </Button>
-                              <Button
-                                variant="outlined"
-                                color="secondary"
-                                size="small"
-                                startIcon={<UploadIcon />}
-                                onClick={() => handleUpload(workDay)}
-                              >
-                                Upload JPG
-                              </Button>
+                                <Button
+                                  variant="outlined"
+                                  color="secondary"
+                                  size="small"
+                                  startIcon={<UploadIcon />}
+                                  sx={{
+                                    mr: 0,
+                                    minWidth: 110,
+                                    justifyContent: 'left',
+                                  }}
+                                  onClick={() =>
+                                    handleFileInputClick(workDay, 'kml')
+                                  }
+                                  disabled={uploading[`${id}_kml`]}
+                                >
+                                  KML
+                                </Button>
+                                {uploading[`${id}_kml`] && (
+                                  <Box sx={{ mt: 1 }}>
+                                    <Typography variant="caption">
+                                      Uploading...{' '}
+                                      {uploadProgress[`${id}_kml`] || 0}%
+                                    </Typography>
+                                    <Box sx={{ width: 80 }}>
+                                      <Stack spacing={1}>
+                                        <Box sx={{ width: '100%' }}>
+                                          <Box
+                                            sx={{
+                                              height: 4,
+                                              bgcolor: '#eee',
+                                              borderRadius: 2,
+                                              overflow: 'hidden',
+                                            }}
+                                          >
+                                            <Box
+                                              sx={{
+                                                width: `${uploadProgress[`${id}_kml`] || 0}%`,
+                                                height: '100%',
+                                                bgcolor: 'primary.main',
+                                                transition: 'width 0.2s',
+                                              }}
+                                            />
+                                          </Box>
+                                        </Box>
+                                      </Stack>
+                                    </Box>
+                                  </Box>
+                                )}
+                              </Box>
+                              <Box sx={{ display: 'inline-block' }}>
+                                <Button
+                                  variant="outlined"
+                                  color="secondary"
+                                  size="small"
+                                  startIcon={<UploadIcon />}
+                                  onClick={() =>
+                                    handleFileInputClick(workDay, 'jpg')
+                                  }
+                                  sx={{ minWidth: 110, justifyContent: 'left' }}
+                                  disabled={uploading[`${id}_jpg`]}
+                                >
+                                  JPG
+                                </Button>
+                                {uploading[`${id}_jpg`] && (
+                                  <Box sx={{ mt: 1 }}>
+                                    <Typography variant="caption">
+                                      Uploading...{' '}
+                                      {uploadProgress[`${id}_jpg`] || 0}%
+                                    </Typography>
+                                    <Box sx={{ width: 80 }}>
+                                      <Stack spacing={1}>
+                                        <Box sx={{ width: '100%' }}>
+                                          <Box
+                                            sx={{
+                                              height: 4,
+                                              bgcolor: '#eee',
+                                              borderRadius: 2,
+                                              overflow: 'hidden',
+                                            }}
+                                          >
+                                            <Box
+                                              sx={{
+                                                width: `${uploadProgress[`${id}_jpg`] || 0}%`,
+                                                height: '100%',
+                                                bgcolor: 'secondary.main',
+                                                transition: 'width 0.2s',
+                                              }}
+                                            />
+                                          </Box>
+                                        </Box>
+                                      </Stack>
+                                    </Box>
+                                  </Box>
+                                )}
+                              </Box>
                             </Box>
                           </TableCell>
                         </TableRow>
@@ -365,6 +587,14 @@ const WorkDayList = () => {
           </Paper>
         </>
       )}
+
+      {/* Hidden file input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
     </MainCard>
   );
 };
