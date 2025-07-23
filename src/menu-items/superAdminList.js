@@ -5,6 +5,7 @@ import {
   IconShadow,
   IconWindmill,
   IconDroneOff,
+  IconDatabaseImport,
 } from '@tabler/icons-react';
 
 // constant
@@ -14,6 +15,7 @@ const icons = {
   IconPalette,
   IconShadow,
   IconWindmill,
+  IconDatabaseImport,
 };
 // ==============================|| UTILITIES MENU ITEMS ||============================== //
 
@@ -42,7 +44,7 @@ const getSuperAdminList = (userRole) => {
       title: 'Data Management',
       type: 'item',
       url: '/work-days',
-      icon: icons.IconPalette,
+      icon: icons.IconDatabaseImport,
       breadcrumbs: false,
     });
   }

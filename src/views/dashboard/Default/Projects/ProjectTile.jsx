@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router';
 import { formatDistanceToNow } from 'date-fns';
 import { useDispatch } from 'react-redux';
 import { setSelectedProjectId } from '../../../../store/slices/projectSlice';
-
+import image from '../../../../assets/images/conture-map.jpg';
 const ProjectTile = ({ project, count }) => {
   console.log(project, '<=== wow');
   const navigate = useNavigate();
@@ -28,10 +28,12 @@ const ProjectTile = ({ project, count }) => {
 
   return (
     <Card
-      elevation={3}
+      elevation={4}
       sx={{
+        maxHeight: 220,
         position: 'relative',
         width: 320,
+        maxWidth: 320,
         borderRadius: 3,
         overflow: 'hidden',
         cursor: 'pointer',
@@ -45,7 +47,7 @@ const ProjectTile = ({ project, count }) => {
         <CardMedia
           component="img"
           height="140"
-          image={'https://picsum.photos/200/300?2'}
+          image={image}
           alt={project.name}
           sx={{
             objectFit: 'cover',
@@ -108,11 +110,7 @@ const ProjectTile = ({ project, count }) => {
               <Typography variant="caption">{count}</Typography>
             </Stack>
             <Stack>
-              <Typography
-                variant="caption"
-                fontSize={10}
-                color="text.secondary"
-              >
+              <Typography variant="caption" fontSize={8} color="text.secondary">
                 {project.createdAt
                   ? `${formatDistanceToNow(new Date(project.createdAt), { addSuffix: true })}`
                   : 'Time unknown'}

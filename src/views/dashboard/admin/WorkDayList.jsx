@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import dayjs from 'dayjs';
 import {
   Box,
   Paper,
@@ -369,7 +370,7 @@ const WorkDayList = () => {
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
                     >
-                      Project Location
+                      Project
                     </TableCell>
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
@@ -384,12 +385,12 @@ const WorkDayList = () => {
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
                     >
-                      OrthoImage
+                      Ortho
                     </TableCell>
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
                     >
-                      KML File
+                      KML
                     </TableCell>
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
@@ -420,7 +421,11 @@ const WorkDayList = () => {
                               ? new Date(workDay.createdAt).toLocaleDateString()
                               : workDay.name}
                           </TableCell>
-                          <TableCell>{workDay.name || '-'}</TableCell>
+                          <TableCell>
+                            {dayjs(workDay.name, 'YYYY-MM-DD', true).isValid()
+                              ? dayjs(workDay.name).format('DD-MM-YYYY')
+                              : workDay.name || '-'}
+                          </TableCell>
                           <TableCell>{project.name || '-'}</TableCell>
                           <TableCell>{project.location || '-'}</TableCell>
                           <TableCell>
