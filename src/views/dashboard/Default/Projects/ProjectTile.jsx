@@ -16,7 +16,6 @@ import { useDispatch } from 'react-redux';
 import { setSelectedProjectId } from '../../../../store/slices/projectSlice';
 import image from '../../../../assets/images/conture-map.jpg';
 const ProjectTile = ({ project, count }) => {
-  console.log(project, '<=== wow');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 

@@ -8,43 +8,53 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
-  OutlinedInput,
+  Pagination,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ProjectTile from './ProjectTile';
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@emotion/react';
-import { progress } from 'framer-motion';
-import { IconBuildingCog, IconDroneOff } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../../../utils/axios.config';
-import { useEffect } from 'react';
 
 function Projects() {
   const theme = useTheme();
   const navigate = useNavigate();
+  const user = useSelector((state) => state.auth);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const user = useSelector((state) => state.auth);
-  const fetchProjects = async (search = '', sort = '') => {
+
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const LIMIT = 12;
+
+  const fetchProjects = async (search = '', sort = '', pageNumber = 1) => {
     setLoading(true);
     setError(null);
     try {
-      const params = {};
+      const params = {
+        email: user.user.email,
+        status: 'active',
+        page: pageNumber,
+        limit: LIMIT,
+      };
       if (search) params.search = search;
       if (sort) params.sortBy = sort;
-      params.email = user.user.email;
-      params.status = 'active';
+
       const response = await axiosInstance.get('/project-members', {
         params,
         headers: { Authorization: user.token },
       });
-      console.log(response.data?.data?.results, '<====');
-      setFilteredProjects(response.data?.data?.results || response.data || []);
+
+      const data = response.data?.data;
+      setFilteredProjects(data?.results || []);
+      setTotalPages(data?.totalPages || 1); // assumes backend returns totalPages
     } catch (err) {
       setError(err.message || 'Failed to fetch projects');
     } finally {
@@ -53,11 +63,12 @@ function Projects() {
   };
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    fetchProjects(searchTerm, sortBy, page);
+  }, [page]);
 
   const handleSearch = () => {
-    fetchProjects(searchTerm, sortBy);
+    setPage(1);
+    fetchProjects(searchTerm, sortBy, 1);
   };
 
   return (
@@ -79,8 +90,8 @@ function Projects() {
         <Grid item xs={12} md={6}>
           <Grid
             container
-            justifyContent={'center'}
-            alignItems={'center'}
+            justifyContent="center"
+            alignItems="center"
             spacing={2}
           >
             <Grid item xs={12} sm={6}>
@@ -136,16 +147,29 @@ function Projects() {
       ) : error ? (
         <Typography color="error">{error}</Typography>
       ) : (
-        <Grid container spacing={3}>
-          {filteredProjects?.map((project, index) => (
-            <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-              <ProjectTile
-                project={project.projectId}
-                count={project.memberCount}
+        <>
+          <Grid container spacing={3}>
+            {filteredProjects?.map((project, index) => (
+              <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+                <ProjectTile
+                  project={project.projectId}
+                  count={project.memberCount}
+                />
+              </Grid>
+            ))}
+          </Grid>
+
+          {totalPages > 1 && (
+            <Box mt={4} display="flex" justifyContent="center">
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(e, value) => setPage(value)}
+                color="primary"
               />
-            </Grid>
-          ))}
-        </Grid>
+            </Box>
+          )}
+        </>
       )}
     </Box>
   );

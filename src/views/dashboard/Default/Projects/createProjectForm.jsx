@@ -25,8 +25,9 @@ import { enqueueSnackbar } from 'notistack';
 
 const ProjectSchema = Yup.object().shape({
   name: Yup.string().required('Project name is required'),
+  description: Yup.string().required('Project Description is required'),
   team: Yup.array().of(Yup.string().email('Invalid email')),
-
+  location: Yup.string().required('Location  is required'),
   startDate: Yup.date()
     .nullable()
     .test(
@@ -65,7 +66,6 @@ const CreateProjectForm = ({ onSubmit }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const theme = useTheme();
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
   const onDrop = (acceptedFiles) => {
@@ -84,13 +84,43 @@ const CreateProjectForm = ({ onSubmit }) => {
     setError(null);
     setUploadProgress(0);
 
+    // If there's no file, create project normally
+    if (!file) {
+      try {
+        const response = await axiosInstance.post('/project', values, {
+          headers: {
+            Authorization: token,
+          },
+        });
+
+        const newProjectId = response.data?.data?._id;
+        navigate(newProjectId ? `/project/${newProjectId}/View` : '/project');
+        if (response.status === 201) {
+          enqueueSnackbar('Successfully Created Project', {
+            variant: 'success',
+          });
+        }
+        return;
+      } catch (e) {
+        setError(
+          e.response?.data?.message || e.message || 'Failed to create project',
+        );
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Attach file metadata for backend presigned URL
     values.file = {
       filename: file.name,
       contentType: file.type,
       size: file.size,
     };
 
+    let newProjectId = null;
+
     try {
+      // Create project and get upload info
       const response = await axiosInstance.post('/project', values, {
         headers: {
           Authorization: token,
@@ -98,47 +128,57 @@ const CreateProjectForm = ({ onSubmit }) => {
       });
 
       const uploadResponse = response.data.data;
-      console.log(uploadResponse, '<==== uplaod response');
-      if (uploadResponse.uploadType === 'single') {
-        await axiosInstance.put(uploadResponse.url, file, {
+      newProjectId = uploadResponse?.project?.id || response.data?.data?._id;
+      // Single file upload (PUT to presigned S3 URL)
+      if (uploadResponse.upload?.uploadType === 'single') {
+        await axiosInstance.put(uploadResponse.upload.url, file, {
           headers: {
             'Content-Type': file.type,
           },
           onUploadProgress: (event) => {
             const percent = Math.round((event.loaded * 100) / event.total);
-            setUploadProgress(percent); // ✅ fixed here
+            setUploadProgress(percent);
           },
         });
-      } else if (uploadResponse.uploadType === 'multipart') {
-        const { parts, uploadId, key, partSize } = uploadResponse;
-        const { id } = uploadResponse.project;
-        let projectId = id;
+      }
+
+      // Multipart upload
+      else if (uploadResponse.upload?.uploadType === 'multipart') {
+        const { parts, uploadId, key, partSize } = uploadResponse.upload;
+
+        // Split file into chunks
         const chunks = [];
         let start = 0;
-
         while (start < file.size) {
           const end = Math.min(start + partSize, file.size);
           chunks.push(file.slice(start, end));
           start = end;
         }
 
+        // Upload each part and collect ETags
         const etags = [];
         for (let i = 0; i < parts.length; i++) {
           const res = await fetch(parts[i].url, {
             method: 'PUT',
             body: chunks[i],
           });
+
+          if (!res.ok) {
+            throw new Error(`Chunk ${i + 1} failed to upload`);
+          }
+
           const etag = res.headers.get('ETag')?.replace(/"/g, '');
           etags.push({ PartNumber: parts[i].partNumber, ETag: etag });
 
           const percent = Math.round(((i + 1) / parts.length) * 100);
-          setUploadProgress(percent); // ✅ fixed here
+          setUploadProgress(percent);
         }
 
+        // Complete multipart upload
         await axiosInstance.post(
           '/work-day/complete-upload',
           {
-            projectId: projectId,
+            projectId: newProjectId,
             name: new Date(),
             key,
             uploadId,
@@ -146,32 +186,27 @@ const CreateProjectForm = ({ onSubmit }) => {
           },
           {
             headers: {
-              Authorization: token, // ✅ fixed here
+              Authorization: token,
             },
           },
         );
       }
 
+      // Notify success
       enqueueSnackbar('Upload successful!', { variant: 'success' });
-
-      if (uploadResponse.uploadType === 'single') {
-        enqueueSnackbar('Successfully Created Historical Data', {
-          variant: 'success',
-        });
-      }
-
-      // Optional redirect:
-      const newProjectId =
-        uploadResponse?.projectId || response.data?.data?._id;
-      navigate(newProjectId ? `/project/${newProjectId}/View` : '/project');
+      enqueueSnackbar('Successfully Created Historical Data', {
+        variant: 'success',
+      });
     } catch (err) {
-      setError(
+      enqueueSnackbar(
         err.response?.data?.message ||
           err.message ||
           'Failed to create project',
+        { variant: 'error' },
       );
     } finally {
       setLoading(false);
+      navigate(newProjectId ? `/project/${newProjectId}/View` : '/project');
     }
   };
 
@@ -194,29 +229,35 @@ const CreateProjectForm = ({ onSubmit }) => {
       >
         {({ values, errors, touched, setFieldValue }) => (
           <Form>
-            <TextField
-              sx={{ mb: 2 }}
-              fullWidth
-              name="name"
-              label="Project Name"
-              value={values.name}
-              onChange={(e) => setFieldValue('name', e.target.value)}
-              error={touched.name && Boolean(errors.name)}
-            />
-            {touched.name && errors.name && (
-              <Typography color="error" variant="caption">
-                {errors.name}
-              </Typography>
-            )}
-
-            <TextField
-              sx={{ mb: 2 }}
-              fullWidth
-              name="location"
-              label="Project Location"
-              value={values.location || ''}
-              onChange={(e) => setFieldValue('location', e.target.value)}
-            />
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                name="name"
+                label="Project Name"
+                value={values.name}
+                onChange={(e) => setFieldValue('name', e.target.value)}
+                error={touched.name && Boolean(errors.name)}
+              />
+              {touched.name && errors.name && (
+                <Typography color="error" variant="caption">
+                  {errors.name}
+                </Typography>
+              )}
+            </Box>
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                name="location"
+                label="Project Location"
+                value={values.location || ''}
+                onChange={(e) => setFieldValue('location', e.target.value)}
+              />
+              {touched.location && errors.location && (
+                <Typography color="error" variant="caption">
+                  {errors.location}
+                </Typography>
+              )}
+            </Box>
 
             {/* Start & End Date */}
             <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -253,15 +294,20 @@ const CreateProjectForm = ({ onSubmit }) => {
                 />
               </Stack>
             </LocalizationProvider>
-
-            <TextField
-              sx={{ mb: 2 }}
-              fullWidth
-              name="description"
-              label="Project Description"
-              value={values.description || ''}
-              onChange={(e) => setFieldValue('description', e.target.value)}
-            />
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                name="description"
+                label="Project Description"
+                value={values.description || ''}
+                onChange={(e) => setFieldValue('description', e.target.value)}
+              />
+              {touched.description && errors.description && (
+                <Typography color="error" variant="caption">
+                  {errors.description}
+                </Typography>
+              )}
+            </Box>
 
             {/* Team Input */}
             <TextField

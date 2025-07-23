@@ -47,7 +47,6 @@ const TeamSetup = () => {
           params: { projectId },
           headers: { Authorization: token },
         });
-        console.log(res.data.data?.results, '<=== res');
         setMembers(res.data.data?.results || []);
       } catch (err) {
         setError(err.response?.data?.message || err.message);
