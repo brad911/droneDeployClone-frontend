@@ -139,7 +139,7 @@ const CreateProjectForm = ({ onSubmit }) => {
           '/work-day/complete-upload',
           {
             projectId: projectId,
-            name: values.name,
+            name: new Date(),
             key,
             uploadId,
             parts: etags,
@@ -161,8 +161,9 @@ const CreateProjectForm = ({ onSubmit }) => {
       }
 
       // Optional redirect:
-      // const newProjectId = uploadResponse?.projectId || response.data?.data?._id;
-      // navigate(newProjectId ? `/project/${newProjectId}/View` : '/project');
+      const newProjectId =
+        uploadResponse?.projectId || response.data?.data?._id;
+      navigate(newProjectId ? `/project/${newProjectId}/View` : '/project');
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -175,7 +176,7 @@ const CreateProjectForm = ({ onSubmit }) => {
   };
 
   return (
-    <Paper sx={{ p: 5, maxWidth: 500 }}>
+    <Paper elevation={4} sx={{ p: 5, maxWidth: 500 }}>
       <Typography variant="h2" mb={2}>
         Create New Project
       </Typography>

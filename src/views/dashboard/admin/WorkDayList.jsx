@@ -423,7 +423,7 @@ const WorkDayList = () => {
                           </TableCell>
                           <TableCell>
                             {dayjs(workDay.name, 'YYYY-MM-DD', true).isValid()
-                              ? dayjs(workDay.name).format('DD-MM-YYYY')
+                              ? dayjs(workDay.name).format('DD/MM/YYYY')
                               : workDay.name || '-'}
                           </TableCell>
                           <TableCell>{project.name || '-'}</TableCell>
