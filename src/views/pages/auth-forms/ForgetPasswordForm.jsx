@@ -31,7 +31,7 @@ import { setCredentials } from '../../../store/slices/authSlice';
 
 // ===============================|| JWT - LOGIN ||=============================== //
 
-export default function AuthLogin() {
+export default function ForgetPasswordForm() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -42,26 +42,18 @@ export default function AuthLogin() {
   const user = useSelector((state) => state.auth);
 
   const handleLogin = async (values, { setSubmitting }) => {
-    delete values.keepLoggedIn;
     try {
-      const response = await axios.post('/auth/login', values); // Replace with your real endpoint
+      const response = await axios.post('/auth/forget-password', values); // Replace with your real endpoint
 
       if (response.status === 200) {
-        enqueueSnackbar('Login successful!', { variant: 'success' });
-        dispatch(
-          setCredentials({
-            user: response.data.data.user,
-            token: response.data.data.tokens.access.token,
-          }),
-        );
-        localStorage.setItem('token', response.data.data.tokens.access.token);
-        setTimeout(() => {
-          navigate('/project');
-        }, 500);
+        enqueueSnackbar('Email Successufully Send, Check your Inbox!', {
+          variant: 'success',
+        });
       }
     } catch (error) {
       enqueueSnackbar(
-        error.response?.data?.message || 'Login failed. Please try again.',
+        error.response?.data?.message ||
+          'Unable To reset your password, Please try again.',
         { variant: 'error' },
       );
     } finally {
@@ -71,12 +63,9 @@ export default function AuthLogin() {
   const formik = useFormik({
     initialValues: {
       email: '',
-      password: '',
-      keepLoggedIn: true,
     },
     validationSchema: Yup.object({
       email: Yup.string().email('Invalid email').required('Email is required'),
-      password: Yup.string().required('Password is required'),
     }),
     onSubmit: handleLogin,
   });
@@ -89,7 +78,7 @@ export default function AuthLogin() {
         error={formik.touched.email && Boolean(formik.errors.email)}
       >
         <InputLabel onClick={() => console.log(user)} htmlFor="email">
-          Email Address / Username
+          Email Address
         </InputLabel>
         <OutlinedInput
           id="email"
@@ -98,7 +87,7 @@ export default function AuthLogin() {
           name="email"
           onBlur={formik.handleBlur}
           onChange={formik.handleChange}
-          label="Email Address / Username"
+          label="Email Address"
         />
       </FormControl>
       {formik.touched.email && formik.errors.email && (
@@ -106,71 +95,6 @@ export default function AuthLogin() {
           {formik.errors.email}
         </Typography>
       )}
-
-      <FormControl
-        fullWidth
-        sx={{ ...theme.typography.customInput }}
-        error={formik.touched.password && Boolean(formik.errors.password)}
-      >
-        <InputLabel htmlFor="password">Password</InputLabel>
-        <OutlinedInput
-          id="password"
-          type={showPassword ? 'text' : 'password'}
-          value={formik.values.password}
-          name="password"
-          onBlur={formik.handleBlur}
-          onChange={formik.handleChange}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
-                edge="end"
-                size="large"
-              >
-                {showPassword ? <Visibility /> : <VisibilityOff />}
-              </IconButton>
-            </InputAdornment>
-          }
-          label="Password"
-        />
-      </FormControl>
-      {formik.touched.password && formik.errors.password && (
-        <Typography color="error" variant="caption">
-          {formik.errors.password}
-        </Typography>
-      )}
-
-      <Grid
-        container
-        sx={{ alignItems: 'center', justifyContent: 'space-between' }}
-      >
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formik.values.keepLoggedIn}
-                onChange={formik.handleChange}
-                name="keepLoggedIn"
-                color="primary"
-              />
-            }
-            label="Remember me"
-          />
-        </Grid>
-        <Grid item>
-          <Typography
-            variant="subtitle1"
-            component={Link}
-            to="/forget-password"
-            color="secondary"
-            sx={{ textDecoration: 'none' }}
-          >
-            Forgot Password?
-          </Typography>
-        </Grid>
-      </Grid>
 
       <Box sx={{ mt: 2 }}>
         <AnimateButton>
@@ -181,7 +105,7 @@ export default function AuthLogin() {
             type="submit"
             variant="contained"
           >
-            Log In
+            Forget Password
           </Button>
         </AnimateButton>
       </Box>

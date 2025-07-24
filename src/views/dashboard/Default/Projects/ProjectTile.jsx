@@ -47,7 +47,7 @@ const ProjectTile = ({ project, count }) => {
           component="img"
           height="140"
           image={image}
-          alt={project.name}
+          alt={project?.name}
           sx={{
             objectFit: 'cover',
             filter: 'brightness(60%)',
@@ -67,7 +67,7 @@ const ProjectTile = ({ project, count }) => {
           }}
         >
           <Typography variant="subtitle1" fontWeight={700} color="white" noWrap>
-            {project.name}
+            {project?.name}
           </Typography>
         </Box>
       </Box>
@@ -102,7 +102,7 @@ const ProjectTile = ({ project, count }) => {
           <Stack direction="row" spacing={2} alignItems="center">
             <Stack direction="row" spacing={0.5} alignItems="center">
               <ImageIcon fontSize="small" />
-              <Typography variant="caption">{project.description}</Typography>
+              <Typography variant="caption">{project.location}</Typography>
             </Stack>
             <Stack direction="row" spacing={0.5} alignItems="center">
               <PersonIcon fontSize="small" />

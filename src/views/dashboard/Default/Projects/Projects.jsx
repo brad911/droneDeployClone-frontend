@@ -146,10 +146,16 @@ function Projects() {
         <Typography variant="body1">Loading projects...</Typography>
       ) : error ? (
         <Typography color="error">{error}</Typography>
+      ) : filteredProjects.length === 0 ? (
+        <Box mt={6} textAlign="center">
+          <Typography variant="h6" color="text.secondary">
+            No projects found. Create a project to start working.
+          </Typography>
+        </Box>
       ) : (
         <>
           <Grid container spacing={3}>
-            {filteredProjects?.map((project, index) => (
+            {filteredProjects.map((project, index) => (
               <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
                 <ProjectTile
                   project={project.projectId}

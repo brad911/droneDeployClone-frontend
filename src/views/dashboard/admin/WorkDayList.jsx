@@ -418,7 +418,7 @@ const WorkDayList = () => {
                         <TableRow key={id}>
                           <TableCell>
                             {workDay.createdAt
-                              ? new Date(workDay.createdAt).toLocaleDateString()
+                              ? dayjs(workDay.createdAt).format('DD/MM/YYYY')
                               : workDay.name}
                           </TableCell>
                           <TableCell>
@@ -470,7 +470,7 @@ const WorkDayList = () => {
                                 startIcon={<DownloadIcon />}
                                 onClick={() => handleDownload(workDay)}
                                 disabled={!hasDownload && !workDay.rawFile}
-                                sx={{ mr: 1, mb: 1, minWidth: 20 }}
+                                sx={{ mr: 1, mb: 1, minWidth: 110, mt: 1 }}
                               >
                                 Download
                               </Button>
