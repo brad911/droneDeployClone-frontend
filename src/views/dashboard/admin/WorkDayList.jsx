@@ -93,6 +93,7 @@ const WorkDayList = () => {
         setWorkDays(res.data.data?.results || []);
         setTotal(res.data.data?.totalResults || 0);
       } catch (err) {
+        console.log(err, '<===== error fetching workdays');
         setError(err.response?.data?.message || err.message);
         enqueueSnackbar(
           err.response?.data?.message ||
@@ -308,8 +309,8 @@ const WorkDayList = () => {
 
   const handleGenerateTilesClick = (workDayId) => {
     // Find the workDay object to check for required files
-    const workDay = workDays.find(wd => (wd._id || wd.id) === workDayId);
-    
+    const workDay = workDays.find((wd) => (wd._id || wd.id) === workDayId);
+
     if (!workDay) {
       enqueueSnackbar('Work day not found', { variant: 'error' });
       return;
@@ -317,18 +318,19 @@ const WorkDayList = () => {
 
     // Check if KML file exists
     const hasKmlFile = workDay.kmlFile && workDay.kmlFile.trim() !== '';
-    
+
     // Check if ortho image exists
-    const hasOrthoImage = workDay.orthoImage && workDay.orthoImage.trim() !== '';
+    const hasOrthoImage =
+      workDay.orthoImage && workDay.orthoImage.trim() !== '';
 
     if (!hasKmlFile || !hasOrthoImage) {
       const missingFiles = [];
       if (!hasKmlFile) missingFiles.push('KML file');
       if (!hasOrthoImage) missingFiles.push('ortho image');
-      
+
       enqueueSnackbar(
-        `Please upload ${missingFiles.join(' and ')} first before generating tiles.`, 
-        { variant: 'warning' }
+        `Please upload ${missingFiles.join(' and ')} first before generating tiles.`,
+        { variant: 'warning' },
       );
       return;
     }
@@ -342,16 +344,22 @@ const WorkDayList = () => {
   const handleConfirmGenerateTiles = async () => {
     const { workDayId } = confirmDialog;
     setGenerateTilesLoading(true);
-    
+
     try {
-      const res = await axiosInstance.get(`/work-day/generate-tiles/${workDayId}`, {
-        headers: { Authorization: token },
-      });
-      
+      const res = await axiosInstance.get(
+        `/work-day/generate-tiles/${workDayId}`,
+        {
+          headers: { Authorization: token },
+        },
+      );
+
       if (res.data?.success) {
-        enqueueSnackbar('Tile generation started successfully! This process will take at least 10 minutes to complete.', {
-          variant: 'success',
-        });
+        enqueueSnackbar(
+          'Tile generation started successfully! This process will take at least 10 minutes to complete.',
+          {
+            variant: 'success',
+          },
+        );
         setConfirmDialog({ open: false, workDayId: null });
       } else {
         enqueueSnackbar('Failed to start tile generation', {
@@ -360,7 +368,9 @@ const WorkDayList = () => {
       }
     } catch (err) {
       enqueueSnackbar(
-        err.response?.data?.message || err.message || 'Failed to generate tiles',
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to generate tiles',
         {
           variant: 'error',
         },
@@ -571,10 +581,12 @@ const WorkDayList = () => {
                               <Box>
                                 <Button
                                   variant="outlined"
-                                   color="primary"
+                                  color="primary"
                                   size="small"
                                   startIcon={<UploadIcon />}
-                                  onClick={() => handleFileInputClick(workDay, 'kml')}
+                                  onClick={() =>
+                                    handleFileInputClick(workDay, 'kml')
+                                  }
                                   disabled={uploading[`${id}_kml`]}
                                   fullWidth
                                   sx={{
@@ -592,8 +604,12 @@ const WorkDayList = () => {
                                 </Button>
                                 {uploading[`${id}_kml`] && (
                                   <Box sx={{ mt: 0.5 }}>
-                                    <Typography variant="caption" color="text.secondary">
-                                      Uploading... {uploadProgress[`${id}_kml`] || 0}%
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      Uploading...{' '}
+                                      {uploadProgress[`${id}_kml`] || 0}%
                                     </Typography>
                                     <Box sx={{ width: '100%', mt: 0.5 }}>
                                       <Box
@@ -622,10 +638,12 @@ const WorkDayList = () => {
                               <Box>
                                 <Button
                                   variant="outlined"
-                                   color="primary"
+                                  color="primary"
                                   size="small"
                                   startIcon={<UploadIcon />}
-                                  onClick={() => handleFileInputClick(workDay, 'jpg')}
+                                  onClick={() =>
+                                    handleFileInputClick(workDay, 'jpg')
+                                  }
                                   disabled={uploading[`${id}_jpg`]}
                                   fullWidth
                                   sx={{
@@ -643,8 +661,12 @@ const WorkDayList = () => {
                                 </Button>
                                 {uploading[`${id}_jpg`] && (
                                   <Box sx={{ mt: 0.5 }}>
-                                    <Typography variant="caption" color="text.secondary">
-                                      Uploading... {uploadProgress[`${id}_jpg`] || 0}%
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      Uploading...{' '}
+                                      {uploadProgress[`${id}_jpg`] || 0}%
                                     </Typography>
                                     <Box sx={{ width: '100%', mt: 0.5 }}>
                                       <Box
@@ -676,7 +698,10 @@ const WorkDayList = () => {
                                 size="small"
                                 startIcon={<IconPhotoEdit />}
                                 onClick={() => handleGenerateTilesClick(id)}
-                                disabled={uploading[`${id}_jpg`] || uploading[`${id}_kml`]}
+                                disabled={
+                                  uploading[`${id}_jpg`] ||
+                                  uploading[`${id}_kml`]
+                                }
                                 fullWidth
                                 sx={{
                                   height: 36,
@@ -734,7 +759,7 @@ const WorkDayList = () => {
           },
         }}
       >
-        <DialogTitle 
+        <DialogTitle
           id="generate-tiles-dialog-title"
           sx={{
             bgcolor: 'primary.light',
@@ -763,32 +788,35 @@ const WorkDayList = () => {
               >
                 <IconPhotoEdit sx={{ color: 'primary.light', fontSize: 32 }} />
               </Box>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  fontWeight: 600, 
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 600,
                   mb: 2,
                   color: 'text.primary',
                 }}
               >
                 Generating Tiles...
               </Typography>
-              <Typography 
-                variant="body1" 
-                sx={{ 
+              <Typography
+                variant="body1"
+                sx={{
                   color: 'text.secondary',
                   lineHeight: 1.6,
                   mb: 3,
                 }}
               >
-                Please wait while we process your request. This may take several minutes.
+                Please wait while we process your request. This may take several
+                minutes.
               </Typography>
               <Box sx={{ width: '100%', maxWidth: 300, mx: 'auto' }}>
                 <Loader />
               </Box>
             </Box>
           ) : (
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mt:2}}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mt: 2 }}
+            >
               <Box
                 sx={{
                   width: 48,
@@ -805,9 +833,9 @@ const WorkDayList = () => {
                 <IconPhotoEdit sx={{ color: 'primary.light', fontSize: 24 }} />
               </Box>
               <Box>
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
+                <Typography
+                  variant="h6"
+                  sx={{
                     fontWeight: 600,
                     mb: 1,
                     color: 'text.primary',
@@ -815,24 +843,25 @@ const WorkDayList = () => {
                 >
                   Time-Intensive Operation
                 </Typography>
-                <Typography 
-                  variant="body1" 
+                <Typography
+                  variant="body1"
                   id="generate-tiles-dialog-description"
-                  sx={{ 
+                  sx={{
                     color: 'text.secondary',
                     lineHeight: 1.6,
                   }}
                 >
-                  This tile generation process will take at least <strong>10 minutes</strong> to complete. 
-                  The system will process your data in the background.
+                  This tile generation process will take at least{' '}
+                  <strong>10 minutes</strong> to complete. The system will
+                  process your data in the background.
                 </Typography>
               </Box>
             </Box>
           )}
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 1, gap: 1 }}>
-          <Button 
-            onClick={handleCancelGenerateTiles} 
+          <Button
+            onClick={handleCancelGenerateTiles}
             variant="outlined"
             disabled={generateTilesLoading}
             sx={{
@@ -853,8 +882,8 @@ const WorkDayList = () => {
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleConfirmGenerateTiles} 
+          <Button
+            onClick={handleConfirmGenerateTiles}
             variant="contained"
             disabled={generateTilesLoading}
             sx={{
@@ -865,7 +894,7 @@ const WorkDayList = () => {
               py: 1,
               '&:hover': {
                 bgcolor: 'secondary.light',
-                color:"black"
+                color: 'black',
               },
               '&:focus': {
                 bgcolor: 'primary.main',
