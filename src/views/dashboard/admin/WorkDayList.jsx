@@ -107,7 +107,7 @@ const WorkDayList = () => {
       }
     };
     fetchWorkDays();
-  }, [projectId, token, page, limit, sortBy, pendingSearch, enqueueSnackbar]);
+  }, [token, page, limit, sortBy, pendingSearch, enqueueSnackbar]);
 
   const getDownloadUrl = (resultFile) => {
     if (!resultFile) return null;
