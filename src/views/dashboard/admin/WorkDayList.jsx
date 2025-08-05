@@ -90,6 +90,7 @@ const WorkDayList = () => {
           params,
           headers: { Authorization: token },
         });
+        console.log(res, '<=== wo wow ow');
         setWorkDays(res.data.data?.results || []);
         setTotal(res.data.data?.totalResults || 0);
       } catch (err) {
