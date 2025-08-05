@@ -19,13 +19,19 @@ import {
   Stack,
   InputLabel,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import MainCard from 'ui-component/cards/MainCard';
+import Loader from 'ui-component/Loader';
 import axiosInstance from 'utils/axios.config';
 import { useSelector } from 'react-redux';
 import { useSnackbar } from 'notistack';
+import { IconPhotoEdit } from '@tabler/icons-react';
 
 const statusOptions = [
   { value: 'processing', label: 'Processing' },
@@ -62,6 +68,11 @@ const WorkDayList = () => {
   });
   const [uploadProgress, setUploadProgress] = useState({}); // { [`${workDayId}_${type}`]: percent }
   const [uploading, setUploading] = useState({}); // { [`${workDayId}_${type}`]: boolean }
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    workDayId: null,
+  });
+  const [generateTilesLoading, setGenerateTilesLoading] = useState(false);
 
   useEffect(() => {
     if (!projectId) return;
@@ -295,6 +306,74 @@ const WorkDayList = () => {
     }
   };
 
+  const handleGenerateTilesClick = (workDayId) => {
+    // Find the workDay object to check for required files
+    const workDay = workDays.find(wd => (wd._id || wd.id) === workDayId);
+    
+    if (!workDay) {
+      enqueueSnackbar('Work day not found', { variant: 'error' });
+      return;
+    }
+
+    // Check if KML file exists
+    const hasKmlFile = workDay.kmlFile && workDay.kmlFile.trim() !== '';
+    
+    // Check if ortho image exists
+    const hasOrthoImage = workDay.orthoImage && workDay.orthoImage.trim() !== '';
+
+    if (!hasKmlFile || !hasOrthoImage) {
+      const missingFiles = [];
+      if (!hasKmlFile) missingFiles.push('KML file');
+      if (!hasOrthoImage) missingFiles.push('ortho image');
+      
+      enqueueSnackbar(
+        `Please upload ${missingFiles.join(' and ')} first before generating tiles.`, 
+        { variant: 'warning' }
+      );
+      return;
+    }
+
+    setConfirmDialog({
+      open: true,
+      workDayId,
+    });
+  };
+
+  const handleConfirmGenerateTiles = async () => {
+    const { workDayId } = confirmDialog;
+    setGenerateTilesLoading(true);
+    
+    try {
+      const res = await axiosInstance.get(`/work-day/generate-tiles/${workDayId}`, {
+        headers: { Authorization: token },
+      });
+      
+      if (res.data?.success) {
+        enqueueSnackbar('Tile generation started successfully! This process will take at least 10 minutes to complete.', {
+          variant: 'success',
+        });
+        setConfirmDialog({ open: false, workDayId: null });
+      } else {
+        enqueueSnackbar('Failed to start tile generation', {
+          variant: 'error',
+        });
+      }
+    } catch (err) {
+      enqueueSnackbar(
+        err.response?.data?.message || err.message || 'Failed to generate tiles',
+        {
+          variant: 'error',
+        },
+      );
+    } finally {
+      setGenerateTilesLoading(false);
+    }
+  };
+
+  const handleCancelGenerateTiles = () => {
+    setConfirmDialog({ open: false, workDayId: null });
+  };
+
   return (
     <MainCard>
       <Box>
@@ -464,7 +543,8 @@ const WorkDayList = () => {
                               : '-'}
                           </TableCell>
                           <TableCell>
-                            <Box>
+                            <Stack spacing={1} sx={{ minWidth: 200 }}>
+                              {/* Download Button */}
                               <Button
                                 variant="outlined"
                                 color="primary"
@@ -472,109 +552,146 @@ const WorkDayList = () => {
                                 startIcon={<DownloadIcon />}
                                 onClick={() => handleDownload(workDay)}
                                 disabled={!hasDownload && !workDay.rawFile}
-                                sx={{ mr: 1, mb: 1, minWidth: 110, mt: 1 }}
+                                fullWidth
+                                sx={{
+                                  height: 36,
+                                  fontSize: '0.75rem',
+                                  fontWeight: 500,
+                                  textTransform: 'none',
+                                  borderWidth: 1.5,
+                                  '&:hover': {
+                                    borderWidth: 2,
+                                  },
+                                }}
                               >
                                 Download
                               </Button>
-                              <Box
-                                sx={{ display: 'inline-block', mr: 1, mb: 1 }}
-                              >
+
+                              {/* KML Upload Button */}
+                              <Box>
                                 <Button
                                   variant="outlined"
-                                  color="secondary"
+                                   color="primary"
                                   size="small"
                                   startIcon={<UploadIcon />}
-                                  sx={{
-                                    mr: 0,
-                                    minWidth: 110,
-                                    justifyContent: 'left',
-                                  }}
-                                  onClick={() =>
-                                    handleFileInputClick(workDay, 'kml')
-                                  }
+                                  onClick={() => handleFileInputClick(workDay, 'kml')}
                                   disabled={uploading[`${id}_kml`]}
+                                  fullWidth
+                                  sx={{
+                                    height: 36,
+                                    fontSize: '0.75rem',
+                                    fontWeight: 500,
+                                    textTransform: 'none',
+                                    borderWidth: 1.5,
+                                    '&:hover': {
+                                      borderWidth: 2,
+                                    },
+                                  }}
                                 >
-                                  KML
+                                  Upload KML
                                 </Button>
                                 {uploading[`${id}_kml`] && (
-                                  <Box sx={{ mt: 1 }}>
-                                    <Typography variant="caption">
-                                      Uploading...{' '}
-                                      {uploadProgress[`${id}_kml`] || 0}%
+                                  <Box sx={{ mt: 0.5 }}>
+                                    <Typography variant="caption" color="text.secondary">
+                                      Uploading... {uploadProgress[`${id}_kml`] || 0}%
                                     </Typography>
-                                    <Box sx={{ width: 80 }}>
-                                      <Stack spacing={1}>
-                                        <Box sx={{ width: '100%' }}>
-                                          <Box
-                                            sx={{
-                                              height: 4,
-                                              bgcolor: '#eee',
-                                              borderRadius: 2,
-                                              overflow: 'hidden',
-                                            }}
-                                          >
-                                            <Box
-                                              sx={{
-                                                width: `${uploadProgress[`${id}_kml`] || 0}%`,
-                                                height: '100%',
-                                                bgcolor: 'primary.main',
-                                                transition: 'width 0.2s',
-                                              }}
-                                            />
-                                          </Box>
-                                        </Box>
-                                      </Stack>
+                                    <Box sx={{ width: '100%', mt: 0.5 }}>
+                                      <Box
+                                        sx={{
+                                          height: 3,
+                                          bgcolor: 'grey.200',
+                                          borderRadius: 1.5,
+                                          overflow: 'hidden',
+                                        }}
+                                      >
+                                        <Box
+                                          sx={{
+                                            width: `${uploadProgress[`${id}_kml`] || 0}%`,
+                                            height: '100%',
+                                            bgcolor: 'primary.main',
+                                            transition: 'width 0.3s ease',
+                                          }}
+                                        />
+                                      </Box>
                                     </Box>
                                   </Box>
                                 )}
                               </Box>
-                              <Box sx={{ display: 'inline-block' }}>
+
+                              {/* JPG Upload Button */}
+                              <Box>
                                 <Button
                                   variant="outlined"
-                                  color="secondary"
+                                   color="primary"
                                   size="small"
                                   startIcon={<UploadIcon />}
-                                  onClick={() =>
-                                    handleFileInputClick(workDay, 'jpg')
-                                  }
-                                  sx={{ minWidth: 110, justifyContent: 'left' }}
+                                  onClick={() => handleFileInputClick(workDay, 'jpg')}
                                   disabled={uploading[`${id}_jpg`]}
+                                  fullWidth
+                                  sx={{
+                                    height: 36,
+                                    fontSize: '0.75rem',
+                                    fontWeight: 500,
+                                    textTransform: 'none',
+                                    borderWidth: 1.5,
+                                    '&:hover': {
+                                      borderWidth: 2,
+                                    },
+                                  }}
                                 >
-                                  JPG
+                                  Upload JPG
                                 </Button>
                                 {uploading[`${id}_jpg`] && (
-                                  <Box sx={{ mt: 1 }}>
-                                    <Typography variant="caption">
-                                      Uploading...{' '}
-                                      {uploadProgress[`${id}_jpg`] || 0}%
+                                  <Box sx={{ mt: 0.5 }}>
+                                    <Typography variant="caption" color="text.secondary">
+                                      Uploading... {uploadProgress[`${id}_jpg`] || 0}%
                                     </Typography>
-                                    <Box sx={{ width: 80 }}>
-                                      <Stack spacing={1}>
-                                        <Box sx={{ width: '100%' }}>
-                                          <Box
-                                            sx={{
-                                              height: 4,
-                                              bgcolor: '#eee',
-                                              borderRadius: 2,
-                                              overflow: 'hidden',
-                                            }}
-                                          >
-                                            <Box
-                                              sx={{
-                                                width: `${uploadProgress[`${id}_jpg`] || 0}%`,
-                                                height: '100%',
-                                                bgcolor: 'secondary.main',
-                                                transition: 'width 0.2s',
-                                              }}
-                                            />
-                                          </Box>
-                                        </Box>
-                                      </Stack>
+                                    <Box sx={{ width: '100%', mt: 0.5 }}>
+                                      <Box
+                                        sx={{
+                                          height: 3,
+                                          bgcolor: 'grey.200',
+                                          borderRadius: 1.5,
+                                          overflow: 'hidden',
+                                        }}
+                                      >
+                                        <Box
+                                          sx={{
+                                            width: `${uploadProgress[`${id}_jpg`] || 0}%`,
+                                            height: '100%',
+                                            bgcolor: 'secondary.main',
+                                            transition: 'width 0.3s ease',
+                                          }}
+                                        />
+                                      </Box>
                                     </Box>
                                   </Box>
                                 )}
                               </Box>
-                            </Box>
+
+                              {/* Generate Tiles Button */}
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                startIcon={<IconPhotoEdit />}
+                                onClick={() => handleGenerateTilesClick(id)}
+                                disabled={uploading[`${id}_jpg`] || uploading[`${id}_kml`]}
+                                fullWidth
+                                sx={{
+                                  height: 36,
+                                  fontSize: '0.75rem',
+                                  fontWeight: 500,
+                                  textTransform: 'none',
+                                  borderWidth: 1.5,
+                                  '&:hover': {
+                                    borderWidth: 2,
+                                  },
+                                }}
+                              >
+                                Generate Tiles
+                              </Button>
+                            </Stack>
                           </TableCell>
                         </TableRow>
                       );
@@ -602,6 +719,167 @@ const WorkDayList = () => {
         style={{ display: 'none' }}
         onChange={handleFileChange}
       />
+
+      {/* Confirmation Dialog for Generate Tiles */}
+      <Dialog
+        open={confirmDialog.open}
+        onClose={generateTilesLoading ? undefined : handleCancelGenerateTiles}
+        aria-labelledby="generate-tiles-dialog-title"
+        aria-describedby="generate-tiles-dialog-description"
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            minWidth: 400,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+          },
+        }}
+      >
+        <DialogTitle 
+          id="generate-tiles-dialog-title"
+          sx={{
+            bgcolor: 'primary.light',
+            color: 'warning.contrastText',
+            fontWeight: 600,
+            fontSize: '1.1rem',
+          }}
+        >
+          ⚠️ Confirmation
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3, pb: 2 }}>
+          {generateTilesLoading ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Box
+                sx={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  bgcolor: 'primary.light',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mx: 'auto',
+                  mb: 2,
+                }}
+              >
+                <IconPhotoEdit sx={{ color: 'primary.light', fontSize: 32 }} />
+              </Box>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  fontWeight: 600, 
+                  mb: 2,
+                  color: 'text.primary',
+                }}
+              >
+                Generating Tiles...
+              </Typography>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  color: 'text.secondary',
+                  lineHeight: 1.6,
+                  mb: 3,
+                }}
+              >
+                Please wait while we process your request. This may take several minutes.
+              </Typography>
+              <Box sx={{ width: '100%', maxWidth: 300, mx: 'auto' }}>
+                <Loader />
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mt:2}}>
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  bgcolor: 'primary.light',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  mt: 0.5,
+                }}
+              >
+                <IconPhotoEdit sx={{ color: 'primary.light', fontSize: 24 }} />
+              </Box>
+              <Box>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 600,
+                    mb: 1,
+                    color: 'text.primary',
+                  }}
+                >
+                  Time-Intensive Operation
+                </Typography>
+                <Typography 
+                  variant="body1" 
+                  id="generate-tiles-dialog-description"
+                  sx={{ 
+                    color: 'text.secondary',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  This tile generation process will take at least <strong>10 minutes</strong> to complete. 
+                  The system will process your data in the background.
+                </Typography>
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1, gap: 1 }}>
+          <Button 
+            onClick={handleCancelGenerateTiles} 
+            variant="outlined"
+            disabled={generateTilesLoading}
+            sx={{
+              color: 'error.main',
+              borderColor: 'error.main',
+              fontWeight: 500,
+              px: 3,
+              py: 1,
+              '&:hover': {
+                bgcolor: 'error.50',
+                borderColor: 'error.dark',
+              },
+              '&:disabled': {
+                color: 'grey.400',
+                borderColor: 'grey.300',
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirmGenerateTiles} 
+            variant="contained"
+            disabled={generateTilesLoading}
+            sx={{
+              bgcolor: 'primary.main',
+              color: 'white',
+              fontWeight: 500,
+              px: 3,
+              py: 1,
+              '&:hover': {
+                bgcolor: 'secondary.light',
+                color:"black"
+              },
+              '&:focus': {
+                bgcolor: 'primary.main',
+              },
+              '&:disabled': {
+                bgcolor: 'grey.300',
+                color: 'grey.500',
+              },
+            }}
+          >
+            {generateTilesLoading ? 'Processing...' : 'Proceed'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </MainCard>
   );
 };
