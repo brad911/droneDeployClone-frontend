@@ -58,7 +58,6 @@ const WorkDayList = () => {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('createdAt:desc');
   const [pendingSearch, setPendingSearch] = useState('');
-  const projectId = useSelector((state) => state.project.selectedProjectId);
   const token = useSelector((state) => state.auth.token);
   const [statusLoading, setStatusLoading] = useState({});
   const fileInputRef = useRef(null);
@@ -75,7 +74,6 @@ const WorkDayList = () => {
   const [generateTilesLoading, setGenerateTilesLoading] = useState(false);
 
   useEffect(() => {
-    if (!projectId) return;
     const fetchWorkDays = async () => {
       setLoading(true);
       setError(null);
