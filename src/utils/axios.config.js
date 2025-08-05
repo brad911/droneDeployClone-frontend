@@ -21,7 +21,9 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
   (error) => {
     // Handle global errors (like 401 redirects)
     if (error.response?.status === 401) {

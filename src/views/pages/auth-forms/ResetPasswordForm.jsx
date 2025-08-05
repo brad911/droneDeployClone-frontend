@@ -3,8 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSnackbar } from 'notistack';
-import axios from '../../../utils/axios.config';
-// material-ui
 import { useTheme } from '@mui/material/styles';
 import {
   Button,
@@ -49,9 +47,8 @@ export default function ResetPasswordForm() {
 
   const handleLogin = async (values, { setSubmitting }) => {
     try {
-      console.log(token, '<==== wew');
       const ResetPasswordResponse = await axiosInstance.post(
-        '/auth/reset-password',
+        'auth/reset-password',
         values, // request body
         {
           params: { token }, // query string -> ?token=...

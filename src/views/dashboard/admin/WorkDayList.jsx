@@ -203,7 +203,7 @@ const WorkDayList = () => {
 
     try {
       // 60MB in bytes
-      const MAX_SINGLE_UPLOAD = 20 * 1024 * 1024;
+      const MAX_SINGLE_UPLOAD = 50 * 1024 * 1024;
       // Step 1: Get upload URL(s)
       const res = await axiosInstance.post(
         '/work-day/upload-resultFile',
@@ -239,6 +239,8 @@ const WorkDayList = () => {
         });
       } else if (type === 'jpg' && file.size > MAX_SINGLE_UPLOAD) {
         // Multipart upload
+        console.log(type, file.size, '<===');
+        console.log(uploadResponse, '<==== wow owowowo');
         const { parts, uploadId, key: s3Key, partSize } = uploadResponse;
         const chunks = [];
         let start = 0;

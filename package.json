@@ -14,6 +14,7 @@
     "@mui/x-date-pickers": "^8.6.0",
     "@reduxjs/toolkit": "^2.8.2",
     "@tabler/icons-react": "3.31.0",
+    "@tmcw/togeojson": "^7.1.2",
     "@tsparticles/basic": "^3.8.1",
     "@tsparticles/engine": "^3.8.1",
     "@tsparticles/preset-links": "^3.2.0",
