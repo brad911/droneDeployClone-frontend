@@ -88,7 +88,7 @@ const WorkDayList = () => {
           params,
           headers: { Authorization: token },
         });
-        console.log(res, '<=== wo wow ow');
+        // console.log(res, '<=== wo wow ow');
         setWorkDays(res.data.data?.results || []);
         setTotal(res.data.data?.totalResults || 0);
       } catch (err) {
@@ -199,10 +199,7 @@ const WorkDayList = () => {
     const extension = file.name.split('.').pop().toLowerCase();
     const key = `${workDay.id || workDay._id}_${type}`;
 
-    if (
-      (type === 'kml' && extension !== 'kml') ||
-      (type === 'jpg' && extension !== 'jpg' && extension !== 'jpeg')
-    ) {
+    if (type === 'tiff' && extension !== 'tiff' && extension !== 'tiff') {
       enqueueSnackbar(`Only .${type.toUpperCase()} files are allowed`, {
         variant: 'error',
       });
@@ -315,22 +312,32 @@ const WorkDayList = () => {
       return;
     }
 
-    // Check if KML file exists
-    const hasKmlFile = workDay.kmlFile && workDay.kmlFile.trim() !== '';
+    // // Check if KML file exists
+    // const hasKmlFile = workDay.kmlFile && workDay.kmlFile.trim() !== '';
 
     // Check if ortho image exists
-    const hasOrthoImage =
-      workDay.orthoImage && workDay.orthoImage.trim() !== '';
+    // const hasOrthoImage =
+    //   workDay.orthoImage && workDay.orthoImage.trim() !== '';
 
-    if (!hasKmlFile || !hasOrthoImage) {
-      const missingFiles = [];
-      if (!hasKmlFile) missingFiles.push('KML file');
-      if (!hasOrthoImage) missingFiles.push('ortho image');
+    // // Check if Tiff file exists
+    const hasTiffFile = workDay.tiffFile && workDay.tiffFile.trim() !== '';
 
-      enqueueSnackbar(
-        `Please upload ${missingFiles.join(' and ')} first before generating tiles.`,
-        { variant: 'warning' },
-      );
+    // if (!hasKmlFile || !hasOrthoImage) {
+    //   const missingFiles = [];
+    //   if (!hasKmlFile) missingFiles.push('KML file');
+    //   if (!hasOrthoImage) missingFiles.push('ortho image');
+
+    //   enqueueSnackbar(
+    //     `Please upload ${missingFiles.join(' and ')} first before generating tiles.`,
+    //     { variant: 'warning' },
+    //   );
+    //   return;
+    // }
+
+    if (!hasTiffFile) {
+      enqueueSnackbar(`Please upload .tiff first before generating tiles.`, {
+        variant: 'warning',
+      });
       return;
     }
 
@@ -475,12 +482,7 @@ const WorkDayList = () => {
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
                     >
-                      Ortho
-                    </TableCell>
-                    <TableCell
-                      sx={{ color: theme.palette.primary.contrastText }}
-                    >
-                      KML
+                      Tiff
                     </TableCell>
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
@@ -541,14 +543,8 @@ const WorkDayList = () => {
                             </FormControl>
                           </TableCell>
                           <TableCell>
-                            {workDay.orthoImage
-                              ? workDay.orthoImage.split('-')[5]
-                              : '-'}
-                          </TableCell>
-                          <TableCell>
-                            {' '}
-                            {workDay.kmlFile
-                              ? workDay.kmlFile.split('-')[5]
+                            {workDay.tiffFile
+                              ? workDay.tiffFile.split('-')[5]
                               : '-'}
                           </TableCell>
                           <TableCell>
@@ -575,64 +571,6 @@ const WorkDayList = () => {
                               >
                                 Download
                               </Button>
-
-                              {/* KML Upload Button */}
-                              <Box>
-                                <Button
-                                  variant="outlined"
-                                  color="primary"
-                                  size="small"
-                                  startIcon={<UploadIcon />}
-                                  onClick={() =>
-                                    handleFileInputClick(workDay, 'kml')
-                                  }
-                                  disabled={uploading[`${id}_kml`]}
-                                  fullWidth
-                                  sx={{
-                                    height: 36,
-                                    fontSize: '0.75rem',
-                                    fontWeight: 500,
-                                    textTransform: 'none',
-                                    borderWidth: 1.5,
-                                    '&:hover': {
-                                      borderWidth: 2,
-                                    },
-                                  }}
-                                >
-                                  Upload KML
-                                </Button>
-                                {uploading[`${id}_kml`] && (
-                                  <Box sx={{ mt: 0.5 }}>
-                                    <Typography
-                                      variant="caption"
-                                      color="text.secondary"
-                                    >
-                                      Uploading...{' '}
-                                      {uploadProgress[`${id}_kml`] || 0}%
-                                    </Typography>
-                                    <Box sx={{ width: '100%', mt: 0.5 }}>
-                                      <Box
-                                        sx={{
-                                          height: 3,
-                                          bgcolor: 'grey.200',
-                                          borderRadius: 1.5,
-                                          overflow: 'hidden',
-                                        }}
-                                      >
-                                        <Box
-                                          sx={{
-                                            width: `${uploadProgress[`${id}_kml`] || 0}%`,
-                                            height: '100%',
-                                            bgcolor: 'primary.main',
-                                            transition: 'width 0.3s ease',
-                                          }}
-                                        />
-                                      </Box>
-                                    </Box>
-                                  </Box>
-                                )}
-                              </Box>
-
                               {/* JPG Upload Button */}
                               <Box>
                                 <Button
@@ -656,7 +594,7 @@ const WorkDayList = () => {
                                     },
                                   }}
                                 >
-                                  Upload JPG
+                                  Upload Tiff
                                 </Button>
                                 {uploading[`${id}_jpg`] && (
                                   <Box sx={{ mt: 0.5 }}>

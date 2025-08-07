@@ -76,8 +76,8 @@ export default function ProjectWork() {
       zoom: 15,
       attributionControl: false,
       preserveDrawingBuffer: true,
-      minZoom: 10,
-      maxZoom: 22,
+      minZoom: 15,
+      maxZoom: 23,
     });
 
     mapboxMap.on('load', () => {
@@ -87,10 +87,10 @@ export default function ProjectWork() {
       mapboxMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
     });
 
-    mapboxMap.on('error', (e) => {
-      console.error('Mapbox error:', e);
-      setError('Failed to load map. Please check your internet connection.');
-    });
+    // mapboxMap.on('error', (e) => {
+    //   console.error('Mapbox error:', e);
+    //   setError('Failed to load map. Please check your internet connection.');
+    // });
 
     mapboxMap.on('sourcedata', (e) => {
       if (e.sourceId.includes('ortho-') && e.isSourceLoaded) {
@@ -204,8 +204,8 @@ export default function ProjectWork() {
         type: 'raster',
         tiles: [`${workDay.tileBaseUrl}/{z}/{x}/{y}.png`],
         tileSize: 256,
-        minzoom: workDay.tileZoomMin || 10,
-        maxzoom: workDay.tileZoomMax || 22,
+        minzoom: 18,
+        maxzoom: 23,
       });
 
       map.addLayer({
@@ -231,57 +231,57 @@ export default function ProjectWork() {
     const map = mapRef.current;
     if (!map) return;
 
-    const { north, south, east, west } = bounds;
+    // const { north, south, east, west } = bounds;
 
-    const boundsGeoJSON = {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [west, south],
-                [east, south],
-                [east, north],
-                [west, north],
-                [west, south],
-              ],
-            ],
-          },
-        },
-      ],
-    };
+    // const boundsGeoJSON = {
+    //   type: 'FeatureCollection',
+    //   features: [
+    //     {
+    //       type: 'Feature',
+    //       geometry: {
+    //         type: 'Polygon',
+    //         coordinates: [
+    //           [
+    //             [west, south],
+    //             [east, south],
+    //             [east, north],
+    //             [west, north],
+    //             [west, south],
+    //           ],
+    //         ],
+    //       },
+    //     },
+    //   ],
+    // };
 
-    try {
-      map.addSource('bounds-box', {
-        type: 'geojson',
-        data: boundsGeoJSON,
-      });
+    // try {
+    //   map.addSource('bounds-box', {
+    //     type: 'geojson',
+    //     data: boundsGeoJSON,
+    //   });
 
-      map.addLayer({
-        id: 'bounds-box-line',
-        type: 'line',
-        source: 'bounds-box',
-        paint: {
-          'line-color': '#00274d',
-          'line-width': 3,
-        },
-      });
+    //   map.addLayer({
+    //     id: 'bounds-box-line',
+    //     type: 'line',
+    //     source: 'bounds-box',
+    //     paint: {
+    //       'line-color': '#00274d',
+    //       'line-width': 3,
+    //     },
+    //   });
 
-      map.addLayer({
-        id: 'bounds-box-fill',
-        type: 'fill',
-        source: 'bounds-box',
-        paint: {
-          'fill-color': '#00274d',
-          'fill-opacity': 0.1,
-        },
-      });
-    } catch (err) {
-      console.error('Failed to add bounds layer:', err);
-    }
+    //   map.addLayer({
+    //     id: 'bounds-box-fill',
+    //     type: 'fill',
+    //     source: 'bounds-box',
+    //     paint: {
+    //       'fill-color': '#00274d',
+    //       'fill-opacity': 0.1,
+    //     },
+    //   });
+    // } catch (err) {
+    //   console.error('Failed to add bounds layer:', err);
+    // }
   };
 
   const fitToBounds = (bounds) => {
