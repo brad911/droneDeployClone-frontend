@@ -26,8 +26,11 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     // Handle global errors (like 401 redirects)
+    console.error(error);
     if (error.response?.status === 401) {
       // e.g., redirect to login
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   },

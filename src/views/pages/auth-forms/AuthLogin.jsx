@@ -42,9 +42,12 @@ export default function AuthLogin() {
   const user = useSelector((state) => state.auth);
 
   const handleLogin = async (values, { setSubmitting }) => {
-    delete values.keepLoggedIn;
+    const payload = {
+      email: values.email,
+      password: values.password,
+    };
     try {
-      const response = await axios.post('/auth/login', values); // Replace with your real endpoint
+      const response = await axios.post('/auth/login', payload); // Replace with your real endpoint
 
       if (response.status === 200) {
         enqueueSnackbar('Login successful!', { variant: 'success' });
@@ -70,8 +73,8 @@ export default function AuthLogin() {
   };
   const formik = useFormik({
     initialValues: {
-      email: '',
-      password: '',
+      email: 'bilalthetester@gmail.com',
+      password: 'Abc123!@#!@#!@#',
       keepLoggedIn: true,
     },
     validationSchema: Yup.object({

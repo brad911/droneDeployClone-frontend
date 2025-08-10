@@ -45,6 +45,7 @@ const UserControlSystem = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
+      console.log(token, '<===== ow wow owo wowo');
       setLoading(true);
       try {
         const params = {
