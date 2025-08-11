@@ -1,0 +1,149 @@
+import {
+  Box,
+  Button,
+  Fade,
+  IconButton,
+  Paper,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { IconTrash, IconX } from '@tabler/icons-react';
+
+const CommentInput = ({
+  commentInput,
+  setCommentInput,
+  addCommentLayer,
+  setCommentFeatures,
+  commentFeatures,
+  handleDeleteComment,
+}) => {
+  const handleCommentSubmit = (comment, geometry) => {
+    const stableId = `comment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    console.log(commentInput, '<==== commentInput');
+    const commentFeature = {
+      type: 'Feature',
+      geometry: commentInput.feature.geometry,
+      properties: {
+        id: stableId,
+        comment: comment,
+        created: new Date().toISOString(),
+        type: 'comment',
+      },
+    };
+
+    const updatedCommentFeatures = [...commentFeatures, commentFeature];
+    console.log(updatedCommentFeatures, '<=== i worked i think');
+    setCommentFeatures(updatedCommentFeatures);
+    addCommentLayer(updatedCommentFeatures);
+    setCommentInput({
+      open: false,
+      feature: null,
+      isEdit: false,
+      position: { x: 0, y: 0 },
+    });
+  };
+
+  return (
+    <Fade in={commentInput.open}>
+      <Paper
+        elevation={4}
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 2000,
+          p: 1.5,
+          width: 250,
+          backgroundColor: '#ffffff',
+          border: '1px solid #e0e0e0',
+          borderRadius: 1.5,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 1,
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontSize: '0.875rem' }}>
+            {commentInput.isEdit ? 'Edit Comment' : 'Add Comment'}
+          </Typography>
+          <IconButton
+            size="small"
+            onClick={() =>
+              setCommentInput({
+                open: false,
+                feature: null,
+                isEdit: false,
+                position: { x: 0, y: 0 },
+              })
+            }
+            sx={{ p: 0.5 }}
+          >
+            <IconX size={14} />
+          </IconButton>
+        </Box>
+        <TextField
+          autoFocus
+          size="small"
+          fullWidth
+          variant="outlined"
+          multiline
+          rows={2}
+          placeholder="Enter comment..."
+          value={commentInput.feature?.properties?.comment || ''}
+          onChange={(e) => {
+            if (commentInput.feature) {
+              const updatedFeature = {
+                ...commentInput.feature,
+                properties: {
+                  ...commentInput.feature.properties,
+                  comment: e.target.value,
+                },
+              };
+              setCommentInput({
+                ...commentInput,
+                feature: updatedFeature,
+              });
+            }
+          }}
+          sx={{ mb: 1 }}
+        />
+        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+          {commentInput.isEdit && commentInput.feature && (
+            <Button
+              size="small"
+              variant="contained"
+              color="error"
+              startIcon={<IconTrash size={14} />}
+              onClick={() => {
+                handleDeleteComment(commentInput.feature);
+              }}
+              sx={{ fontSize: '0.75rem', py: 0.5 }}
+            >
+              Delete
+            </Button>
+          )}
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() =>
+              handleCommentSubmit(
+                commentInput.feature?.properties?.comment || '',
+              )
+            }
+            disabled={!commentInput.feature?.properties?.comment?.trim()}
+            sx={{ fontSize: '0.75rem', py: 0.5 }}
+          >
+            {commentInput.isEdit ? 'Update' : 'Add'}
+          </Button>
+        </Box>
+      </Paper>
+    </Fade>
+  );
+};
+
+export default CommentInput;

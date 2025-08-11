@@ -38,6 +38,8 @@ import { useSelector } from 'react-redux';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { enqueueSnackbar } from 'notistack';
+import CommentInput from './CommentInput';
+import AreaPopUp from './AreaPopUp';
 
 mapboxgl.accessToken =
   import.meta.env.VITE_MAPBOX_API_KEY ||
@@ -67,6 +69,7 @@ export default function ProjectWork() {
   const [error, setError] = useState(null);
   const [tileLoading, setTileLoading] = useState(false);
   const [commentFeatures, setCommentFeatures] = useState([]);
+  const [test, setTest] = useState({});
   const [areaPopup, setAreaPopup] = useState({
     open: false,
     area: 0,
@@ -450,55 +453,17 @@ export default function ProjectWork() {
           });
         }
         if (feature.geometry.type === 'Point') {
-          // Get click position for comment input
           const canvas = mapboxMap.getCanvas();
           const rect = canvas.getBoundingClientRect();
-
-          // Generate a stable ID that won't change
-          const stableId = `comment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-          // Create a complete comment feature with all necessary properties
-          const commentFeature = {
-            type: 'Feature',
-            geometry: feature.geometry,
-            id: stableId,
-            properties: {
-              comment: '',
-              created: new Date().toISOString(),
-              type: 'comment',
-            },
-          };
-
-          console.log('=== COMMENT CREATION DEBUG ===');
-          console.log('Creating new comment with stable ID:', stableId);
-          console.log('Complete comment feature:', commentFeature);
-          console.log(
-            'Current commentFeatures before adding:',
-            commentFeatures,
-          );
-
-          // Immediately add this feature to our commentFeatures state
-          const updatedCommentFeatures = [...commentFeatures, commentFeature];
-          console.log(
-            'Updated commentFeatures after adding:',
-            updatedCommentFeatures,
-          );
-
-          setCommentFeatures(updatedCommentFeatures);
-
-          // Update the comment layer with the new feature
-          addCommentLayer(updatedCommentFeatures);
-
-          // Now set the comment input with the feature that has a guaranteed ID
+          // Store the clicked geometry for later use after comment is entered
           setCommentInput({
             open: true,
-            feature: commentFeature,
+            feature: {
+              geometry: feature.geometry,
+            },
             isEdit: false,
             position: { x: rect.width / 2, y: rect.height / 2 },
           });
-
-          console.log('Comment input set with feature ID:', commentFeature.id);
-          console.log('=== END COMMENT CREATION DEBUG ===');
         }
       });
 
@@ -702,30 +667,11 @@ export default function ProjectWork() {
       }, 1000);
 
       setTileLoading(false);
-      console.log(
-        map.getStyle().layers.map((l) => l.id),
-        '<=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
-      );
     } catch (err) {
       console.error('Error adding tile layer:', err);
       setError('Failed to load orthomosaic tiles.');
       setTileLoading(false);
     }
-  };
-
-  // Debug function to check map layers
-  const debugMapLayers = () => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    console.log('=== MAP LAYERS DEBUG ===');
-    const layers = map.getStyle().layers;
-    layers.forEach((layer, index) => {
-      console.log(
-        `${index}: ${layer.id} (${layer.type}) - visible: ${map.getLayoutProperty(layer.id, 'visibility') !== 'none'}`,
-      );
-    });
-    console.log('=== END DEBUG ===');
   };
 
   const fitToBounds = (bounds) => {
@@ -759,16 +705,17 @@ export default function ProjectWork() {
     console.log('Updating comment layer with features:', features);
 
     // Always remove existing comment layer and source first
-    if (map.getLayer('comment-points')) {
-      console.log('Removing existing comment layer');
-      map.removeLayer('comment-points');
-    }
-    if (map.getSource('comments')) {
-      console.log('Removing existing comment source');
-      map.removeSource('comments');
-    }
+    // if (map.getLayer('comment-points')) {
+    //   console.log('Removing existing comment layer');
+    //   map.removeLayer('comment-points');
+    // }
+    // if (map.getSource('comments')) {
+    //   console.log('Removing existing comment source');
+    //   map.removeSource('comments');
+    // }
 
     // Only add new layer if there are features
+    console.log('checking features ', features);
     if (features && features.length > 0) {
       console.log('Adding new comment layer with', features.length, 'features');
 
@@ -792,6 +739,7 @@ export default function ProjectWork() {
           'text-anchor': 'top',
         },
         paint: {
+          'text-size': 1,
           'text-color': '#000',
           'text-halo-color': '#fff',
           'text-halo-width': 2,
@@ -818,155 +766,6 @@ export default function ProjectWork() {
     console.log('Comment layer update complete');
   };
 
-  // Debug comment features state
-  const debugCommentFeatures = () => {
-    console.log('=== COMMENT FEATURES DEBUG ===');
-    console.log('Current commentFeatures:', commentFeatures);
-    console.log('Number of comments:', commentFeatures.length);
-
-    commentFeatures.forEach((comment, index) => {
-      console.log(`Comment ${index + 1}:`, {
-        id: comment.id,
-        properties: comment.properties,
-        geometry: comment.geometry.type,
-      });
-    });
-
-    console.log('=== END COMMENT FEATURES DEBUG ===');
-  };
-
-  // Debug comment input state
-  const debugCommentInput = () => {
-    console.log('=== COMMENT INPUT DEBUG ===');
-    console.log('Comment input state:', commentInput);
-    console.log('Comment input feature:', commentInput.feature);
-    console.log('Feature ID:', commentInput.feature?.id);
-    console.log('Feature properties:', commentInput.feature?.properties);
-    console.log('Is edit mode:', commentInput.isEdit);
-    console.log('Is open:', commentInput.open);
-    console.log('=== END COMMENT INPUT DEBUG ===');
-  };
-
-  // Verify comment ID consistency
-  const verifyCommentIds = () => {
-    const map = mapRef.current;
-    if (!map || !isMapLoaded) return;
-
-    console.log('=== COMMENT ID VERIFICATION ===');
-    console.log('State commentFeatures:', commentFeatures);
-
-    try {
-      const source = map.getSource('comments');
-      if (source && source._data) {
-        console.log('Map source data:', source._data);
-        console.log(
-          'Map feature IDs:',
-          source._data.features.map((f) => f.id),
-        );
-      }
-
-      // Check if IDs match
-      const stateIds = commentFeatures.map((f) => f.id);
-      const mapIds = source?._data?.features?.map((f) => f.id) || [];
-
-      console.log('State IDs:', stateIds);
-      console.log('Map IDs:', mapIds);
-
-      const missingInMap = stateIds.filter((id) => !mapIds.includes(id));
-      const missingInState = mapIds.filter((id) => !stateIds.includes(id));
-
-      if (missingInMap.length > 0) {
-        console.warn('IDs missing in map:', missingInMap);
-      }
-      if (missingInState.length > 0) {
-        console.warn('IDs missing in state:', missingInState);
-      }
-
-      if (missingInMap.length === 0 && missingInState.length === 0) {
-        console.log('✅ All comment IDs are consistent between state and map');
-      } else {
-        console.error('❌ Comment ID mismatch detected!');
-      }
-    } catch (error) {
-      console.error('Error verifying comment IDs:', error);
-    }
-
-    console.log('=== END VERIFICATION ===');
-  };
-
-  // Force refresh comment layer
-  const refreshCommentLayer = () => {
-    const map = mapRef.current;
-    if (!map || !isMapLoaded) return;
-
-    console.log('Force refreshing comment layer...');
-    addCommentLayer(commentFeatures);
-
-    // Force map repaint
-    if (map.isStyleLoaded()) {
-      map.triggerRepaint();
-    }
-  };
-
-  const handleCommentSubmit = (comment) => {
-    if (!comment.trim()) return;
-
-    console.log('=== COMMENT SUBMISSION DEBUG ===');
-    console.log('Submitting comment:', comment);
-    console.log('Comment input feature:', commentInput.feature);
-    console.log('Feature ID:', commentInput.feature?.id);
-    console.log('Is edit mode:', commentInput.isEdit);
-
-    if (!commentInput.feature?.id) {
-      console.error('Cannot submit comment: No feature ID found');
-      alert('Error: Cannot submit comment. Please try again.');
-      return;
-    }
-
-    if (commentInput.isEdit) {
-      console.log(
-        '1231312321######################################################',
-      );
-      // Edit existing comment - preserve the original ID
-      const updated = commentFeatures.map((f) =>
-        f.id === commentInput.feature.id
-          ? { ...f, properties: { ...f.properties, comment } }
-          : f,
-      );
-      setCommentFeatures(updated);
-      addCommentLayer(updated);
-    } else {
-      console.log('######################################################');
-      // For new comments, we just need to update the existing feature in our state
-      // since it was already added during creation
-      console.log(commentFeatures, '<==== comment Feaures');
-      console.log(commentInput, '<==');
-      const updated = commentFeatures.map((f) => {
-        console.log('i ran wowowoowowwowo');
-        console.log(
-          f.id,
-          commentInput.feature.id,
-          f.id === commentInput.feature.id,
-          '<=== dimagh ki dahi',
-        );
-        return f.id === commentInput.feature.id
-          ? { ...f, properties: { ...f.properties, comment } }
-          : f;
-      });
-      setCommentFeatures(updated);
-      addCommentLayer(updated);
-    }
-
-    setCommentInput({
-      open: false,
-      feature: null,
-      isEdit: false,
-      position: { x: 0, y: 0 },
-    });
-
-    console.log('=== END SUBMISSION DEBUG ===');
-  };
-
   const handleDeleteComment = (feature) => {
     console.log('=== COMMENT DELETION DEBUG ===');
     console.log('Attempting to delete comment', feature);
@@ -974,8 +773,7 @@ export default function ProjectWork() {
     console.log(commentFeatures[0].properties.comment);
     console.log(feature.properties.comment);
     const updated = commentFeatures.filter((f) => {
-      // Compare coordinates arrays (assuming both are Points)
-      return f.properties.comment !== feature.properties.comment; // keep only if coords differ
+      return f.properties.id !== feature.properties.id; // keep only if coords differ
     });
 
     console.log('Updated commentFeatures after deletion:', updated);
@@ -1029,15 +827,15 @@ export default function ProjectWork() {
       <Breadcrumbs links={pageLinks} card custom rightAlign={false} />
       <Divider sx={{ my: 2 }} />
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-
       <Box display="flex" height="calc(100vh - 200px)" gap={2}>
         <Box sx={{ width: '300px', pr: 2, overflowY: 'auto' }}>
-          <Typography variant="h3" gutterBottom>
+          <Typography
+            onClick={() => {
+              console.log(commentFeatures, '<=== comment features');
+            }}
+            variant="h3"
+            gutterBottom
+          >
             Layers
           </Typography>
           <FormGroup>
@@ -1113,178 +911,16 @@ export default function ProjectWork() {
             },
           }}
         >
-          {tileLoading && (
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: 'rgba(0,0,0,0.2)',
-                zIndex: 1000,
-              }}
-            >
-              <CircularProgress />
-              <Typography variant="body1" sx={{ ml: 2 }}>
-                Loading tiles...
-              </Typography>
-            </Box>
-          )}
-
-          {/* Area Calculation Popup */}
-          <Fade in={areaPopup.open}>
-            <Paper
-              elevation={4}
-              sx={{
-                position: 'absolute',
-                top: 20,
-                left: 20,
-                zIndex: 2000,
-                p: 1.5,
-                minWidth: 150,
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(8px)',
-                border: '1px solid #3bb2d0',
-                borderRadius: 1.5,
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  mb: 0.5,
-                }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  color="primary"
-                  sx={{ fontSize: '0.875rem' }}
-                >
-                  Area
-                </Typography>
-                <IconButton
-                  size="small"
-                  onClick={() => setAreaPopup({ ...areaPopup, open: false })}
-                  sx={{ p: 0.5 }}
-                >
-                  <IconX size={14} />
-                </IconButton>
-              </Box>
-              <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                {areaPopup.area.km2} km²
-              </Typography>
-              <Typography variant="caption" color="textSecondary">
-                ({areaPopup.area.m2} m²)
-              </Typography>
-            </Paper>
-          </Fade>
-
-          {/* Minimalistic Comment Input */}
-          <Fade in={commentInput.open}>
-            <Paper
-              elevation={4}
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                zIndex: 2000,
-                p: 1.5,
-                width: 250,
-                backgroundColor: '#ffffff',
-                border: '1px solid #e0e0e0',
-                borderRadius: 1.5,
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  mb: 1,
-                }}
-              >
-                <Typography variant="subtitle2" sx={{ fontSize: '0.875rem' }}>
-                  {commentInput.isEdit ? 'Edit Comment' : 'Add Comment'}
-                </Typography>
-                <IconButton
-                  size="small"
-                  onClick={() =>
-                    setCommentInput({
-                      open: false,
-                      feature: null,
-                      isEdit: false,
-                      position: { x: 0, y: 0 },
-                    })
-                  }
-                  sx={{ p: 0.5 }}
-                >
-                  <IconX size={14} />
-                </IconButton>
-              </Box>
-              <TextField
-                autoFocus
-                size="small"
-                fullWidth
-                variant="outlined"
-                multiline
-                rows={2}
-                placeholder="Enter comment..."
-                value={commentInput.feature?.properties?.comment || ''}
-                onChange={(e) => {
-                  if (commentInput.feature) {
-                    const updatedFeature = {
-                      ...commentInput.feature,
-                      properties: {
-                        ...commentInput.feature.properties,
-                        comment: e.target.value,
-                      },
-                    };
-                    setCommentInput({
-                      ...commentInput,
-                      feature: updatedFeature,
-                    });
-                  }
-                }}
-                sx={{ mb: 1 }}
-              />
-              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                {commentInput.isEdit && commentInput.feature && (
-                  <Button
-                    size="small"
-                    variant="contained"
-                    color="error"
-                    startIcon={<IconTrash size={14} />}
-                    onClick={() => {
-                      handleDeleteComment(commentInput.feature);
-                    }}
-                    sx={{ fontSize: '0.75rem', py: 0.5 }}
-                  >
-                    Delete
-                  </Button>
-                )}
-                <Button
-                  size="small"
-                  variant="contained"
-                  onClick={() =>
-                    handleCommentSubmit(
-                      commentInput.feature?.properties?.comment || '',
-                    )
-                  }
-                  disabled={!commentInput.feature?.properties?.comment?.trim()}
-                  sx={{ fontSize: '0.75rem', py: 0.5 }}
-                >
-                  {commentInput.isEdit ? 'Update' : 'Add'}
-                </Button>
-              </Box>
-            </Paper>
-          </Fade>
+          <AreaPopUp areaPopup={areaPopup} setAreaPopup={setAreaPopup} />
         </Box>
+        <CommentInput
+          addCommentLayer={addCommentLayer}
+          setCommentFeatures={setCommentFeatures}
+          commentInput={commentInput}
+          setCommentInput={setCommentInput}
+          commentFeatures={commentFeatures}
+          handleDeleteComment={handleDeleteComment}
+        />
       </Box>
     </MainCard>
   );
