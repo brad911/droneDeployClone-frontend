@@ -8,6 +8,10 @@ import {
   Typography,
 } from '@mui/material';
 import { IconTrash, IconX } from '@tabler/icons-react';
+import axiosInstance from '../../../../utils/axios.config';
+import { useSelector } from 'react-redux';
+import { enqueueSnackbar } from 'notistack';
+import mapboxgl from 'mapbox-gl';
 
 const CommentInput = ({
   commentInput,
@@ -16,31 +20,53 @@ const CommentInput = ({
   setCommentFeatures,
   commentFeatures,
   handleDeleteComment,
+  workDay,
 }) => {
-  const handleCommentSubmit = (comment, geometry) => {
-    const stableId = `comment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    console.log(commentInput, '<==== commentInput');
-    const commentFeature = {
-      type: 'Feature',
-      geometry: commentInput.feature.geometry,
-      properties: {
-        id: stableId,
-        comment: comment,
-        created: new Date().toISOString(),
-        type: 'comment',
-      },
-    };
-
-    const updatedCommentFeatures = [...commentFeatures, commentFeature];
-    console.log(updatedCommentFeatures, '<=== i worked i think');
-    setCommentFeatures(updatedCommentFeatures);
-    addCommentLayer(updatedCommentFeatures);
-    setCommentInput({
-      open: false,
-      feature: null,
-      isEdit: false,
-      position: { x: 0, y: 0 },
-    });
+  const token = useSelector((state) => state.auth.token);
+  const handleCommentSubmit = async (comment, geometry) => {
+    try {
+      const stableId = `comment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const commentFeature = {
+        type: 'Feature',
+        geometry: commentInput.feature.geometry,
+        properties: {
+          id: stableId,
+          workDayId: workDay.id,
+          comment: comment,
+          type: 'comment',
+          color: commentInput.feature.properties.color,
+          created: new Date().toISOString(),
+        },
+      };
+      //Create A feature At the backend
+      const payload = {
+        geometry: commentFeature.geometry,
+        properties: commentFeature.properties,
+        featureType: commentFeature.properties.type,
+        workDayId: workDay.id,
+      };
+      const response = await axiosInstance.post('/mapFeature', payload, {
+        headers: { Authorization: token },
+      });
+      if (response.status === 201) {
+        enqueueSnackbar('Sucessfully Added Comment', { variant: 'success' });
+      }
+      const updatedCommentFeatures = [...commentFeatures, commentFeature];
+      setCommentFeatures(updatedCommentFeatures);
+      // addCommentLayer(updatedCommentFeatures);
+      setCommentInput({
+        open: false,
+        feature: null,
+        isEdit: false,
+        position: { x: 0, y: 0 },
+      });
+      new mapboxgl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(`<strong> ${comment}</strong>`)
+        .addTo(mapboxMap);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (

@@ -1,0 +1,46 @@
+.map-popup {
+  font-family: 'Inter', sans-serif;
+  background: #1e1e2f;
+  color: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  min-width: 220px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.map-popup .popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.map-popup .close-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #aaa;
+  transition: color 0.2s;
+}
+
+.map-popup .close-btn:hover {
+  color: #ff6b6b;
+}
+
+.map-popup .popup-body {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.mapboxgl-popup {
+  pointer-events: none;
+}
+.mapboxgl-popup-content {
+  pointer-events: auto;
+}

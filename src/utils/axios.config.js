@@ -11,27 +11,29 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     // You can add tokens here if needed
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = token;
+    }
     return config;
   },
   (error) => Promise.reject(error),
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    // Handle global errors (like 401 redirects)
     console.error(error);
+
     if (error.response?.status === 401) {
-      // e.g., redirect to login
       localStorage.removeItem('token');
-      window.location.href = '/login';
+
+      // ✅ Only redirect if not already on /login
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
+
     return Promise.reject(error);
   },
 );

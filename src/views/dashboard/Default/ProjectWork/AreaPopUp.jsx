@@ -42,11 +42,8 @@ const AreaPopUp = ({ areaPopup, setAreaPopup }) => {
             <IconX size={14} />
           </IconButton>
         </Box>
-        <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-          {areaPopup.area.km2} km²
-        </Typography>
         <Typography variant="caption" color="textSecondary">
-          ({areaPopup.area.m2} m²)
+          {areaPopup.message}
         </Typography>
       </Paper>
     </Fade>

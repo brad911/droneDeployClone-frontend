@@ -3,36 +3,54 @@ import { lazy } from 'react';
 // project imports
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
-import FilesHandler from '../views/dashboard/Default/Files/FilesHandler';
-import Projects from '../views/dashboard/Default/Projects/Projects';
-import CreateProjectPage from '../views/dashboard/Default/Projects/CreateProjectPage';
 import ProtectedRoute from '../utils/protectedRoute';
-import ProjectView from '../views/dashboard/Default/Projects/ProjectView';
-import Project from '../views/dashboard/Default/Projects/Project';
-import ProjectWork from '../views/dashboard/Default/ProjectWork/ProjectWork';
-import CompareProject from '../views/dashboard/Default/Projects/CompareProject';
-import DprForm from 'views/dashboard/Default/Projects/Project/DprForm';
-import IssueReport from 'views/dashboard/Default/issues/IssuesReport.jsx';
-import FilesTab from '../views/dashboard/Default/Projects/Project/tabs/FileTab';
-import AllDirectionViewList from 'views/dashboard/Default/Projects/Project/360ViewList';
-import TeamSetup from '../views/dashboard/Default/Projects/Project/TeamSetup';
-import UserControlSystem from '../views/dashboard/admin/userControlSystem';
-import WorkDayList from '../views/dashboard/admin/WorkDayList';
 
-// dashboard routing
+// ==============================|| LAZY IMPORTS ||============================== //
 const DashboardDefault = Loadable(
   lazy(() => import('views/dashboard/Default')),
 );
-
-// utilities routing
-// const UtilsTypography = Loadable(
-//   lazy(() => import('views/utilities/Typography')),
-// );
-// const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
-// const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
-
-// // sample page routing
-// const SamplePage = Loadable(lazy(() => import('views/sample-page')));
+const FilesHandler = Loadable(
+  lazy(() => import('views/dashboard/Default/Files/FilesHandler')),
+);
+const Projects = Loadable(
+  lazy(() => import('views/dashboard/Default/Projects/Projects')),
+);
+const CreateProjectPage = Loadable(
+  lazy(() => import('views/dashboard/Default/Projects/CreateProjectPage')),
+);
+const ProjectView = Loadable(
+  lazy(() => import('views/dashboard/Default/Projects/ProjectView')),
+);
+const Project = Loadable(
+  lazy(() => import('views/dashboard/Default/Projects/Project')),
+);
+const ProjectWork = Loadable(
+  lazy(() => import('views/dashboard/Default/ProjectWork/ProjectWork')),
+);
+const CompareProject = Loadable(
+  lazy(() => import('views/dashboard/Default/Projects/CompareProject')),
+);
+const DprForm = Loadable(
+  lazy(() => import('views/dashboard/Default/Projects/Project/DprForm')),
+);
+const IssueReport = Loadable(
+  lazy(() => import('views/dashboard/Default/issues/IssuesReport')),
+);
+const FilesTab = Loadable(
+  lazy(() => import('views/dashboard/Default/Projects/Project/tabs/FileTab')),
+);
+const AllDirectionViewList = Loadable(
+  lazy(() => import('views/dashboard/Default/Projects/Project/360ViewList')),
+);
+const TeamSetup = Loadable(
+  lazy(() => import('views/dashboard/Default/Projects/Project/TeamSetup')),
+);
+const UserControlSystem = Loadable(
+  lazy(() => import('views/dashboard/admin/userControlSystem')),
+);
+const WorkDayList = Loadable(
+  lazy(() => import('views/dashboard/admin/WorkDayList')),
+);
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -48,10 +66,7 @@ const MainRoutes = {
       path: 'createProject',
       element: <ProtectedRoute element={CreateProjectPage} />,
     },
-    {
-      path: '/project',
-      element: <ProtectedRoute element={Projects} />,
-    },
+    { path: '/project', element: <ProtectedRoute element={Projects} /> },
     {
       path: '/project/:id/viewer',
       element: <ProtectedRoute element={Projects} />,

@@ -7,6 +7,8 @@
 @use 'pages/landingPage/landingPageFooter.scss';
 @use 'pages/landingPage/industryCapture.scss';
 @use '../../src/assets/scss/reactBigCalender.scss';
+@use './components/MapToolBar/colorPicker.scss';
+@use './components//mapboxStyles//mapboxPopup.scss';
 
 @font-face {
   font-family: 'Inter';

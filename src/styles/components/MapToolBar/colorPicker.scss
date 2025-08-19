@@ -1,0 +1,45 @@
+.color-picker-control {
+  position: relative;
+}
+
+.color-picker-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: white;
+  border: none;
+  cursor: pointer;
+}
+
+.color-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #aaa;
+}
+
+.color-popup {
+  position: absolute;
+  top: 0;
+  right: 36px; /* left of toolbar */
+  flex-direction: column;
+  gap: 6px;
+  background: white;
+  padding: 6px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.color-option {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: 4px;
+  border: 1px solid #aaa;
+}
+.color-option:hover {
+  transform: scale(1.1);
+}
