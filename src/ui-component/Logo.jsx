@@ -10,7 +10,7 @@
  * import logo from 'assets/images/logo.svg';
  *
  */
-import logo from '../assets/images/yourLogoHere.jpg';
+// import logo from '../assets/images/yourLogoHere.jpg';
 // ==============================|| LOGO SVG ||============================== //
 
 export default function Logo() {

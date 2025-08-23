@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
-import geojsonArea, { geometry } from '@mapbox/geojson-area';
+import geojsonArea from '@mapbox/geojson-area';
 import dayjs from 'dayjs';
 import * as turf from '@turf/turf';
 import {
@@ -18,18 +18,11 @@ import {
   Button,
   Alert,
   CircularProgress,
-  TextField,
-  Paper,
-  IconButton,
-  Fade,
 } from '@mui/material';
 import {
   IconBuildingCog,
   IconDroneOff,
   IconLiveViewFilled,
-  IconX,
-  IconEdit,
-  IconTrash,
 } from '@tabler/icons-react';
 import Breadcrumbs from '../../../../ui-component/extended/Breadcrumbs';
 import MainCard from 'ui-component/cards/MainCard';
@@ -39,12 +32,9 @@ import { useSelector } from 'react-redux';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { enqueueSnackbar } from 'notistack';
 import CommentInput from './CommentInput';
-import AreaPopUp from './AreaPopUp';
 import ColorPickerControl from './colorPickerControl';
 
-mapboxgl.accessToken =
-  import.meta.env.VITE_MAPBOX_API_KEY ||
-  'pk.eyJ1IjoiaGlyYWtyYWoiLCJhIjoiY21icXd5eHRnMDNtaTJxczcxd2RmbTZwOCJ9.P6kpsuLMDdeK2DIMJZMrmw';
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
 
 const pageLinks = [
   { title: 'Projects', to: '/project', icon: IconDroneOff },
@@ -74,13 +64,8 @@ export default function ProjectWork() {
   const [error, setError] = useState(null);
   const [tileLoading, setTileLoading] = useState(false);
   const [commentFeatures, setCommentFeatures] = useState([]);
-  const [text, setText] = useState('');
-  const [areaPopup, setAreaPopup] = useState({
-    open: false,
-    area: 0,
-    position: { x: 0, y: 0 },
-    message: '',
-  });
+  const [selectedColor, setSelectedColor] = useState('#2563EB');
+  const [selectedOpacity, setSelectedOpacity] = useState(0.5);
   const [commentInput, setCommentInput] = useState({
     open: false,
     feature: null,
@@ -159,8 +144,11 @@ export default function ProjectWork() {
 
     // --- Helpers --------------------------------------------------------------
 
-    const DEFAULT_COLOR = '#3bb2d0'; // fallback color
-    let currentColor = DEFAULT_COLOR; // active drawing color
+    const DEFAULT_COLOR = selectedColor; // fallback colo
+    const DEFAULT_OPACITY = selectedOpacity;
+    var currentColor = selectedColor; // active drawing color
+
+    var currentOpacity = DEFAULT_OPACITY;
 
     // Safely set a paint property only if the layer exists
     const safeSetPaint = (layerId, prop, value) => {
@@ -188,24 +176,59 @@ export default function ProjectWork() {
     // Build the full style array for Mapbox Draw.
     // - ACTIVE layers use the literal `activeColor` so they change instantly when we call `applyActiveDrawColor`.
     // - INACTIVE layers use the per-feature property `['get','color']` with fallback to DEFAULT_COLOR.
-    const buildDrawStyles = (activeColor) => {
-      const fallback = DEFAULT_COLOR;
-      const getColor = ['coalesce', ['get', 'color'], fallback];
+    const buildDrawStyles = (DEFAULT_COLOR, DEFAULT_OPACITY) => {
+      const getColor = [
+        'coalesce',
+        ['get', 'user_color'],
+        ['get', 'color'],
+        DEFAULT_COLOR,
+      ];
+      const getOpacity = [
+        'coalesce',
+        ['get', 'user_opacity'],
+        ['get', 'opacity'],
+        DEFAULT_OPACITY,
+      ];
 
       return [
-        // ----------------- POLYGONS -----------------
-        // Active polygon fill (while drawing/editing)
+        // ✅ Active Polygon Fill (while drawing)
         {
           id: 'gl-draw-polygon-fill-active',
           type: 'fill',
           filter: ['all', ['==', '$type', 'Polygon'], ['==', 'active', 'true']],
           paint: {
-            'fill-color': activeColor,
-            'fill-outline-color': activeColor,
-            'fill-opacity': 0.3,
+            'fill-color': getColor,
+            'fill-outline-color': getColor,
+            'fill-opacity': getOpacity,
           },
         },
-        // Inactive polygon fill (after created)
+        // ✅ Active Polygon Stroke
+        {
+          id: 'gl-draw-polygon-stroke-active',
+          type: 'line',
+          filter: ['all', ['==', '$type', 'Polygon'], ['==', 'active', 'true']],
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: {
+            'line-color': getColor,
+            'line-width': 1,
+          },
+        },
+        // ✅ Active LineString
+        {
+          id: 'gl-draw-line-active',
+          type: 'line',
+          filter: [
+            'all',
+            ['==', '$type', 'LineString'],
+            ['==', 'active', 'true'],
+          ],
+          paint: {
+            'line-color': getColor,
+            'line-width': 1,
+          },
+        },
+
+        // ✅ Inactive Polygon Fill
         {
           id: 'gl-draw-polygon-fill-inactive',
           type: 'fill',
@@ -217,22 +240,10 @@ export default function ProjectWork() {
           paint: {
             'fill-color': getColor,
             'fill-outline-color': getColor,
-            'fill-opacity': 0.2,
+            'fill-opacity': getOpacity,
           },
         },
-        // Active polygon stroke (while drawing/editing)
-        {
-          id: 'gl-draw-polygon-stroke-active',
-          type: 'line',
-          filter: ['all', ['==', '$type', 'Polygon'], ['==', 'active', 'true']],
-          layout: { 'line-cap': 'round', 'line-join': 'round' },
-          paint: {
-            'line-color': activeColor,
-            'line-dasharray': [0.2, 2],
-            'line-width': 1,
-          },
-        },
-        // Inactive polygon stroke (after created)
+        // ✅ Inactive Polygon Stroke
         {
           id: 'gl-draw-polygon-stroke-inactive',
           type: 'line',
@@ -244,24 +255,11 @@ export default function ProjectWork() {
           layout: { 'line-cap': 'round', 'line-join': 'round' },
           paint: {
             'line-color': getColor,
-            'line-dasharray': [0.2, 2],
-            'line-width': 2,
+            // 'line-dasharray': [0.2, 2],
+            'line-width': 1,
           },
         },
-
-        // ----------------- LINES -----------------
-        // Active line
-        {
-          id: 'gl-draw-line-active',
-          type: 'line',
-          filter: [
-            'all',
-            ['==', '$type', 'LineString'],
-            ['==', 'active', 'true'],
-          ],
-          paint: { 'line-color': activeColor, 'line-width': 2 },
-        },
-        // Inactive line
+        // ✅ Inactive LineString
         {
           id: 'gl-draw-line-inactive',
           type: 'line',
@@ -270,71 +268,12 @@ export default function ProjectWork() {
             ['==', '$type', 'LineString'],
             ['==', 'active', 'false'],
           ],
-          paint: { 'line-color': getColor, 'line-width': 2 },
-        },
-
-        // ----------------- POINTS / VERTICES -----------------
-        // Midpoints
-        {
-          id: 'gl-draw-point-mid',
-          type: 'circle',
-          filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'midpoint']],
           paint: {
-            'circle-radius': 4,
-            'circle-color': activeColor,
-            'circle-stroke-color': '#ffffff',
-            'circle-stroke-width': 2,
+            'line-color': getColor,
+            'line-width': 2,
           },
         },
-        // Active vertices
-        {
-          id: 'gl-draw-point-vertex-active',
-          type: 'circle',
-          filter: [
-            'all',
-            ['==', '$type', 'Point'],
-            ['==', 'meta', 'vertex'],
-            ['==', 'active', 'true'],
-          ],
-          paint: {
-            'circle-radius': 6,
-            'circle-color': activeColor,
-            'circle-stroke-color': '#ffffff',
-            'circle-stroke-width': 3,
-          },
-        },
-        // Inactive vertices
-        {
-          id: 'gl-draw-point-vertex-inactive',
-          type: 'circle',
-          filter: [
-            'all',
-            ['==', '$type', 'Point'],
-            ['==', 'meta', 'vertex'],
-            ['==', 'active', 'false'],
-          ],
-          paint: {
-            'circle-radius': 5,
-            'circle-color': getColor,
-            'circle-stroke-color': '#ffffff',
-            'circle-stroke-width': 2,
-          },
-        },
-
-        // ----------------- STANDALONE POINTS (e.g., comments) -----------------
-        // Active (while placing)
-        {
-          id: 'gl-draw-point-active',
-          type: 'circle',
-          filter: [
-            'all',
-            ['==', '$type', 'Point'],
-            ['!=', 'meta', 'midpoint'],
-            ['==', 'active', 'true'],
-          ],
-          paint: { 'circle-radius': 4, 'circle-color': activeColor },
-        },
-        // Inactive (after placed)
+        // ✅ Points (for handles)
         {
           id: 'gl-draw-point-inactive',
           type: 'circle',
@@ -344,7 +283,10 @@ export default function ProjectWork() {
             ['!=', 'meta', 'midpoint'],
             ['==', 'active', 'false'],
           ],
-          paint: { 'circle-radius': 4, 'circle-color': getColor },
+          paint: {
+            'circle-radius': 4,
+            'circle-color': getColor,
+          },
         },
         {
           id: 'gl-draw-point-comment',
@@ -356,24 +298,49 @@ export default function ProjectWork() {
             ['==', 'user_type', 'comment'],
           ],
           paint: {
-            'circle-radius': 4, // 👈 bigger point
-            'circle-color': getColor, // use saved property
+            'circle-radius': 4,
+            'circle-color': getColor,
             'circle-stroke-color': '#fff',
             'circle-stroke-width': 2,
           },
         },
+        // ✅ Active points (handles)
+        {
+          id: 'gl-draw-point-active',
+          type: 'circle',
+          filter: [
+            'all',
+            ['==', '$type', 'Point'],
+            ['!=', 'meta', 'midpoint'],
+            ['==', 'active', 'true'],
+          ],
+          paint: {
+            'circle-radius': 6, // slightly bigger when active
+            'circle-color': getColor,
+            'circle-stroke-color': getColor,
+            'circle-stroke-width': 2,
+          },
+        },
+
+        // ✅ Active comment points
+        {
+          id: 'gl-draw-point-comment-active',
+          type: 'circle',
+          filter: [
+            'all',
+            ['==', '$type', 'Point'],
+            ['==', 'active', 'true'],
+            ['==', 'meta', 'feature'],
+            ['==', 'user_type', 'comment'],
+          ],
+          paint: {
+            'circle-radius': 6, // highlight selected comment
+            'circle-color': getColor,
+            'circle-stroke-color': '#fff',
+            'circle-stroke-width': 3,
+          },
+        },
       ];
-    };
-
-    // Compute and (re)position the scale label for line features
-    const updateScale = (e) => {
-      const feature = e?.features?.[0];
-      if (!feature || feature.geometry.type !== 'LineString') return;
-
-      const lengthInKm = turf.length(feature, { units: 'kilometers' });
-      const lengthInMeters = lengthInKm * 1000;
-      const label = `${lengthInMeters.toFixed(2)} m`;
-      enqueueSnackbar(label, { variant: 'success' });
     };
 
     // 3) Map load
@@ -409,14 +376,20 @@ export default function ProjectWork() {
       }, 1000);
 
       // Color picker control: update `currentColor` + repaint ACTIVE draw layers
-      const colorControl = new ColorPickerControl((picked) => {
-        currentColor = picked || DEFAULT_COLOR;
-        applyActiveDrawColor(currentColor);
+      const colorControl = new ColorPickerControl((color, opacity) => {
+        console.log(color, opacity, '<==== picked');
+        currentColor = color || DEFAULT_COLOR;
+        currentOpacity = opacity || DEFAULT_OPACITY;
+        console.log(currentColor, '<==== current');
+        setSelectedColor(color);
+        setSelectedOpacity(opacity);
+        // applyActiveDrawColor(currentColor);
       });
       mapboxMap.addControl(colorControl, 'top-right');
 
       // 4) Mapbox Draw with custom styles + userProperties
       const draw = new MapboxDraw({
+        userProperties: true, // ✅ allow 'color' (and other) custom properties
         displayControlsDefault: false,
         controls: {
           polygon: true,
@@ -424,21 +397,24 @@ export default function ProjectWork() {
           point: true,
           trash: true,
         },
-        styles: buildDrawStyles(currentColor), // initial paint
-        userProperties: true, // ✅ allow 'color' (and other) custom properties
+        styles: buildDrawStyles(currentColor, currentOpacity),
+        // initial paint
       });
       mapboxMap.addControl(draw, 'top-right');
       drawRef.current = draw;
 
       // Make sure active layers reflect the initial color immediately
-      applyActiveDrawColor(currentColor);
+      // applyActiveDrawColor(currentColor);
 
       // ----------------- Draw Events -----------------
 
       // When a feature is created, persist the color into its properties
       mapboxMap.on('draw.create', async (e) => {
         const workdayId = selectedWorkDay.id;
+        console.log('current Color', currentColor, '<==== wow  wowo  wowo');
         e.features.forEach((f) => {
+          console.log(f.id, '<=== f');
+          // draw.setFeatureProperty(f.id, 'color', activeColor);
           draw.setFeatureProperty(f.id, 'color', currentColor);
         });
 
@@ -449,16 +425,13 @@ export default function ProjectWork() {
         }
 
         if (feature.geometry.type === 'LineString') {
-          console.log(feature, '<=== featuer LineSTring');
           // updateScale(e);
           if (!feature || feature.geometry.type !== 'LineString') return;
-
           const lengthInMeters = turf.length(feature, { units: 'meters' });
           const midpointCoords = turf.along(feature, lengthInMeters / 2, {
             units: 'meters',
           }).geometry.coordinates;
           const label = `${lengthInMeters.toFixed(2)} m`;
-          console.log(feature, '<==== feature wow wow ow ow');
           const customId = `polygon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
           feature.properties.comment = label;
           feature.properties.color = currentColor;
@@ -504,9 +477,10 @@ export default function ProjectWork() {
           draw.setFeatureProperty(feature.id, 'id', customId);
           // const rect = mapboxMap.getCanvas().getBoundingClientRect();
           feature.properties.color = currentColor;
-          feature.properties.areaKm2 = areaKm2;
+          feature.properties.opacity = feature.properties.areaKm2 = areaKm2;
           feature.properties.areaM2 = areaM2;
           feature.properties.id = customId;
+          feature.properties.opacity = currentOpacity;
           try {
             const payload = {
               featureType: 'polygon',
@@ -551,11 +525,14 @@ export default function ProjectWork() {
             position: { x: rect.width / 2, y: rect.height / 2 },
           });
         }
+        console.log('bhrwa  agya');
+        draw.add(feature);
       });
 
       // On update, we keep the original color (don’t overwrite).
       // If you want to recolor edited features to currentColor, uncomment below:
       mapboxMap.on('draw.update', async (e) => {
+        console.log('on update');
         if (mapRef.current.__activePopup) {
           mapRef.current.__activePopup.remove();
         }
@@ -576,7 +553,6 @@ export default function ProjectWork() {
           const areaKm2 = (area / 1000000).toFixed(2);
           const areaM2 = area.toFixed(2);
           const coords = turf.centroid(feature).geometry.coordinates;
-          const rect = mapboxMap.getCanvas().getBoundingClientRect();
           const popup = new mapboxgl.Popup({
             closeButton: true,
             offset: 15,
@@ -589,7 +565,7 @@ export default function ProjectWork() {
           feature.properties.color = currentColor;
           feature.properties.areaKm2 = areaKm2;
           feature.properties.areaM2 = areaM2;
-
+          feature.properties.opacity = currentOpacity;
           try {
             const payload = {
               featureType: 'polygon',
@@ -680,6 +656,7 @@ export default function ProjectWork() {
       //   },
       // );
       mapboxMap.on('draw.delete', async (e) => {
+        console.log('on delete');
         if (mapRef.current.__activePopup) {
           mapRef.current.__activePopup.remove();
         }
@@ -703,6 +680,7 @@ export default function ProjectWork() {
       });
       // click handler for lines
       mapboxMap.on('click', (e) => {
+        console.log('on click');
         if (mapRef.current.__activePopup) {
           mapRef.current.__activePopup.remove();
         }
@@ -736,10 +714,14 @@ export default function ProjectWork() {
         ];
 
         // keep only layers that actually exist in the current style
-        const existingLayers = possibleLayers.filter((layerId) =>
-          mapboxMap.getStyle().layers.some((l) => l.id === layerId),
-        );
-
+        // console.log(
+        //   mapboxMap.getStyle().layers,
+        //   '<=------ wo wow ow Layers Layers',
+        // );
+        const existingLayers = mapboxMap
+          .getStyle()
+          .layers.map((layer) => layer.id)
+          .filter((id) => possibleLayers.includes(id));
         const features = mapboxMap.queryRenderedFeatures(e.point, {
           layers: existingLayers,
         });
@@ -778,8 +760,9 @@ export default function ProjectWork() {
             .addTo(mapboxMap);
         }
         if (
-          feature.geometry.type === 'LineString' &&
-          feature.properties.mode !== 'draw_polygon'
+          feature.geometry.type === 'LineString'
+          //  &&
+          // feature.properties.mode !== 'draw_polygon'
         ) {
           console.log(feature, '<==== feature line string selection');
 
@@ -806,51 +789,45 @@ export default function ProjectWork() {
         }
       });
 
-      // If you have a separate layer named 'comment-points' and want to edit/view the comment
-      // mapboxMap.on('click', 'comment-points', (e) => {
-      //   e.preventDefault();
-      //   const feature = e.features?.[0];
-      //   console.log(
-      //     '################################################################',
-      //   );
-      //   console.log(feature, '<=== feature on selection');
-      //   console.log(feature.type, '<==== feature type');
-      //   if (!feature) return;
+      mapboxMap.on('draw.selectionchange', (e) => {
+        if (e.features.length > 0) {
+          const feature = e.features[0];
+          if (
+            feature.geometry.type === 'LineString'
+            //  &&
+            // feature.properties.mode !== 'draw_polygon'
+          ) {
+            console.log(feature, '<==== feature line string selection');
 
-      //   const rect = mapboxMap.getCanvas().getBoundingClientRect();
-      //   const commentFeature = {
-      //     type: 'Feature',
-      //     geometry: feature.geometry,
-      //     id: feature.id,
-      //     properties: {
-      //       ...feature.properties,
-      //       comment: feature.properties?.comment || '',
-      //       type: 'comment',
-      //       lastEdited: new Date().toISOString(),
-      //     },
-      //   };
+            // Always work in kilometers
+            const lengthInKm = turf.length(feature, { units: 'kilometers' });
+            const midpointCoords = turf.along(feature, lengthInKm / 2, {
+              units: 'kilometers',
+            }).geometry.coordinates;
 
-      //   setCommentInput({
-      //     open: true,
-      //     feature: commentFeature,
-      //     isEdit: true,
-      //     position: { x: rect.width / 2, y: rect.height / 2 },
-      //   });
-      // });
+            const lengthInMeters = lengthInKm * 1000;
+            const label = `${lengthInMeters.toFixed(2)} m`;
 
-      // // Load tiles if a workDay is selected
-      // if (workDayData.length > 0 && selectedDate) {
-      //   const workDay = workDayData.find((w) => w.name === selectedDate);
-      //   if (workDay && workDay.tileBaseUrl) addTileLayer(workDay);
-      // }
+            if (midpointCoords && !midpointCoords.some(Number.isNaN)) {
+              const popup = new mapboxgl.Popup()
+                .setLngLat(midpointCoords)
+                .setHTML(`<strong>${label}</strong>`)
+                .addTo(mapboxMap);
+              mapRef.current.__activePopup = popup;
+            }
+
+            enqueueSnackbar(`Length: ${lengthInMeters.toFixed(2)} m`, {
+              variant: 'success',
+            });
+          }
+        }
+      });
     });
 
     // Tile loading spinner control
     mapboxMap.on('sourcedata', (e) => {
-      if (mapRef.current.__activePopup) {
-        mapRef.current.__activePopup.remove();
-      }
       if (e.sourceId?.includes('ortho-') && e.isSourceLoaded) {
+        console.log('on source data remove');
         setTileLoading(false);
       }
     });
@@ -884,20 +861,14 @@ export default function ProjectWork() {
         .map((feature) => {
           const { geometry, properties } = feature;
           if (!geometry) return null;
-
+          console.log(properties.color, '<=== incoming color');
           return {
             type: 'Feature',
             geometry,
             properties: {
               ...properties,
               comment: properties?.comment || '',
-              color:
-                properties?.color ||
-                (geometry.type === 'Point'
-                  ? '#FF0000'
-                  : geometry.type === 'LineString'
-                    ? '#0000FF'
-                    : '#00FF00'),
+              color: properties?.color,
               message: properties?.message || 'No message set',
             },
           };
@@ -932,9 +903,15 @@ export default function ProjectWork() {
 
     // 3) Add to Draw
     if (filteredFeatures.features.length) {
+      filteredFeatures.features = filteredFeatures.features.map((f) => {
+        if (!f.properties.color || f.properties.color === 'null') {
+          f.properties.color = DEFAULT_COLOR;
+        }
+        return f;
+      });
       draw.add(filteredFeatures);
+      draw.changeMode('simple_select');
     }
-
     // 4) Orthomosaic
     if (layers.orthomosaic && workDay.tileBaseUrl) {
       console.log('nopitynope');
@@ -1260,8 +1237,29 @@ export default function ProjectWork() {
         <Box sx={{ width: '250px', pr: 2, height: '100%' }}>
           <Typography
             onClick={() => {
-              console.log(commentFeatures, '<=== comment features');
-              console.log(selectedWorkDay.id, '>====== selected workday ID');
+              // console.log(commentFeatures, '<=== comment features');
+              // console.log(selectedWorkDay.id, '>====== selected workday ID');
+              // // console.log(selectedColor, '<=== olor ococococo');
+              // console.log(drawRef.current.getAll());
+              // console.log(
+              //   mapRef.current
+              //     .getStyle()
+              //     .layers.filter((l) => l.id.includes('draw')),
+              // );
+
+              const coldFeatures = mapRef.current.querySourceFeatures(
+                'mapbox-gl-draw-cold',
+              );
+              const hotFeatures =
+                mapRef.current.querySourceFeatures('mapbox-gl-draw-hot');
+              console.log(
+                'Cold:',
+                coldFeatures.map((f) => f.properties),
+              );
+              console.log(
+                'Hot:',
+                hotFeatures.map((f) => f.properties),
+              );
             }}
             variant="h3"
             gutterBottom
@@ -1362,13 +1360,7 @@ export default function ProjectWork() {
               fontWeight: 'bold',
             },
           }}
-        >
-          <AreaPopUp
-            areaPopup={areaPopup}
-            setAreaPopup={setAreaPopup}
-            text={text || ''}
-          />
-        </Box>
+        ></Box>
         <CommentInput
           addCommentLayer={addCommentLayer}
           setCommentFeatures={setCommentFeatures}

@@ -12,7 +12,9 @@ import Logo from 'ui-component/Logo';
 export default function LogoSection() {
   return (
     <Link
-      style={{ textDecoration: 'none' }}
+      style={{
+        textDecoration: 'none',
+      }}
       component={RouterLink}
       to={'/'}
       aria-label="theme-logo"
