@@ -15,10 +15,12 @@
   font-size: 15px;
   font-weight: 600;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  padding-bottom: 6px;
-  margin-bottom: 10px;
+  // padding-bottom: 6px;
+  // margin-bottom: 10px;
 }
-
+.mapboxgl-popup-content {
+  padding: 0 !important;
+}
 .map-popup .close-btn {
   background: transparent;
   border: none;
@@ -35,7 +37,7 @@
 
 .map-popup .popup-body {
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 0.5;
 }
 
 .mapboxgl-popup {

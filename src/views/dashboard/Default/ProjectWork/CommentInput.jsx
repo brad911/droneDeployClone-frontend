@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import * as turf from '@turf/turf';
 import { IconTrash, IconX } from '@tabler/icons-react';
 import axiosInstance from '../../../../utils/axios.config';
 import { useSelector } from 'react-redux';
@@ -21,49 +22,62 @@ const CommentInput = ({
   commentFeatures,
   handleDeleteComment,
   workDay,
+  drawRef,
 }) => {
+  const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const handleCommentSubmit = async (comment, geometry) => {
     try {
       const stableId = `comment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+      const baseFeature = { ...commentInput.feature };
+
+      // Prepare the feature for backend and local state
       const commentFeature = {
+        ...baseFeature,
         type: 'Feature',
-        geometry: commentInput.feature.geometry,
+        geometry: geometry || baseFeature.geometry,
         properties: {
+          ...baseFeature.properties,
           id: stableId,
           workDayId: workDay.id,
-          comment: comment,
+          comment,
           type: 'comment',
-          color: commentInput.feature.properties.color,
-          created: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          createdBy: user,
         },
       };
-      //Create A feature At the backend
+
+      // Backend payload
       const payload = {
         geometry: commentFeature.geometry,
         properties: commentFeature.properties,
         featureType: commentFeature.properties.type,
         workDayId: workDay.id,
       };
+
       const response = await axiosInstance.post('/mapFeature', payload, {
         headers: { Authorization: token },
       });
+
       if (response.status === 201) {
-        enqueueSnackbar('Sucessfully Added Comment', { variant: 'success' });
+        enqueueSnackbar('Successfully Added Comment', { variant: 'success' });
       }
-      const updatedCommentFeatures = [...commentFeatures, commentFeature];
-      setCommentFeatures(updatedCommentFeatures);
-      // addCommentLayer(updatedCommentFeatures);
+
+      // Update state
+      setCommentFeatures((prev) => [...prev, commentFeature]);
+
+      // Add to map
+      console.log(commentFeature, '<=== yeets');
+      drawRef.add(commentFeature);
+
+      // Reset comment input
       setCommentInput({
         open: false,
         feature: null,
         isEdit: false,
         position: { x: 0, y: 0 },
       });
-      new mapboxgl.Popup()
-        .setLngLat(coordinates)
-        .setHTML(`<strong> ${comment}</strong>`)
-        .addTo(mapboxMap);
     } catch (e) {
       console.error(e);
     }

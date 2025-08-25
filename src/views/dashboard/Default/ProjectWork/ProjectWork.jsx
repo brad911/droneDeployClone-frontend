@@ -42,10 +42,78 @@ const pageLinks = [
   { title: 'Exterior(Map View)', icon: IconLiveViewFilled },
 ];
 
+const popUpContent = ({ label, createdBy, createdAt }) => {
+  return `
+    <div style="
+      font-family: 'Arial', sans-serif;
+      background-color: #fff;
+      border: 1px solid #B3D3F0; /* secondary200 */
+      border-radius: 8px;
+      overflow: hidden;
+      width: 200px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    ">
+      <!-- Header -->
+      <div style="
+        background-color: #2563EB; /* primaryMain */
+        color: #fff;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      ">
+        ${label}
+      </div>
+      
+      <!-- Body -->
+      <div style="
+        padding: 6px 8px;
+        background-color: #D6E6F5; /* secondaryLight */
+        display: flex;
+        justify-content: space-between;
+        font-size: 8px;
+        color: #1F3F66; /* secondary800 */
+      ">
+        <span>${createdBy}</span>
+        <span style="color: #666;">
+          ${new Date(createdAt).toLocaleDateString()} ${new Date(createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </span>
+      </div>
+    </div>
+  `;
+};
+
+const readInfoFromFeature = (properties, label) => {
+  let user;
+  let date;
+  console.log(properties, '<===== props');
+  if (properties.createdBy) {
+    user = properties.createdBy;
+  } else {
+    user = JSON.parse(properties.user_createdBy);
+  }
+  if (properties.createdAt) {
+    date = properties.createdAt;
+  } else {
+    date = properties.user_createdAt;
+  }
+  console.log(user, '<=======user');
+  console.log(date, '<=======daet');
+  return {
+    createdBy: `${user.firstName} ${user.lastName}`,
+    createdAt: new Date(date),
+    label,
+  };
+};
+
 export default function ProjectWork() {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
   const drawRef = useRef(null);
+  const user = useSelector((state) => state.auth.user);
 
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
@@ -411,9 +479,7 @@ export default function ProjectWork() {
       // When a feature is created, persist the color into its properties
       mapboxMap.on('draw.create', async (e) => {
         const workdayId = selectedWorkDay.id;
-        console.log('current Color', currentColor, '<==== wow  wowo  wowo');
         e.features.forEach((f) => {
-          console.log(f.id, '<=== f');
           // draw.setFeatureProperty(f.id, 'color', activeColor);
           draw.setFeatureProperty(f.id, 'color', currentColor);
         });
@@ -428,11 +494,11 @@ export default function ProjectWork() {
           // updateScale(e);
           if (!feature || feature.geometry.type !== 'LineString') return;
           const lengthInMeters = turf.length(feature, { units: 'meters' });
-          const midpointCoords = turf.along(feature, lengthInMeters / 2, {
-            units: 'meters',
-          }).geometry.coordinates;
           const label = `${lengthInMeters.toFixed(2)} m`;
           const customId = `polygon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          feature.properties.createdBy = user;
+          feature.properties.createdAt = new Date();
+          feature.createdAt = new Date().toISOString;
           feature.properties.comment = label;
           feature.properties.color = currentColor;
           feature.properties.id = customId;
@@ -449,18 +515,7 @@ export default function ProjectWork() {
             if (saveLine.status === 201) {
               enqueueSnackbar('Line created ', { variant: 'success' });
             }
-            // 👇 ensure popup runs after map finishes render
-            console.log(midpointCoords, '<=== yo');
-            setTimeout(() => {
-              const popup = new mapboxgl.Popup({
-                closeButton: true,
-                offset: 15,
-              })
-                .setLngLat(midpointCoords)
-                .setHTML(`<strong>Length: ${label}</strong>`)
-                .addTo(mapRef.current);
-              mapRef.current.__activePopup = popup;
-            }, 0);
+            draw.add(feature);
           } catch (e) {
             console.error(e);
           }
@@ -469,15 +524,15 @@ export default function ProjectWork() {
         }
 
         if (feature.geometry.type === 'Polygon') {
-          const area = geojsonArea.geometry(feature.geometry);
-          const areaKm2 = (area / 1000000).toFixed(2);
-          const areaM2 = area.toFixed(2);
+          const areaM2 = geojsonArea.geometry(feature.geometry).toFixed(2);
+          const label = `${areaM2} m²`;
           const customId = `polygon-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
           const coords = turf.centroid(feature).geometry.coordinates; // [lng, lat]
           draw.setFeatureProperty(feature.id, 'id', customId);
           // const rect = mapboxMap.getCanvas().getBoundingClientRect();
           feature.properties.color = currentColor;
-          feature.properties.opacity = feature.properties.areaKm2 = areaKm2;
+          feature.properties.createdAt = new Date();
+          feature.properties.createdBy = user;
           feature.properties.areaM2 = areaM2;
           feature.properties.id = customId;
           feature.properties.opacity = currentOpacity;
@@ -488,7 +543,6 @@ export default function ProjectWork() {
               properties: feature.properties,
               workDayId: workdayId,
             };
-            console.log(payload, '<==== payload wow');
             const savePolygon = await axiosInstance.post(
               '/mapFeature',
               payload,
@@ -504,9 +558,12 @@ export default function ProjectWork() {
                 offset: 15,
               })
                 .setLngLat(coords)
-                .setHTML(`<strong>Area: ${areaM2} m²</strong>`)
+                .setHTML(
+                  popUpContent(readInfoFromFeature(feature.properties, label)),
+                )
                 .addTo(mapRef.current);
               mapRef.current.__activePopup = popup;
+              draw.add(feature);
             }, 0);
           } catch (e) {
             console.error(e);
@@ -518,21 +575,20 @@ export default function ProjectWork() {
           setCommentInput({
             open: true,
             feature: {
+              feature,
               geometry: feature.geometry,
+              color: currentColor,
               properties: { color: currentColor }, // also store on comment draft
             },
             isEdit: false,
             position: { x: rect.width / 2, y: rect.height / 2 },
           });
         }
-        console.log('bhrwa  agya');
-        draw.add(feature);
       });
 
       // On update, we keep the original color (don’t overwrite).
       // If you want to recolor edited features to currentColor, uncomment below:
       mapboxMap.on('draw.update', async (e) => {
-        console.log('on update');
         if (mapRef.current.__activePopup) {
           mapRef.current.__activePopup.remove();
         }
@@ -553,13 +609,6 @@ export default function ProjectWork() {
           const areaKm2 = (area / 1000000).toFixed(2);
           const areaM2 = area.toFixed(2);
           const coords = turf.centroid(feature).geometry.coordinates;
-          const popup = new mapboxgl.Popup({
-            closeButton: true,
-            offset: 15,
-          })
-            .setLngLat(coords)
-            .setHTML(`<strong>Area: ${areaM2}</strong>`)
-            .addTo(mapRef.current);
           mapRef.current.__activePopup = popup;
 
           feature.properties.color = currentColor;
@@ -597,16 +646,6 @@ export default function ProjectWork() {
               units: 'kilometers',
             }).geometry.coordinates;
 
-            // ✅ Show popup at midpoint
-            if (midpointCoords && !midpointCoords.some(Number.isNaN)) {
-              const popup = new mapboxgl.Popup()
-                .setLngLat(midpointCoords)
-                .setHTML(`<strong>${lengthM} m</strong>`)
-                .addTo(mapboxMap);
-
-              mapRef.current.__activePopup = popup;
-            }
-
             // ✅ Save properties
             feature.properties.color = currentColor;
             feature.properties.lengthKm = lengthKm.toFixed(2);
@@ -633,42 +672,51 @@ export default function ProjectWork() {
             console.error('Error updating line:', err);
           }
         }
+        if (feature?.geometry?.type === 'Point') {
+          try {
+            // ✅ Extract coordinates
+            const [lng, lat] = feature.geometry.coordinates;
+
+            // ✅ Save properties
+            feature.properties.color = currentColor;
+            feature.properties.coordinates = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+            // ✅ Prepare payload
+            const payload = {
+              featureType: 'comment',
+              geometry: feature.geometry,
+              properties: feature.properties,
+              workDayId: workdayId,
+            };
+
+            // ✅ Send update to backend
+            const updatePoint = await axiosInstance.patch(
+              `/mapFeature/propertyId/${feature?.properties.id}`,
+              payload,
+              { headers: { Authorization: token } },
+            );
+
+            if (updatePoint.status === 200) {
+              enqueueSnackbar('Point Updated', { variant: 'success' });
+            }
+          } catch (err) {
+            console.error('Error updating point:', err);
+          }
+        }
       });
-
-      // click handler for points
-      // mapboxMap.on(
-      //   'click',
-      //   ['gl-draw-point-inactive.hot', 'gl-draw-point-active.hot'],
-      //   (e) => {
-      //     console.log(e, '<=== point handler');
-      //     const feature = e.features?.[0];
-      //     if (!feature) return;
-
-      //     if (
-      //       feature.geometry.type === 'Point' &&
-      //       feature.properties.user_type === 'comment'
-      //     ) {
-      //       console.log(feature, '<=== featuer');
-      //       const comment =
-      //         feature.properties?.comment || feature.properties?.user_comment;
-      //       enqueueSnackbar(`Comment: ${comment}`, { variant: 'info' });
-      //     }
-      //   },
-      // );
       mapboxMap.on('draw.delete', async (e) => {
         console.log('on delete');
         if (mapRef.current.__activePopup) {
           mapRef.current.__activePopup.remove();
         }
         const feature = e.features[0];
-        console.log(feature, '<=== my feature');
         console.log('Deleted features:', e.features);
         try {
           const res = await axiosInstance.delete(
             `/mapfeature/propertyId/${feature.properties.id}`,
           );
           if (res.status === 200) {
-            enqueueSnackbar('successfully removed feature', {
+            enqueueSnackbar('Successfully removed feature', {
               variant: 'success',
             });
           }
@@ -713,11 +761,6 @@ export default function ProjectWork() {
           'gl-draw-polygon-stroke-static',
         ];
 
-        // keep only layers that actually exist in the current style
-        // console.log(
-        //   mapboxMap.getStyle().layers,
-        //   '<=------ wo wow ow Layers Layers',
-        // );
         const existingLayers = mapboxMap
           .getStyle()
           .layers.map((layer) => layer.id)
@@ -727,11 +770,11 @@ export default function ProjectWork() {
         });
         if (!features.length) return;
         const feature = features[0];
-
         if (
           feature.geometry.type === 'Point' &&
           feature.properties.user_type === 'comment'
         ) {
+          console.log(feature, '<==== yeeter');
           // handle comment points
           const coordinates = feature.geometry.coordinates.slice();
           const comment =
@@ -740,7 +783,9 @@ export default function ProjectWork() {
             '';
           const popup = new mapboxgl.Popup()
             .setLngLat(coordinates)
-            .setHTML(`<strong> ${comment}</strong>`)
+            .setHTML(
+              popUpContent(readInfoFromFeature(feature.properties, comment)),
+            )
             .addTo(mapboxMap);
           mapRef.current.__activePopup = popup;
         }
@@ -748,15 +793,14 @@ export default function ProjectWork() {
         if (feature.geometry.type === 'Polygon') {
           console.log(feature, '<=== featuer agae ');
           const area = geojsonArea.geometry(feature.geometry);
-          const areaM2 = area.toFixed(2);
-          const centroid = turf.centroid(feature);
-          const coords = centroid.geometry.coordinates; // [lng, lat]
-          console.log(centroid, '<==== centroid');
-          console.log(coords, '<=== coores');
+          const label = `${area.toFixed(2)} m²`;
+          const coords = turf.centroid(feature).geometry.coordinates;
           // const rect = mapboxMap.getCanvas().getBoundingClientRect();
           new mapboxgl.Popup()
             .setLngLat(coords)
-            .setHTML(`<strong>Area: ${areaM2} m2</strong>`)
+            .setHTML(
+              popUpContent(readInfoFromFeature(feature.properties, label)),
+            )
             .addTo(mapboxMap);
         }
         if (
@@ -778,7 +822,9 @@ export default function ProjectWork() {
           if (midpointCoords && !midpointCoords.some(Number.isNaN)) {
             const popup = new mapboxgl.Popup()
               .setLngLat(midpointCoords)
-              .setHTML(`<strong>${label}</strong>`)
+              .setHTML(
+                popUpContent(readInfoFromFeature(feature.properties, label)),
+              )
               .addTo(mapboxMap);
             mapRef.current.__activePopup = popup;
           }
@@ -792,10 +838,10 @@ export default function ProjectWork() {
       mapboxMap.on('draw.selectionchange', (e) => {
         if (e.features.length > 0) {
           const feature = e.features[0];
+          console.log(feature.geometry.type, '<=====randy');
           if (
-            feature.geometry.type === 'LineString'
-            //  &&
-            // feature.properties.mode !== 'draw_polygon'
+            feature.geometry.type === 'LineString' &&
+            feature.properties.mode !== 'draw_polygon'
           ) {
             console.log(feature, '<==== feature line string selection');
 
@@ -811,7 +857,9 @@ export default function ProjectWork() {
             if (midpointCoords && !midpointCoords.some(Number.isNaN)) {
               const popup = new mapboxgl.Popup()
                 .setLngLat(midpointCoords)
-                .setHTML(`<strong>${label}</strong>`)
+                .setHTML(
+                  popUpContent(readInfoFromFeature(feature.properties, label)),
+                )
                 .addTo(mapboxMap);
               mapRef.current.__activePopup = popup;
             }
@@ -819,6 +867,21 @@ export default function ProjectWork() {
             enqueueSnackbar(`Length: ${lengthInMeters.toFixed(2)} m`, {
               variant: 'success',
             });
+          }
+          if (feature.geometry.type === 'Point') {
+            console.log(feature, '<============wew');
+            const popup = new mapboxgl.Popup()
+              .setLngLat(feature.geometry.coordinates)
+              .setHTML(
+                popUpContent(
+                  readInfoFromFeature(
+                    feature.properties,
+                    feature.properties.comment,
+                  ),
+                ),
+              )
+              .addTo(mapboxMap);
+            mapRef.current.__activePopup = popup;
           }
         }
       });
@@ -845,137 +908,83 @@ export default function ProjectWork() {
     if (!selectedDate || !mapRef.current || !isMapLoaded || !workDayData.length)
       return;
 
-    const workDay = workDayData.find((w) => w.name === selectedDate);
-    if (!workDay) return;
-    cleanupLayers(workDay.id);
-    const draw = drawRef.current;
-    const map = mapRef.current;
+    const setMapFeature = async () => {
+      const workDay = workDayData.find((w) => w.name === selectedDate);
+      if (!workDay) return;
 
-    // 🧹 clear previous features
-    draw.deleteAll();
+      // 🧹 Cleanup previous layers
+      cleanupLayers(workDay.id);
 
-    // 1) Build FeatureCollection from DB
-    const allFeaturesGeoJSON = {
-      type: 'FeatureCollection',
-      features: commentFeatures
-        .map((feature) => {
-          const { geometry, properties } = feature;
-          if (!geometry) return null;
-          console.log(properties.color, '<=== incoming color');
-          return {
-            type: 'Feature',
-            geometry,
-            properties: {
-              ...properties,
-              comment: properties?.comment || '',
-              color: properties?.color,
-              message: properties?.message || 'No message set',
-            },
-          };
-        })
-        .filter(Boolean),
+      const draw = drawRef.current;
+      // Clear previous features
+      draw.deleteAll();
+      try {
+        // Fetch features for the selected workday
+        const { data } = await axiosInstance.get('/mapFeature', {
+          params: { workDayId: workDay.id, limit: 100 },
+          headers: { Authorization: token },
+        });
+
+        const results = data?.data?.results || [];
+
+        // Build FeatureCollection
+        const allFeaturesGeoJSON = {
+          type: 'FeatureCollection',
+          features: results
+            .map(({ geometry, properties, createdBy, createdAt }) => {
+              if (!geometry) return null;
+              return {
+                type: 'Feature',
+                geometry,
+                properties: {
+                  ...properties,
+                  createdBy: createdBy,
+                  createdAt: createdAt,
+                  comment: properties?.comment || '',
+                  color: properties?.color || DEFAULT_COLOR,
+                  message: properties?.message || 'No message set',
+                },
+              };
+            })
+            .filter(Boolean),
+        };
+
+        // Apply layer filters
+        const filteredFeatures = {
+          ...allFeaturesGeoJSON,
+          features: allFeaturesGeoJSON.features.filter((f) => {
+            if (f.geometry.type === 'Point' && layers.showComments) return true;
+            if (f.geometry.type === 'LineString' && layers.showLineString)
+              return true;
+            if (f.geometry.type === 'Polygon' && layers.showPolygons)
+              return true;
+            return false;
+          }),
+        };
+
+        // Add filtered features to map
+        if (filteredFeatures.features.length) {
+          draw.add(filteredFeatures);
+          draw.changeMode('simple_select');
+        }
+
+        // Handle orthomosaic layer
+        if (layers.orthomosaic && workDay.tileBaseUrl) {
+          setTileLoading(true);
+          addTileLayer(workDay);
+        }
+
+        // Fit map to bounds
+        if (workDay.tileBounds) {
+          fitToBounds(workDay.tileBounds);
+        }
+      } catch (error) {
+        console.error('Error loading map features:', error);
+      }
     };
 
-    // 2) Filter by toggles
-    let filteredFeatures = { ...allFeaturesGeoJSON, features: [] };
-
-    if (layers.showComments) {
-      filteredFeatures.features.push(
-        ...allFeaturesGeoJSON.features.filter(
-          (f) => f.geometry.type === 'Point',
-        ),
-      );
-    }
-    if (layers.showLineString) {
-      filteredFeatures.features.push(
-        ...allFeaturesGeoJSON.features.filter(
-          (f) => f.geometry.type === 'LineString',
-        ),
-      );
-    }
-    if (layers.showPolygons) {
-      filteredFeatures.features.push(
-        ...allFeaturesGeoJSON.features.filter(
-          (f) => f.geometry.type === 'Polygon',
-        ),
-      );
-    }
-
-    // 3) Add to Draw
-    if (filteredFeatures.features.length) {
-      filteredFeatures.features = filteredFeatures.features.map((f) => {
-        if (!f.properties.color || f.properties.color === 'null') {
-          f.properties.color = DEFAULT_COLOR;
-        }
-        return f;
-      });
-      draw.add(filteredFeatures);
-      draw.changeMode('simple_select');
-    }
-    // 4) Orthomosaic
-    if (layers.orthomosaic && workDay.tileBaseUrl) {
-      console.log('nopitynope');
-      setTileLoading(true);
-      addTileLayer(workDay);
-    }
-
-    // // 5) Annotations toggle
-    // if (layers.annotations) {
-    //   // addKmlLayer(workDay)
-    // } else {
-    //   if (map.getLayer('annotations')) map.removeLayer('annotations');
-    //   if (map.getSource('annotations')) map.removeSource('annotations');
-    // }
-
-    // 6) Fit bounds
-    if (workDay.tileBounds) {
-      fitToBounds(workDay.tileBounds);
-    }
-  }, [
-    selectedDate,
-    isMapLoaded,
-    layers,
-    workDayData,
-    commentFeatures,
-    selectedWorkDay,
-  ]);
-
-  // --- Add hover popup once (not inside effect) ---
-  // useEffect(() => {
-  //   const map = mapRef.current;
-  //   if (!map) return;
-
-  //   const popup = new mapboxgl.Popup({
-  //     closeButton: false,
-  //     closeOnClick: false,
-  //   });
-
-  //   // Hover on any draw feature
-  //   map.on('mouseenter', 'gl-draw-point-inactive.hot', (e) => {
-  //     console.log('wow mouse');
-  //     const feature = e.features?.[0];
-  //     if (!feature) return;
-
-  //     map.getCanvas().style.cursor = 'pointer';
-
-  //     popup
-  //       .setLngLat(e.lngLat)
-  //       .setHTML(
-  //         `<b>${feature.properties.comment || feature.properties.message}</b>`,
-  //       )
-  //       .addTo(map);
-  //   });
-
-  //   map.on('mouseleave', 'gl-draw-point-inactive.hot', () => {
-  //     map.getCanvas().style.cursor = '';
-  //     popup.remove();
-  //   });
-
-  //   // same for polygons/lines if you want
-  //   return () => {
-  //     popup.remove();
-  //   };
-  // }, []);
+    setMapFeature();
+  }, [selectedDate, isMapLoaded, layers, workDayData]);
 
   const cleanupLayers = (workDayId) => {
     const map = mapRef.current;
@@ -1246,7 +1255,7 @@ export default function ProjectWork() {
               //     .getStyle()
               //     .layers.filter((l) => l.id.includes('draw')),
               // );
-
+              console.log(user, '<============ user');
               const coldFeatures = mapRef.current.querySourceFeatures(
                 'mapbox-gl-draw-cold',
               );
@@ -1287,7 +1296,7 @@ export default function ProjectWork() {
                   disabled={loading}
                 />
               }
-              label="Show Lines"
+              label="Lines"
             />
             <FormControlLabel
               control={
@@ -1298,7 +1307,7 @@ export default function ProjectWork() {
                   disabled={loading}
                 />
               }
-              label="Show Polygons"
+              label="Polygons"
             />
             <FormControlLabel
               control={
@@ -1309,7 +1318,7 @@ export default function ProjectWork() {
                   disabled={loading}
                 />
               }
-              label="Show Comments"
+              label="Comments"
             />
           </FormGroup>
 
@@ -1369,6 +1378,7 @@ export default function ProjectWork() {
           commentFeatures={commentFeatures}
           handleDeleteComment={handleDeleteComment}
           workDay={selectedWorkDay}
+          drawRef={drawRef.current}
         />
       </Box>
     </MainCard>
