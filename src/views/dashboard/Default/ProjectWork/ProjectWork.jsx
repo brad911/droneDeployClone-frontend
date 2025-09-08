@@ -123,6 +123,7 @@ export default function ProjectWork() {
     showComments: true,
     showPolygons: true,
     showLineString: true,
+    builtinOverlay: false,
   });
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [historicalDates, setHistoricalDates] = useState([]);
@@ -140,6 +141,7 @@ export default function ProjectWork() {
     isEdit: false,
     position: { x: 0, y: 0 },
   });
+  const [mapFeatures, setMapFeatures] = useState([]);
 
   const projectId = useSelector((state) => state.project.selectedProjectId);
   const token = useSelector((state) => state.auth.token);
@@ -218,29 +220,7 @@ export default function ProjectWork() {
 
     var currentOpacity = DEFAULT_OPACITY;
 
-    // Safely set a paint property only if the layer exists
-    const safeSetPaint = (layerId, prop, value) => {
-      if (mapboxMap.getLayer(layerId)) {
-        mapboxMap.setPaintProperty(layerId, prop, value);
-      }
-    };
-
     // Apply the currently selected color to *active* draw layers so new drawing uses it
-    const applyActiveDrawColor = (color) => {
-      // Polygons (active fill + stroke)
-      safeSetPaint('gl-draw-polygon-fill-active', 'fill-color', color);
-      safeSetPaint('gl-draw-polygon-fill-active', 'fill-outline-color', color);
-      safeSetPaint('gl-draw-polygon-stroke-active', 'line-color', color);
-
-      // Lines (active)
-      safeSetPaint('gl-draw-line-active', 'line-color', color);
-
-      // Points / vertices shown while drawing
-      safeSetPaint('gl-draw-point-mid', 'circle-color', color);
-      safeSetPaint('gl-draw-point-vertex-active', 'circle-color', color);
-      safeSetPaint('gl-draw-point-active', 'circle-color', color);
-    };
-
     // Build the full style array for Mapbox Draw.
     // - ACTIVE layers use the literal `activeColor` so they change instantly when we call `applyActiveDrawColor`.
     // - INACTIVE layers use the per-feature property `['get','color']` with fallback to DEFAULT_COLOR.
@@ -705,6 +685,11 @@ export default function ProjectWork() {
         }
       });
       mapboxMap.on('draw.delete', async (e) => {
+        setMapFeatures((prevFeatures) => {
+          return prevFeatures.filter(
+            (f) => f.properties.id !== feature.properties.id,
+          );
+        });
         console.log('on delete');
         if (mapRef.current.__activePopup) {
           mapRef.current.__activePopup.remove();
@@ -838,7 +823,6 @@ export default function ProjectWork() {
       mapboxMap.on('draw.selectionchange', (e) => {
         if (e.features.length > 0) {
           const feature = e.features[0];
-          console.log(feature.geometry.type, '<=====randy');
           if (
             feature.geometry.type === 'LineString' &&
             feature.properties.mode !== 'draw_polygon'
@@ -903,23 +887,17 @@ export default function ProjectWork() {
     };
   }, [selectedWorkDay]);
 
-  // Update map layers when date changes
+  //get features
   useEffect(() => {
     if (!selectedDate || !mapRef.current || !isMapLoaded || !workDayData.length)
       return;
 
-    const setMapFeature = async () => {
+    const fetchFeatures = async () => {
       const workDay = workDayData.find((w) => w.name === selectedDate);
       if (!workDay) return;
+      drawRef.current.deleteAll();
 
-      // 🧹 Cleanup previous layers
-      cleanupLayers(workDay.id);
-
-      const draw = drawRef.current;
-      // Clear previous features
-      draw.deleteAll();
       try {
-        // Fetch features for the selected workday
         const { data } = await axiosInstance.get('/mapFeature', {
           params: { workDayId: workDay.id, limit: 100 },
           headers: { Authorization: token },
@@ -927,64 +905,162 @@ export default function ProjectWork() {
 
         const results = data?.data?.results || [];
 
-        // Build FeatureCollection
         const allFeaturesGeoJSON = {
           type: 'FeatureCollection',
-          features: results
-            .map(({ geometry, properties, createdBy, createdAt }) => {
-              if (!geometry) return null;
-              return {
-                type: 'Feature',
-                geometry,
-                properties: {
-                  ...properties,
-                  createdBy: createdBy,
-                  createdAt: createdAt,
-                  comment: properties?.comment || '',
-                  color: properties?.color || DEFAULT_COLOR,
-                  message: properties?.message || 'No message set',
-                },
-              };
-            })
-            .filter(Boolean),
+          features: results.map(
+            ({ geometry, properties, createdBy, createdAt }) => ({
+              type: 'Feature',
+              geometry,
+              properties: {
+                ...properties,
+                createdBy,
+                createdAt,
+                comment: properties?.comment || '',
+                color: properties?.color || selectedColor,
+                message: properties?.message || 'No message set',
+              },
+            }),
+          ),
         };
+        console.log(allFeaturesGeoJSON.features, '<======== yeeeter');
 
-        // Apply layer filters
-        const filteredFeatures = {
-          ...allFeaturesGeoJSON,
-          features: allFeaturesGeoJSON.features.filter((f) => {
-            if (f.geometry.type === 'Point' && layers.showComments) return true;
-            if (f.geometry.type === 'LineString' && layers.showLineString)
-              return true;
-            if (f.geometry.type === 'Polygon' && layers.showPolygons)
-              return true;
-            return false;
-          }),
-        };
-
-        // Add filtered features to map
-        if (filteredFeatures.features.length) {
-          draw.add(filteredFeatures);
-          draw.changeMode('simple_select');
-        }
-
-        // Handle orthomosaic layer
-        if (layers.orthomosaic && workDay.tileBaseUrl) {
-          setTileLoading(true);
-          addTileLayer(workDay);
-        }
-
-        // Fit map to bounds
-        if (workDay.tileBounds) {
-          fitToBounds(workDay.tileBounds);
-        }
+        setMapFeatures(allFeaturesGeoJSON.features); // ✅ Store only features
       } catch (error) {
         console.error('Error loading map features:', error);
       }
     };
 
-    setMapFeature();
-  }, [selectedDate, isMapLoaded, layers, workDayData]);
+    fetchFeatures();
+  }, [selectedDate, isMapLoaded, workDayData]); // ✅ Removed `layers`
+
+  // 🎯 Render features & layers whenever map state changes
+  useEffect(() => {
+    const workDay = workDayData.find((w) => w.name === selectedDate);
+    if (!mapRef.current || !isMapLoaded || !workDay) return;
+
+    const map = mapRef.current;
+
+    // 🔹 IDs for sources & layers (scoped to workDay)
+    const overlaySourceId = `overlay-${workDay.id}`;
+    const overlayLayers = {
+      fill: `overlay-fill-${workDay.id}`,
+      line: `overlay-line-${workDay.id}`,
+      point: `overlay-point-${workDay.id}`,
+    };
+
+    // 🧹 Cleanup old overlay layers & sources
+    Object.values(overlayLayers).forEach((id) => {
+      if (map.getLayer(id)) map.removeLayer(id);
+    });
+    if (map.getSource(overlaySourceId)) map.removeSource(overlaySourceId);
+
+    // 🧹 Always clear Draw when workDay changes or features update
+    if (drawRef.current) {
+      drawRef.current.deleteAll();
+    }
+
+    // 🔹 Separate overlay vs editable features
+    const overlayFeatures = mapFeatures.filter((f) => f.properties?.overlay);
+    const editableFeatures = mapFeatures.filter((f) => !f.properties?.overlay);
+
+    // =========================
+    // ✏️ Editable Features (Draw)
+    // =========================
+    if (drawRef.current && editableFeatures.length) {
+      const filtered = editableFeatures.filter((f) => {
+        const t = f.geometry?.type;
+        return (
+          (t === 'Polygon' && layers.showPolygons) ||
+          (t === 'LineString' && layers.showLineString) ||
+          (t === 'Point' && layers.showComments)
+        );
+      });
+
+      if (filtered.length && layers.annotations) {
+        drawRef.current.add({
+          type: 'FeatureCollection',
+          features: filtered,
+        });
+        drawRef.current.changeMode('simple_select');
+      }
+    }
+
+    // =========================
+    // 🗺️ Overlay Features
+    // =========================
+    if (layers.builtinOverlay && overlayFeatures.length) {
+      map.addSource(overlaySourceId, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: overlayFeatures },
+      });
+
+      if (layers.showPolygons) {
+        map.addLayer({
+          id: overlayLayers.fill,
+          type: 'fill',
+          source: overlaySourceId,
+          filter: ['==', ['geometry-type'], 'Polygon'],
+          paint: {
+            'fill-color': ['coalesce', ['get', 'color_hex'], '#2563EB'],
+            'fill-opacity': 0.3,
+          },
+        });
+      }
+
+      if (layers.showLineString) {
+        map.addLayer({
+          id: overlayLayers.line,
+          type: 'line',
+          source: overlaySourceId,
+          filter: ['==', ['geometry-type'], 'LineString'],
+          paint: {
+            'line-color': ['coalesce', ['get', 'color_hex'], '#2563EB'],
+            'line-width': 1,
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+        });
+      }
+
+      if (layers.showComments) {
+        map.addLayer({
+          id: overlayLayers.point,
+          type: 'circle',
+          source: overlaySourceId,
+          filter: ['==', ['geometry-type'], 'Point'],
+          paint: {
+            'circle-radius': 3,
+            'circle-color': ['coalesce', ['get', 'color_hex'], '#2563EB'],
+          },
+        });
+      }
+    }
+
+    // =========================
+    // 🖼️ Orthomosaic Layer
+    // =========================
+    if (layers.orthomosaic && workDay.tileBaseUrl) {
+      setTileLoading(true);
+      addTileLayer(workDay);
+    }
+
+    // =========================
+    // 🎯 Fit to Bounds
+    // =========================
+    if (workDay.tileBounds) {
+      fitToBounds(workDay.tileBounds);
+    } else if (overlayFeatures.length) {
+      const bounds = new mapboxgl.LngLatBounds();
+      overlayFeatures.forEach((f) => {
+        if (f.geometry.type === 'Point') bounds.extend(f.geometry.coordinates);
+        else if (f.geometry.type === 'LineString')
+          f.geometry.coordinates.forEach((c) => bounds.extend(c));
+        else if (f.geometry.type === 'Polygon')
+          f.geometry.coordinates.flat().forEach((c) => bounds.extend(c));
+      });
+      if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 40 });
+    }
+  }, [mapFeatures, layers, isMapLoaded, selectedDate, workDayData]);
 
   const cleanupLayers = (workDayId) => {
     const map = mapRef.current;
@@ -1031,8 +1107,8 @@ export default function ProjectWork() {
         type: 'raster',
         tiles: [`${workDay.tileBaseUrl}/{z}/{x}/{y}.png`],
         tileSize: 256,
-        minzoom: 18,
-        maxzoom: 24,
+        minzoom: 10,
+        maxzoom: 23,
       });
 
       const firstDrawLayerId = map
@@ -1246,28 +1322,23 @@ export default function ProjectWork() {
         <Box sx={{ width: '250px', pr: 2, height: '100%' }}>
           <Typography
             onClick={() => {
-              // console.log(commentFeatures, '<=== comment features');
-              // console.log(selectedWorkDay.id, '>====== selected workday ID');
-              // // console.log(selectedColor, '<=== olor ococococo');
-              // console.log(drawRef.current.getAll());
-              // console.log(
-              //   mapRef.current
-              //     .getStyle()
-              //     .layers.filter((l) => l.id.includes('draw')),
-              // );
-              console.log(user, '<============ user');
-              const coldFeatures = mapRef.current.querySourceFeatures(
-                'mapbox-gl-draw-cold',
-              );
-              const hotFeatures =
-                mapRef.current.querySourceFeatures('mapbox-gl-draw-hot');
+              const allRenderedFeatures =
+                mapRef.current.queryRenderedFeatures();
               console.log(
-                'Cold:',
-                coldFeatures.map((f) => f.properties),
+                'Total Rendered Features:',
+                allRenderedFeatures.length,
               );
+              const overlayRenderedFeatures =
+                mapRef.current.queryRenderedFeatures({
+                  layers: [
+                    `overlay-fill-68ad75d9366cff02d631be9f`,
+                    `overlay-line-68ad75d9366cff02d631be9f`,
+                    `overlay-point-68ad75d9366cff02d631be9f`,
+                  ],
+                });
               console.log(
-                'Hot:',
-                hotFeatures.map((f) => f.properties),
+                'Overlay Rendered Features:',
+                overlayRenderedFeatures.length,
               );
             }}
             variant="h3"
@@ -1319,6 +1390,17 @@ export default function ProjectWork() {
                 />
               }
               label="Comments"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={layers.builtinOverlay}
+                  onChange={handleLayerChange}
+                  name="builtinOverlay"
+                  disabled={loading}
+                />
+              }
+              label="Built-in Overlay"
             />
           </FormGroup>
 

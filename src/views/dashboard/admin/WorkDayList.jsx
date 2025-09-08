@@ -47,6 +47,7 @@ const sortOptions = [
 ];
 
 const WorkDayList = () => {
+  const dxfFileInputRef = useRef(null);
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const [workDays, setWorkDays] = useState([]);
@@ -312,27 +313,8 @@ const WorkDayList = () => {
       return;
     }
 
-    // // Check if KML file exists
-    // const hasKmlFile = workDay.kmlFile && workDay.kmlFile.trim() !== '';
-
-    // Check if ortho image exists
-    // const hasOrthoImage =
-    //   workDay.orthoImage && workDay.orthoImage.trim() !== '';
-
     // // Check if Tiff file exists
     const hasTiffFile = workDay.tiffFile && workDay.tiffFile.trim() !== '';
-
-    // if (!hasKmlFile || !hasOrthoImage) {
-    //   const missingFiles = [];
-    //   if (!hasKmlFile) missingFiles.push('KML file');
-    //   if (!hasOrthoImage) missingFiles.push('ortho image');
-
-    //   enqueueSnackbar(
-    //     `Please upload ${missingFiles.join(' and ')} first before generating tiles.`,
-    //     { variant: 'warning' },
-    //   );
-    //   return;
-    // }
 
     if (!hasTiffFile) {
       enqueueSnackbar(`Please upload .tiff first before generating tiles.`, {
@@ -388,6 +370,50 @@ const WorkDayList = () => {
 
   const handleCancelGenerateTiles = () => {
     setConfirmDialog({ open: false, workDayId: null });
+  };
+
+  const handleDxfFileInputClick = (workDay) => {
+    // reuse your existing uploadContext pattern
+    setUploadContext({ workDay, type: 'dxf' });
+    if (dxfFileInputRef.current) dxfFileInputRef.current.click();
+  };
+
+  const handleDxfFileChange = async () => {
+    const { workDay } = uploadContext;
+    const file = dxfFileInputRef.current?.files?.[0];
+    if (!file) {
+      enqueueSnackbar('Please select a .dxf file', { variant: 'warning' });
+      return;
+    }
+
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext !== 'dxf') {
+      enqueueSnackbar('Only .dxf files are allowed', { variant: 'error' });
+      return;
+    }
+    enqueueSnackbar('Uploading DXF file', { variant: 'info' });
+    const formData = new FormData();
+    formData.append('file', file); // 👈 name must match Multer field name
+    try {
+      await axiosInstance.post(
+        `/mapFeature/overlayUpload/${workDay._id || workDay.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: token,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+
+      enqueueSnackbar('DXF uploaded successfully!', { variant: 'success' });
+      if (dxfFileInputRef.current) dxfFileInputRef.current.value = '';
+    } catch (err) {
+      console.error('DXF upload failed', err);
+      enqueueSnackbar(err.response?.data?.message || err.message, {
+        variant: 'error',
+      });
+    }
   };
 
   return (
@@ -627,6 +653,27 @@ const WorkDayList = () => {
                                   </Box>
                                 )}
                               </Box>
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                startIcon={<UploadIcon />}
+                                onClick={() => handleDxfFileInputClick(workDay)}
+                                disabled={
+                                  uploading[`${workDay._id || workDay.id}_dxf`]
+                                }
+                                fullWidth
+                                sx={{
+                                  height: 36,
+                                  fontSize: '0.75rem',
+                                  fontWeight: 500,
+                                  textTransform: 'none',
+                                  borderWidth: 1.5,
+                                  '&:hover': { borderWidth: 2 },
+                                }}
+                              >
+                                Upload DXF
+                              </Button>
 
                               {/* Generate Tiles Button */}
                               <Button
@@ -680,6 +727,13 @@ const WorkDayList = () => {
         ref={fileInputRef}
         style={{ display: 'none' }}
         onChange={handleFileChange}
+      />
+      <input
+        type="file"
+        ref={dxfFileInputRef}
+        style={{ display: 'none' }}
+        accept=".dxf"
+        onChange={handleDxfFileChange}
       />
 
       {/* Confirmation Dialog for Generate Tiles */}
