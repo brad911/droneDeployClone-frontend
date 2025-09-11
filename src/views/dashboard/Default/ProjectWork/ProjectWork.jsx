@@ -1400,7 +1400,7 @@ export default function ProjectWork() {
                   disabled={loading}
                 />
               }
-              label="Built-in Overlay"
+              label="CAD Overlay"
             />
           </FormGroup>
 
