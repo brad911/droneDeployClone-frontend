@@ -6,94 +6,97 @@ import {
   MenuItem,
   FormControl,
   Select,
-  Card,
-  CardContent,
 } from '@mui/material';
 import { ReactCompareSlider } from 'react-compare-slider';
-import Carousel from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
 import mapboxgl from 'mapbox-gl';
-import Breadcrumbs from '../../../../ui-component/extended/Breadcrumbs';
+import axios from 'utils/axios.config';
 import MainCard from 'ui-component/cards/MainCard';
+import Breadcrumbs from '../../../../ui-component/extended/Breadcrumbs';
 import {
   IconBuildingCog,
   IconDroneOff,
   IconGitCompare,
-  IconLiveViewFilled,
 } from '@tabler/icons-react';
+import { useSelector } from 'react-redux';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiaGlyYWtyYWoiLCJhIjoiY21icXd5eHRnMDNtaTJxczcxd2RmbTZwOCJ9.P6kpsuLMDdeK2DIMJZMrmw';
 
-function getRandomDate(start, end) {
-  return new Date(
-    start.getTime() + Math.random() * (end.getTime() - start.getTime()),
-  );
-}
-
-const startDate = new Date(2024, 0, 1); // Jan 1, 2024
-const endDate = new Date(2025, 0, 1); // Jan 1, 2025
-
-const mockMapSnapshots = new Array(10).fill(null).map((_, i) => {
-  const randomDate = getRandomDate(startDate, endDate);
-  return {
-    id: i,
-    label: randomDate.toDateString(), // or .toLocaleDateString() if you prefer
-    center: [72.5714 + i * 0.1, 23.0225 + i * 0.1],
-    zoom: 10 + (i % 3),
-  };
-});
-
-const MapBoxInstance = ({ center, zoom, mapStyle }) => {
+const MapBoxInstance = ({ workDay }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !workDay?.tileBaseUrl) return;
 
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: mapStyle,
-      center,
-      zoom,
+      style: 'mapbox://styles/mapbox/satellite-v9', // base style
+      center: [
+        (workDay.tileBounds.west + workDay.tileBounds.east) / 2,
+        (workDay.tileBounds.south + workDay.tileBounds.north) / 2,
+      ],
+      zoom: workDay.tileZoomMin ?? 15,
+    });
+
+    map.on('load', () => {
+      map.addSource('ortho-source', {
+        type: 'raster',
+        tiles: [`${workDay.tileBaseUrl}/{z}/{x}/{y}.png`],
+        tileSize: 256,
+      });
+
+      map.addLayer({
+        id: 'ortho-layer',
+        type: 'raster',
+        source: 'ortho-source',
+        paint: {},
+      });
     });
 
     return () => map.remove();
-  }, [center, zoom, mapStyle]);
+  }, [workDay]);
 
   return <Box ref={containerRef} sx={{ width: '100%', height: '100%' }} />;
 };
 
 export default function CompareProject() {
-  const [firstMap, setFirstMap] = useState(mockMapSnapshots[0]);
-  const [secondMap, setSecondMap] = useState(mockMapSnapshots[1]);
-  const theme = useTheme();
+  const [workDays, setWorkDays] = useState([]);
+  const [firstWorkDay, setFirstWorkDay] = useState(null);
+  const [secondWorkDay, setSecondWorkDay] = useState(null);
+  const projectId = useSelector((state) => state.project.selectedProjectId);
 
-  const handleSelect = (type, id) => {
-    const snap = mockMapSnapshots.find((s) => s.id === id);
-    if (type === 'first') setFirstMap(snap);
-    else setSecondMap(snap);
-  };
+  useEffect(() => {
+    const fetchWorkDays = async () => {
+      try {
+        const res = await axios.get(
+          `/work-day?projectId=${projectId}&limit=1000`,
+        );
+        const filtered = res.data.data.results.filter((w) => w.tileBaseUrl); // only those with tiles
+        setWorkDays(filtered);
+        if (filtered.length >= 2) {
+          setFirstWorkDay(filtered[0]);
+          setSecondWorkDay(filtered[1]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch workdays', err);
+      }
+    };
+    fetchWorkDays();
+  }, [projectId]);
 
-  const responsive = {
-    superLargeDesktop: { breakpoint: { max: 4000, min: 1536 }, items: 5 },
-    desktop: { breakpoint: { max: 1536, min: 1024 }, items: 4 },
-    tablet: { breakpoint: { max: 1024, min: 640 }, items: 3 },
-    mobile: { breakpoint: { max: 640, min: 0 }, items: 2 },
-  };
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
-    { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
-    { title: 'Comapre View', icon: IconGitCompare }, // No `to` makes it the current page
+    {
+      title: 'Project Name',
+      to: `/project/${projectId}/View`,
+      icon: IconBuildingCog,
+    },
+    { title: 'Compare View', icon: IconGitCompare },
   ];
 
   return (
     <MainCard>
-      <Box
-        sx={{
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
+      <Box sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h1" gutterBottom>
           Compare View
         </Typography>
@@ -106,16 +109,20 @@ export default function CompareProject() {
           rightAlign={false}
         />
       </Box>
-      {/* Selection Inputs */}
+
+      {/* Dropdowns */}
       <Box display="flex" gap={2} mb={3}>
         <FormControl fullWidth>
           <Select
-            value={firstMap.id}
-            onChange={(e) => handleSelect('first', e.target.value)}
+            value={firstWorkDay?.id || ''}
+            onChange={(e) => {
+              const selected = workDays.find((w) => w.id === e.target.value);
+              setFirstWorkDay(selected);
+            }}
           >
-            {mockMapSnapshots.map((snap) => (
-              <MenuItem key={snap.id} value={snap.id}>
-                {snap.label}
+            {workDays.map((w) => (
+              <MenuItem key={w.id} value={w.id}>
+                {w.name}
               </MenuItem>
             ))}
           </Select>
@@ -123,44 +130,39 @@ export default function CompareProject() {
 
         <FormControl fullWidth>
           <Select
-            value={secondMap.id}
-            onChange={(e) => handleSelect('second', e.target.value)}
+            value={secondWorkDay?.id || ''}
+            onChange={(e) => {
+              const selected = workDays.find((w) => w.id === e.target.value);
+              setSecondWorkDay(selected);
+            }}
           >
-            {mockMapSnapshots.map((snap) => (
-              <MenuItem key={snap.id} value={snap.id}>
-                {snap.label}
+            {workDays.map((w) => (
+              <MenuItem key={w.id} value={w.id}>
+                {w.name}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
       </Box>
 
-      {/* Map Compare Slider */}
-      <Box mb={5} borderRadius={2} overflow="hidden" sx={{ height: 400 }}>
-        <ReactCompareSlider
-          itemOne={
-            <Box sx={{ width: '100%', height: '100%' }}>
-              <MapBoxInstance
-                center={firstMap.center}
-                zoom={firstMap.zoom}
-                mapStyle="mapbox://styles/mapbox/streets-v11"
-              />
-            </Box>
-          }
-          itemTwo={
-            <Box sx={{ width: '100%', height: '100%' }}>
-              <MapBoxInstance
-                center={secondMap.center}
-                zoom={secondMap.zoom}
-                mapStyle="mapbox://styles/mapbox/satellite-v9"
-              />
-            </Box>
-          }
-          style={{ height: '100%' }}
-        />
+      {/* Compare Slider */}
+      <Box mb={5} borderRadius={2} overflow="hidden" sx={{ height: 500 }}>
+        {firstWorkDay && secondWorkDay && (
+          <ReactCompareSlider
+            itemOne={
+              <Box sx={{ width: '100%', height: '100%' }}>
+                <MapBoxInstance workDay={firstWorkDay} />
+              </Box>
+            }
+            itemTwo={
+              <Box sx={{ width: '100%', height: '100%' }}>
+                <MapBoxInstance workDay={secondWorkDay} />
+              </Box>
+            }
+            style={{ height: '100%' }}
+          />
+        )}
       </Box>
-
-      {/* Snapshot Carousel */}
     </MainCard>
   );
 }

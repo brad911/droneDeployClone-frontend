@@ -89,7 +89,6 @@ const popUpContent = ({ label, createdBy, createdAt }) => {
 const readInfoFromFeature = (properties, label) => {
   let user;
   let date;
-  console.log(properties, '<===== props');
   if (properties.createdBy) {
     user = properties.createdBy;
   } else {
@@ -100,8 +99,6 @@ const readInfoFromFeature = (properties, label) => {
   } else {
     date = properties.user_createdAt;
   }
-  console.log(user, '<=======user');
-  console.log(date, '<=======daet');
   return {
     createdBy: `${user.firstName} ${user.lastName}`,
     createdAt: new Date(date),

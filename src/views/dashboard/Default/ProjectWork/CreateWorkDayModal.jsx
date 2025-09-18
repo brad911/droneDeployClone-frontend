@@ -68,25 +68,23 @@ const CreateWorkDayModal = ({ open = false, onClose, onSave }) => {
       const res = await axiosInstance.post(
         '/work-day/get-url',
         {
-          projectId: projectId,
+          projectId,
           name: form.date,
           filename: form.file.name,
           contentType: form.file.type,
           size: form.file.size,
         },
-        {
-          headers: {
-            Authorization: userToken,
-          },
-        },
+        { headers: { Authorization: userToken } },
       );
+
       const uploadResponse = res.data.data;
-      console.log(uploadResponse);
+      if (!uploadResponse)
+        throw new Error('Invalid upload response from server');
+
       if (uploadResponse.uploadType === 'single') {
+        if (!uploadResponse.url) throw new Error('Missing upload URL');
         await axiosInstance.put(uploadResponse.url, form.file, {
-          headers: {
-            'Content-Type': form.file.type,
-          },
+          headers: { 'Content-Type': form.file.type },
           onUploadProgress: (event) => {
             const percent = Math.round((event.loaded * 100) / event.total);
             setProgress(percent);
@@ -96,48 +94,46 @@ const CreateWorkDayModal = ({ open = false, onClose, onSave }) => {
         const { parts, uploadId, key, partSize } = uploadResponse;
         const chunks = [];
         let start = 0;
+
         while (start < form.file.size) {
           const end = Math.min(start + partSize, form.file.size);
-          chunks.push(file.slice(start, end));
+          chunks.push(form.file.slice(start, end));
           start = end;
         }
+
         const etags = [];
         for (let i = 0; i < parts.length; i++) {
-          const res = await fetch(parts[i].url, {
-            method: 'PUT',
-            body: chunks[i],
-          });
-          const etag = res.headers.get('ETag')?.replace(/"/g, '');
-          etags.push({ PartNumber: parts[i].partNumber, ETag: etag });
-          const percent = Math.round(((i + 1) / parts.length) * 100);
-          setProgress(percent);
+          try {
+            const res = await fetch(parts[i].url, {
+              method: 'PUT',
+              body: chunks[i],
+            });
+            if (!res.ok) throw new Error(`Chunk ${i + 1} upload failed`);
+            const etag = res.headers.get('ETag')?.replace(/"/g, '');
+            etags.push({ PartNumber: parts[i].partNumber, ETag: etag });
+            setProgress(Math.round(((i + 1) / parts.length) * 100));
+          } catch (err) {
+            console.error('❌ Chunk upload failed:', err);
+            throw new Error('Multipart upload failed');
+          }
         }
+
         await axiosInstance.post(
           '/work-day/complete-upload',
-          {
-            projectId: projectId,
-            name: form.date,
-            key,
-            uploadId,
-            parts: etags,
-          },
-          {
-            headers: {
-              Authorization: userToken,
-            },
-          },
+          { projectId, name: form.date, key, uploadId, parts: etags },
+          { headers: { Authorization: userToken } },
         );
       }
+
       enqueueSnackbar('Upload successful!', { variant: 'success' });
-      if (uploadResponse.uploadType === 'single') {
-        enqueueSnackbar('SuccessFully Created Historical Data', {
-          variant: 'success',
-        });
-      }
+      enqueueSnackbar('Successfully Created Historical Data', {
+        variant: 'success',
+      });
+
       if (onSave) onSave();
       onClose();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       enqueueSnackbar(
         error?.response?.data?.message || error.message || 'Upload failed.',
         { variant: 'error' },

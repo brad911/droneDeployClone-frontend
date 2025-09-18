@@ -32,6 +32,7 @@ import axiosInstance from 'utils/axios.config';
 import { useSelector } from 'react-redux';
 import { useSnackbar } from 'notistack';
 import { IconPhotoEdit } from '@tabler/icons-react';
+import GenerateTilesConfirmationBox from './GenerateTilesConfirmationDialogBox';
 
 const statusOptions = [
   { value: 'processing', label: 'Processing' },
@@ -329,7 +330,7 @@ const WorkDayList = () => {
     });
   };
 
-  const handleConfirmGenerateTiles = async () => {
+  const handleConfirmGenerateTiles = async (maxzoom) => {
     const { workDayId } = confirmDialog;
     setGenerateTilesLoading(true);
 
@@ -338,6 +339,7 @@ const WorkDayList = () => {
         `/work-day/generate-tiles/${workDayId}`,
         {
           headers: { Authorization: token },
+          params: { maxzoom },
         },
       );
 
@@ -737,7 +739,7 @@ const WorkDayList = () => {
       />
 
       {/* Confirmation Dialog for Generate Tiles */}
-      <Dialog
+      {/* <Dialog
         open={confirmDialog.open}
         onClose={generateTilesLoading ? undefined : handleCancelGenerateTiles}
         aria-labelledby="generate-tiles-dialog-title"
@@ -899,7 +901,13 @@ const WorkDayList = () => {
             {generateTilesLoading ? 'Processing...' : 'Proceed'}
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
+      <GenerateTilesConfirmationBox
+        confirmDialog={confirmDialog}
+        generateTilesLoading={generateTilesLoading}
+        handleCancelGenerateTiles={handleCancelGenerateTiles}
+        handleConfirmGenerateTiles={handleConfirmGenerateTiles}
+      />
     </MainCard>
   );
 };
