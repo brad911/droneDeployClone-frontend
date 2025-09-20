@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  Box,
-  Typography,
-  useTheme,
-  MenuItem,
-  FormControl,
-  Select,
-} from '@mui/material';
+import { Box, Typography, MenuItem, FormControl, Select } from '@mui/material';
 import { ReactCompareSlider } from 'react-compare-slider';
 import mapboxgl from 'mapbox-gl';
+import syncMove from 'mapbox-gl-sync-move'; // ✅ Import the sync plugin
 import axios from 'utils/axios.config';
 import MainCard from 'ui-component/cards/MainCard';
 import Breadcrumbs from '../../../../ui-component/extended/Breadcrumbs';
@@ -22,7 +16,8 @@ import { useSelector } from 'react-redux';
 mapboxgl.accessToken =
   'pk.eyJ1IjoiaGlyYWtyYWoiLCJhIjoiY21icXd5eHRnMDNtaTJxczcxd2RmbTZwOCJ9.P6kpsuLMDdeK2DIMJZMrmw';
 
-const MapBoxInstance = ({ workDay }) => {
+// 🔹 Map component that exposes map instance to parent
+const MapBoxInstance = ({ workDay, onMapReady }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -30,7 +25,7 @@ const MapBoxInstance = ({ workDay }) => {
 
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: 'mapbox://styles/mapbox/satellite-v9', // base style
+      style: 'mapbox://styles/mapbox/satellite-v9',
       center: [
         (workDay.tileBounds.west + workDay.tileBounds.east) / 2,
         (workDay.tileBounds.south + workDay.tileBounds.north) / 2,
@@ -39,6 +34,7 @@ const MapBoxInstance = ({ workDay }) => {
     });
 
     map.on('load', () => {
+      // Add raster source/layer for orthomosaic tiles
       map.addSource('ortho-source', {
         type: 'raster',
         tiles: [`${workDay.tileBaseUrl}/{z}/{x}/{y}.png`],
@@ -49,12 +45,20 @@ const MapBoxInstance = ({ workDay }) => {
         id: 'ortho-layer',
         type: 'raster',
         source: 'ortho-source',
-        paint: {},
       });
+
+      // ✅ Ensure zoom/drag interactions are enabled
+      map.scrollZoom.enable();
+      map.dragPan.enable();
+      map.dragRotate.enable();
+      map.keyboard.enable();
+
+      // ✅ Notify parent that this map is ready
+      if (onMapReady) onMapReady(map);
     });
 
     return () => map.remove();
-  }, [workDay]);
+  }, [workDay, onMapReady]);
 
   return <Box ref={containerRef} sx={{ width: '100%', height: '100%' }} />;
 };
@@ -63,6 +67,11 @@ export default function CompareProject() {
   const [workDays, setWorkDays] = useState([]);
   const [firstWorkDay, setFirstWorkDay] = useState(null);
   const [secondWorkDay, setSecondWorkDay] = useState(null);
+
+  // ✅ Use state instead of refs so useEffect runs when both maps are ready
+  const [mapA, setMapA] = useState(null);
+  const [mapB, setMapB] = useState(null);
+
   const projectId = useSelector((state) => state.project.selectedProjectId);
 
   useEffect(() => {
@@ -71,7 +80,7 @@ export default function CompareProject() {
         const res = await axios.get(
           `/work-day?projectId=${projectId}&limit=1000`,
         );
-        const filtered = res.data.data.results.filter((w) => w.tileBaseUrl); // only those with tiles
+        const filtered = res.data.data.results.filter((w) => w.tileBaseUrl);
         setWorkDays(filtered);
         if (filtered.length >= 2) {
           setFirstWorkDay(filtered[0]);
@@ -83,6 +92,14 @@ export default function CompareProject() {
     };
     fetchWorkDays();
   }, [projectId]);
+
+  // ✅ Sync maps when both are ready
+  useEffect(() => {
+    if (mapA && mapB) {
+      const unsync = syncMove(mapA, mapB);
+      return () => unsync && unsync();
+    }
+  }, [mapA, mapB]);
 
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
@@ -96,18 +113,16 @@ export default function CompareProject() {
 
   return (
     <MainCard>
+      {/* Header */}
       <Box sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h1" gutterBottom>
           Compare View
         </Typography>
       </Box>
-      <Box justifyContent={'left'}>
-        <Breadcrumbs
-          links={pageLinks}
-          card={true}
-          custom={true}
-          rightAlign={false}
-        />
+
+      {/* Breadcrumbs */}
+      <Box justifyContent="left">
+        <Breadcrumbs links={pageLinks} card custom rightAlign={false} />
       </Box>
 
       {/* Dropdowns */}
@@ -115,10 +130,9 @@ export default function CompareProject() {
         <FormControl fullWidth>
           <Select
             value={firstWorkDay?.id || ''}
-            onChange={(e) => {
-              const selected = workDays.find((w) => w.id === e.target.value);
-              setFirstWorkDay(selected);
-            }}
+            onChange={(e) =>
+              setFirstWorkDay(workDays.find((w) => w.id === e.target.value))
+            }
           >
             {workDays.map((w) => (
               <MenuItem key={w.id} value={w.id}>
@@ -131,10 +145,9 @@ export default function CompareProject() {
         <FormControl fullWidth>
           <Select
             value={secondWorkDay?.id || ''}
-            onChange={(e) => {
-              const selected = workDays.find((w) => w.id === e.target.value);
-              setSecondWorkDay(selected);
-            }}
+            onChange={(e) =>
+              setSecondWorkDay(workDays.find((w) => w.id === e.target.value))
+            }
           >
             {workDays.map((w) => (
               <MenuItem key={w.id} value={w.id}>
@@ -145,19 +158,16 @@ export default function CompareProject() {
         </FormControl>
       </Box>
 
-      {/* Compare Slider */}
+      {/* Compare Slider with Two Maps */}
       <Box mb={5} borderRadius={2} overflow="hidden" sx={{ height: 500 }}>
         {firstWorkDay && secondWorkDay && (
           <ReactCompareSlider
+            onlyHandleDraggable // ✅ Prevents slider from jumping on map click
             itemOne={
-              <Box sx={{ width: '100%', height: '100%' }}>
-                <MapBoxInstance workDay={firstWorkDay} />
-              </Box>
+              <MapBoxInstance workDay={firstWorkDay} onMapReady={setMapA} />
             }
             itemTwo={
-              <Box sx={{ width: '100%', height: '100%' }}>
-                <MapBoxInstance workDay={secondWorkDay} />
-              </Box>
+              <MapBoxInstance workDay={secondWorkDay} onMapReady={setMapB} />
             }
             style={{ height: '100%' }}
           />

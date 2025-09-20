@@ -46,3 +46,7 @@
 .mapboxgl-popup-content {
   pointer-events: auto;
 }
+
+.mapboxgl-map {
+  pointer-events: auto !important;
+}
