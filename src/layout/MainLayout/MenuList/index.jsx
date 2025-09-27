@@ -8,7 +8,6 @@ import { useLocation } from 'react-router-dom';
 // project imports
 import NavItem from './NavItem';
 import NavGroup from './NavGroup';
-import menuItems from 'menu-items';
 import getPlatformMenu from 'menu-items/platformList';
 import AdminDashboard from 'menu-items/superAdminList';
 import managementList from 'menu-items/managementList';
@@ -27,11 +26,17 @@ function MenuList() {
   const selectedProjectId = useSelector(
     (state) => state.project.selectedProjectId,
   );
+  const selectedProject = useSelector((state) => state.project);
+  const projectName = selectedProject?.name;
+  console.log(selectedProject, '<========= bhen ka luun');
   const userType = useSelector((state) => state.auth.user.type);
+  const user = useSelector((state) => state.auth.user);
   // Always build items in the order: AdminDashboard, platform (conditionally), managementList
   let items = [AdminDashboard(userType)];
   if (/^\/project\/*\//.test(location.pathname)) {
-    items.push(getPlatformMenu(selectedProjectId));
+    items.push(
+      getPlatformMenu(selectedProjectId, projectName, user.permissions || ''),
+    );
   }
   items.push(managementList);
 

@@ -12,20 +12,6 @@ export default function useMenuItems() {
     return [];
   }
 
-  //   const isAnas = user === 'anas';
-  //   const isUser = user === 'user';
-
-  //   const items = [];
-
-  //   if (isAnas) {
-  //     items.push(anasList);
-  //   }
-
-  //   if (isUser) {
-  //     items.push(userList);
-  //   }
-
-  // Conditionally add projectList if on specific path
   if (/^\/project\/\d+$/.test(location.pathname)) {
     items.push(projectList);
   }

@@ -13,7 +13,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from 'react-router';
 import { formatDistanceToNow } from 'date-fns';
 import { useDispatch } from 'react-redux';
-import { setSelectedProjectId } from '../../../../store/slices/projectSlice';
+import { setSelectedProject } from '../../../../store/slices/projectSlice';
 import image from '../../../../assets/images/conture-map.jpg';
 const ProjectTile = ({ project, count }) => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const ProjectTile = ({ project, count }) => {
 
   const handleView = () => {
     const id = project._id || project.id;
-    dispatch(setSelectedProjectId(id));
+    dispatch(setSelectedProject({ id, name: project.name }));
     navigate(`/project/${id}/View`);
   };
 

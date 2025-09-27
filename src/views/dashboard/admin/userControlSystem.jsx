@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -16,12 +15,17 @@ import {
   Select,
   InputLabel,
   FormControl,
+  Tooltip,
+  IconButton,
 } from '@mui/material';
 import Pagination from '@mui/material/Pagination';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import axiosInstance from 'utils/axios.config';
 import { useSnackbar } from 'notistack';
 import { useSelector } from 'react-redux';
 import MainCard from 'ui-component/cards/MainCard';
+import PermissionModal from './PermissionModal'; // NEW COMPONENT
+
 const UserControlSystem = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,10 +38,11 @@ const UserControlSystem = () => {
   const [pendingSearch, setPendingSearch] = useState({ email: '', name: '' });
   const [sortBy, setSortBy] = useState('createdAt:desc');
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [openPermissionModal, setOpenPermissionModal] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const token = useSelector((state) => state.auth.token);
 
-  // Only search when button is clicked
   const handleSearch = () => {
     setPendingSearch({ email: searchEmail, name: searchName });
     setPage(1);
@@ -45,7 +50,6 @@ const UserControlSystem = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      console.log(token, '<===== ow wow owo wowo');
       setLoading(true);
       try {
         const params = {
@@ -75,9 +79,7 @@ const UserControlSystem = () => {
       await axiosInstance.patch(
         `/user/${id}`,
         { status: newStatus },
-        {
-          headers: { Authorization: token },
-        },
+        { headers: { Authorization: token } },
       );
       setRefreshFlag((flag) => !flag);
       enqueueSnackbar(
@@ -99,6 +101,8 @@ const UserControlSystem = () => {
       <Typography variant="h2" mb={2}>
         User Control Panel
       </Typography>
+
+      {/* Search & Filters */}
       <Box mb={2} display="flex" alignItems="center" gap={2}>
         <TextField
           label="Search by Email"
@@ -128,6 +132,8 @@ const UserControlSystem = () => {
           Search
         </Button>
       </Box>
+
+      {/* Table */}
       {loading ? (
         <Typography>Loading users...</Typography>
       ) : error ? (
@@ -142,38 +148,88 @@ const UserControlSystem = () => {
                   <TableCell>Email</TableCell>
                   <TableCell>Designation</TableCell>
                   <TableCell>Organization</TableCell>
-                  <TableCell>Gender</TableCell>
+                  {/* <TableCell>Gender</TableCell> */}
                   <TableCell>Role</TableCell>
                   <TableCell>Type</TableCell>
                   <TableCell>Status</TableCell>
-                  <TableCell>Action</TableCell>
+                  <TableCell align="center">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users
-                  // .filter((user) => user.role !== 'admin')
-                  .map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        {user?.firstName} {user?.lastName}
-                      </TableCell>
-                      <TableCell>{user?.email}</TableCell>
-                      <TableCell>{user?.designation}</TableCell>
-                      <TableCell>{user?.organization}</TableCell>
-                      <TableCell>{user?.gender}</TableCell>
-                      <TableCell>{user?.role}</TableCell>
-                      <TableCell>{user?.type}</TableCell>
-
-                      <TableCell>
-                        <Chip
-                          label={user.status}
-                          color={
-                            user.status === 'enabled' ? 'success' : 'warning'
+                {users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      {user.firstName} {user.lastName}
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.designation}</TableCell>
+                    <TableCell>{user.organization}</TableCell>
+                    {/* <TableCell>{user.gender}</TableCell> */}
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell>{user.type}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={user.status}
+                        color={
+                          user.status === 'enabled' ? 'success' : 'warning'
+                        }
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell align="center" justifyContent={'center'}>
+                      <Box gap={1} display="flex" justifyContent="center">
+                        <Tooltip
+                          title={
+                            <Box>
+                              {Object.entries(user.permissions || {}).map(
+                                ([key, value]) => (
+                                  <Typography
+                                    key={key}
+                                    variant="caption"
+                                    display="block"
+                                  >
+                                    {key}: {value ? '✅' : '❌'}
+                                  </Typography>
+                                ),
+                              )}
+                            </Box>
                           }
+                          arrow
+                          componentsProps={{
+                            tooltip: {
+                              sx: {
+                                bgcolor: 'white',
+                                color: 'black',
+                                boxShadow: 1,
+                                borderRadius: 1,
+                                fontSize: '0.75rem',
+                              },
+                            },
+                            arrow: {
+                              sx: {
+                                color: 'white',
+                              },
+                            },
+                          }}
+                        >
+                          <IconButton size="small" color="primary">
+                            <InfoOutlinedIcon />
+                          </IconButton>
+                        </Tooltip>
+
+                        {/* Change Permissions */}
+                        <Button
                           size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
+                          variant="outlined"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setOpenPermissionModal(true);
+                          }}
+                        >
+                          Change
+                        </Button>
+
+                        {/* Enable/Disable */}
                         <Button
                           variant="contained"
                           color={
@@ -191,19 +247,14 @@ const UserControlSystem = () => {
                         >
                           {user.status === 'enabled' ? 'Disable' : 'Enable'}
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                {users.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={8} align="center">
-                      No users found.
+                      </Box>
                     </TableCell>
                   </TableRow>
-                )}
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
+
           <Pagination
             count={Math.ceil(total / limit)}
             page={page}
@@ -212,6 +263,16 @@ const UserControlSystem = () => {
             sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}
           />
         </>
+      )}
+
+      {/* Modal */}
+      {selectedUser && (
+        <PermissionModal
+          open={openPermissionModal}
+          onClose={() => setOpenPermissionModal(false)}
+          user={selectedUser}
+          onSave={() => setRefreshFlag((flag) => !flag)}
+        />
       )}
     </MainCard>
   );

@@ -1,8 +1,6 @@
 // assets
 import { IconSettingsFilled } from '@tabler/icons-react';
 
-
-
 // ==============================|| EXTRA PAGES MENU ITEMS ||============================== //
 
 const management = {
