@@ -35,7 +35,7 @@ const TeamSetup = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const projectId = useSelector((state) => state.project.selectedProjectId);
+  const projectId = useSelector((state) => state.project.id);
   const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
@@ -128,7 +128,7 @@ const TeamSetup = () => {
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
     { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
-    { title: 'Project Files', icon: IconUsers }, // No `to` makes it the current page
+    { title: 'Project Team', icon: IconUsers }, // No `to` makes it the current page
   ];
 
   return (
