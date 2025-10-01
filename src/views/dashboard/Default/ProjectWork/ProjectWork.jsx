@@ -140,7 +140,7 @@ export default function ProjectWork() {
   });
   const [mapFeatures, setMapFeatures] = useState([]);
 
-  const projectId = useSelector((state) => state.project.selectedProjectId);
+  const projectId = useSelector((state) => state.project.id);
   const token = useSelector((state) => state.auth.token);
 
   // Fetch work days data
