@@ -24,7 +24,7 @@ const CreateWorkDayModal = ({ open = false, onClose, onSave }) => {
   });
   const { enqueueSnackbar } = useSnackbar();
   const userToken = useSelector((state) => state.auth.token);
-  const projectId = useSelector((state) => state.project.selectedProjectId);
+  const projectId = useSelector((state) => state.project.id);
 
   useEffect(() => {
     if (!open) {

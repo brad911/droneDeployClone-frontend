@@ -72,7 +72,7 @@ export default function CompareProject() {
   const [mapA, setMapA] = useState(null);
   const [mapB, setMapB] = useState(null);
 
-  const projectId = useSelector((state) => state.project.selectedProjectId);
+  const projectId = useSelector((state) => state.project.id);
 
   useEffect(() => {
     const fetchWorkDays = async () => {

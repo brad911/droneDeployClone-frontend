@@ -23,9 +23,7 @@ function MenuList() {
   const [selectedID, setSelectedID] = useState('');
   const lastItem = null;
   const location = useLocation();
-  const selectedProjectId = useSelector(
-    (state) => state.project.selectedProjectId,
-  );
+  const selectedProjectId = useSelector((state) => state.project.id);
   const selectedProject = useSelector((state) => state.project);
   const projectName = selectedProject?.name;
   console.log(selectedProject, '<========= bhen ka luun');
