@@ -11,6 +11,7 @@ import {
 import { useDropzone } from 'react-dropzone';
 import { IconCloudUpload } from '@tabler/icons-react';
 import axiosInstance from '../../../../utils/axios.config';
+import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useSnackbar } from 'notistack';
 
@@ -78,18 +79,24 @@ const CreateWorkDayModal = ({ open = false, onClose, onSave }) => {
       );
 
       const uploadResponse = res.data.data;
+      console.log(uploadResponse, '<<<<< upload response');
       if (!uploadResponse)
         throw new Error('Invalid upload response from server');
 
       if (uploadResponse.uploadType === 'single') {
         if (!uploadResponse.url) throw new Error('Missing upload URL');
-        await axiosInstance.put(uploadResponse.url, form.file, {
-          headers: { 'Content-Type': form.file.type },
-          onUploadProgress: (event) => {
-            const percent = Math.round((event.loaded * 100) / event.total);
-            setProgress(percent);
-          },
-        });
+        try {
+          await axios.put(uploadResponse.url, form.file, {
+            headers: { 'Content-Type': form.file.type },
+            onUploadProgress: (event) => {
+              const percent = Math.round((event.loaded * 100) / event.total);
+              setProgress(percent);
+            },
+          });
+        } catch (err) {
+          console.error('❌ Single upload failed:', err);
+          throw new Error('Single upload failed');
+        }
       } else if (uploadResponse.uploadType === 'multipart') {
         const { parts, uploadId, key, partSize } = uploadResponse;
         const chunks = [];

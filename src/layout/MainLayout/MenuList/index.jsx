@@ -26,7 +26,6 @@ function MenuList() {
   const selectedProjectId = useSelector((state) => state.project.id);
   const selectedProject = useSelector((state) => state.project);
   const projectName = selectedProject?.name;
-  console.log(selectedProject, '<========= bhen ka luun');
   const userType = useSelector((state) => state.auth.user.type);
   const user = useSelector((state) => state.auth.user);
   // Always build items in the order: AdminDashboard, platform (conditionally), managementList
