@@ -10,7 +10,7 @@ const isAuthenticated = () => {
 
 const ProtectedRoute = ({ element: Component, isBoth = false, ...rest }) => {
   const access = isAuthenticated();
-  return access || isBoth ? <Component {...rest} /> : <Navigate to="/" />;
+  return access || isBoth ? <Component {...rest} /> : <Navigate to="/login" />;
 };
 
 export default ProtectedRoute;

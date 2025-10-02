@@ -69,13 +69,13 @@ export default function AppBar({ ...others }) {
       <MuiAppBar>
         <Container>
           <Toolbar sx={{ py: 2.5, px: `0 !important` }}>
-            <Typography
+            {/* <Typography
               component={RouterLink}
               to="/"
               sx={{ flexGrow: 1, textAlign: 'left' }}
-            >
-              <Logo />
-            </Typography>
+            > */}
+            <Logo />
+            {/* </Typography> */}
             <Stack
               direction="row"
               sx={{ display: { xs: 'none', sm: 'block' } }}

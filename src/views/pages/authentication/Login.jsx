@@ -50,13 +50,13 @@ export default function Login() {
                   sx={{ alignItems: 'center', justifyContent: 'center' }}
                 >
                   <Grid sx={{ mb: 3, textDecoration: 'none' }}>
-                    <Link
+                    {/* <Link
                       style={{ textDecoration: 'none' }}
                       to="/"
                       aria-label="logo"
-                    >
-                      <Logo />
-                    </Link>
+                    > */}
+                    <Logo />
+                    {/* </Link> */}
                   </Grid>
                   <Grid size={12}>
                     <Grid
