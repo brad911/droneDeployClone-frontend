@@ -1,4 +1,4 @@
-import{aR as di,aK as mi,r as s,P as d,a2 as ui}from"./index-gpMRNU1w.js";/**
+import{aR as di,aK as mi,r as s,P as d,a2 as ui}from"./index-q9geJBwq.js";/**
  * @license @tabler/icons-react v3.31.0 - MIT
  *
  * This source code is licensed under the MIT license.

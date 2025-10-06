@@ -75,8 +75,8 @@ export default function AuthLogin() {
     initialValues: {
       email: '',
       password: '',
-      email: 'bilalthetester@gmail.com',
-      password: 'Abc123!@#!@#!@#',
+      // email: 'bilalthetester@gmail.com',
+      // password: 'Abc123!@#!@#!@#',
       keepLoggedIn: true,
     },
     validationSchema: Yup.object({
