@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router';
 import { useDropzone } from 'react-dropzone';
 import { IconCloudUpload } from '@tabler/icons-react';
 import axiosInstance from '../../../../utils/axios.config';
+import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { enqueueSnackbar } from 'notistack';
 
@@ -117,8 +118,6 @@ const CreateProjectForm = ({ onSubmit }) => {
       size: file.size,
     };
 
-    let newProjectId = null;
-
     try {
       // Create project and get upload info
       const response = await axiosInstance.post('/project', values, {
@@ -128,10 +127,11 @@ const CreateProjectForm = ({ onSubmit }) => {
       });
 
       const uploadResponse = response.data.data;
-      newProjectId = uploadResponse?.project?.id || response.data?.data?._id;
+      let newProjectId =
+        uploadResponse?.project?.id || response.data?.data?._id;
       // Single file upload (PUT to presigned S3 URL)
       if (uploadResponse.upload?.uploadType === 'single') {
-        await axiosInstance.put(uploadResponse.upload.url, file, {
+        await axios.put(uploadResponse.upload.url, file, {
           headers: {
             'Content-Type': file.type,
           },
@@ -206,7 +206,7 @@ const CreateProjectForm = ({ onSubmit }) => {
       );
     } finally {
       setLoading(false);
-      navigate(newProjectId ? `/project/${newProjectId}/View` : '/project');
+      navigate('/project');
     }
   };
 

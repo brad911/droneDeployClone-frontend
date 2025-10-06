@@ -7,6 +7,7 @@ import {
   IconView360Number,
   IconFiles,
   IconUsers,
+  IconIconsFilled,
 } from '@tabler/icons-react';
 
 const getPlatformMenu = (projectId, projectName, permissions = {}) => {
@@ -30,6 +31,16 @@ const getPlatformMenu = (projectId, projectName, permissions = {}) => {
       type: 'item',
       url: `/project/${projectId}/compare`,
       icon: IconGitCompare,
+      breadcrumbs: false,
+    });
+  }
+  if (permissions.activityManagement) {
+    children.push({
+      id: 'activityManagement',
+      title: 'Activity',
+      type: 'item',
+      url: `/project/${projectId}/activity`,
+      icon: IconIconsFilled,
       breadcrumbs: false,
     });
   }

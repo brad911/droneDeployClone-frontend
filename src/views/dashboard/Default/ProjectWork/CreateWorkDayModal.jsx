@@ -79,7 +79,7 @@ const CreateWorkDayModal = ({ open = false, onClose, onSave }) => {
       );
 
       const uploadResponse = res.data.data;
-      console.log(uploadResponse, '<<<<< upload response');
+      console.log(uploadResponse, '<===== upload response');
       if (!uploadResponse)
         throw new Error('Invalid upload response from server');
 

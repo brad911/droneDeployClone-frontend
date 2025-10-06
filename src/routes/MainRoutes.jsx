@@ -4,13 +4,11 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import ProtectedRoute from '../utils/protectedRoute';
+import Activity from '../views/activity/Activity';
 
 // ==============================|| LAZY IMPORTS ||============================== //
 const DashboardDefault = Loadable(
   lazy(() => import('views/dashboard/Default')),
-);
-const FilesHandler = Loadable(
-  lazy(() => import('views/dashboard/Default/Files/FilesHandler')),
 );
 const Projects = Loadable(
   lazy(() => import('views/dashboard/Default/Projects/Projects')),
@@ -18,9 +16,7 @@ const Projects = Loadable(
 const CreateProjectPage = Loadable(
   lazy(() => import('views/dashboard/Default/Projects/CreateProjectPage')),
 );
-const ProjectView = Loadable(
-  lazy(() => import('views/dashboard/Default/Projects/ProjectView')),
-);
+
 const Project = Loadable(
   lazy(() => import('views/dashboard/Default/Projects/Project')),
 );
@@ -84,6 +80,7 @@ const MainRoutes = {
     { path: '/user-control-panel', element: <UserControlSystem /> },
     { path: '/work-days', element: <ProtectedRoute element={WorkDayList} /> },
     { path: '/project/:projectID/:projectWorkDayID', element: <ProjectWork /> },
+    { path: '/project/:projectID/activity', element: <Activity /> },
   ],
 };
 
