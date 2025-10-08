@@ -222,6 +222,12 @@ const Activity = () => {
                         <strong>Cost</strong>
                       </TableCell>
                       <TableCell>
+                        <strong>Started At</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Ended At</strong>
+                      </TableCell>
+                      <TableCell>
                         <strong>Assigned To</strong>
                       </TableCell>
 
@@ -253,6 +259,27 @@ const Activity = () => {
                           <TableCell>{activity.quantity}</TableCell>
                           <TableCell>{activity.unit}</TableCell>
                           <TableCell>{activity.cost}</TableCell>
+                          <TableCell>
+                            {new Date(activity.startedAt).toLocaleDateString(
+                              'en-GB',
+                              {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              },
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(activity.endedAt).toLocaleDateString(
+                              'en-GB',
+                              {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              },
+                            )}
+                          </TableCell>
+
                           <TableCell>{assignedName}</TableCell>
 
                           {(role === 'owner' || role === 'editor') && (

@@ -144,6 +144,13 @@ export default function Typography(theme, borderRadius, fontFamily) {
         },
       },
     },
+    muiDate: {
+      width: 220,
+      borderRadius: `${borderRadius + 4}px`, // <--- increase this
+      '& .MuiOutlinedInput-root': {
+        borderRadius: `${borderRadius + 4}px`, // <--- increase this
+      },
+    },
     mainContent: {
       backgroundColor: theme.palette.grey[100],
       width: '100%',
