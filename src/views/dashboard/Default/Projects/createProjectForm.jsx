@@ -125,75 +125,76 @@ const CreateProjectForm = ({ onSubmit }) => {
           Authorization: token,
         },
       });
-
-      const uploadResponse = response.data.data;
-      let newProjectId =
-        uploadResponse?.project?.id || response.data?.data?._id;
-      // Single file upload (PUT to presigned S3 URL)
-      if (uploadResponse.upload?.uploadType === 'single') {
-        await axios.put(uploadResponse.upload.url, file, {
-          headers: {
-            'Content-Type': file.type,
-          },
-          onUploadProgress: (event) => {
-            const percent = Math.round((event.loaded * 100) / event.total);
-            setUploadProgress(percent);
-          },
-        });
-      }
-
-      // Multipart upload
-      else if (uploadResponse.upload?.uploadType === 'multipart') {
-        const { parts, uploadId, key, partSize } = uploadResponse.upload;
-
-        // Split file into chunks
-        const chunks = [];
-        let start = 0;
-        while (start < file.size) {
-          const end = Math.min(start + partSize, file.size);
-          chunks.push(file.slice(start, end));
-          start = end;
+      if (file !== null) {
+        const uploadResponse = response.data.data;
+        let newProjectId =
+          uploadResponse?.project?.id || response.data?.data?._id;
+        // Single file upload (PUT to presigned S3 URL)
+        if (uploadResponse.upload?.uploadType === 'single') {
+          await axios.put(uploadResponse.upload.url, file, {
+            headers: {
+              'Content-Type': file.type,
+            },
+            onUploadProgress: (event) => {
+              const percent = Math.round((event.loaded * 100) / event.total);
+              setUploadProgress(percent);
+            },
+          });
         }
 
-        // Upload each part and collect ETags
-        const etags = [];
-        for (let i = 0; i < parts.length; i++) {
-          const res = await fetch(parts[i].url, {
-            method: 'PUT',
-            body: chunks[i],
-          });
+        // Multipart upload
+        else if (uploadResponse.upload?.uploadType === 'multipart') {
+          const { parts, uploadId, key, partSize } = uploadResponse.upload;
 
-          if (!res.ok) {
-            throw new Error(`Chunk ${i + 1} failed to upload`);
+          // Split file into chunks
+          const chunks = [];
+          let start = 0;
+          while (start < file.size) {
+            const end = Math.min(start + partSize, file.size);
+            chunks.push(file.slice(start, end));
+            start = end;
           }
 
-          const etag = res.headers.get('ETag')?.replace(/"/g, '');
-          etags.push({ PartNumber: parts[i].partNumber, ETag: etag });
+          // Upload each part and collect ETags
+          const etags = [];
+          for (let i = 0; i < parts.length; i++) {
+            const res = await fetch(parts[i].url, {
+              method: 'PUT',
+              body: chunks[i],
+            });
 
-          const percent = Math.round(((i + 1) / parts.length) * 100);
-          setUploadProgress(percent);
+            if (!res.ok) {
+              throw new Error(`Chunk ${i + 1} failed to upload`);
+            }
+
+            const etag = res.headers.get('ETag')?.replace(/"/g, '');
+            etags.push({ PartNumber: parts[i].partNumber, ETag: etag });
+
+            const percent = Math.round(((i + 1) / parts.length) * 100);
+            setUploadProgress(percent);
+          }
+
+          // Complete multipart upload
+          await axiosInstance.post(
+            '/work-day/complete-upload',
+            {
+              projectId: newProjectId,
+              name: new Date(),
+              key,
+              uploadId,
+              parts: etags,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
+            },
+          );
         }
 
-        // Complete multipart upload
-        await axiosInstance.post(
-          '/work-day/complete-upload',
-          {
-            projectId: newProjectId,
-            name: new Date(),
-            key,
-            uploadId,
-            parts: etags,
-          },
-          {
-            headers: {
-              Authorization: token,
-            },
-          },
-        );
+        // Notify success
+        enqueueSnackbar('Upload successful!', { variant: 'success' });
       }
-
-      // Notify success
-      enqueueSnackbar('Upload successful!', { variant: 'success' });
       enqueueSnackbar('Successfully Created Historical Data', {
         variant: 'success',
       });
@@ -266,23 +267,21 @@ const CreateProjectForm = ({ onSubmit }) => {
                   label="Start Date"
                   value={values.startDate}
                   onChange={(val) => setFieldValue('startDate', val)}
+                  format="dd-MM-yyyy"
                   renderInput={(params) => (
-                    <Box
-                      sx={{ '& .MuiInputBase-root': { borderRadius: '30px' } }}
-                    >
-                      <TextField
-                        {...params}
-                        fullWidth
-                        error={touched.startDate && Boolean(errors.startDate)}
-                        helperText={touched.startDate && errors.startDate}
-                      />
-                    </Box>
+                    <TextField
+                      {...params}
+                      fullWidth
+                      error={touched.startDate && Boolean(errors.startDate)}
+                      helperText={touched.startDate && errors.startDate}
+                    />
                   )}
                 />
                 <DatePicker
                   label="End Date"
                   value={values.endDate}
                   onChange={(val) => setFieldValue('endDate', val)}
+                  format="dd-MM-yyyy"
                   renderInput={(params) => (
                     <TextField
                       {...params}

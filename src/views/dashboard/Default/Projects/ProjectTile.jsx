@@ -102,7 +102,7 @@ const ProjectTile = ({ project, count }) => {
           <Stack direction="row" spacing={2} alignItems="center">
             <Stack direction="row" spacing={0.5} alignItems="center">
               <ImageIcon fontSize="small" />
-              <Typography variant="caption">{project.location}</Typography>
+              <Typography variant="caption">{project?.location}</Typography>
             </Stack>
             <Stack direction="row" spacing={0.5} alignItems="center">
               <PersonIcon fontSize="small" />
@@ -110,8 +110,8 @@ const ProjectTile = ({ project, count }) => {
             </Stack>
             <Stack>
               <Typography variant="caption" fontSize={8} color="text.secondary">
-                {project.createdAt
-                  ? `${formatDistanceToNow(new Date(project.createdAt), { addSuffix: true })}`
+                {project?.createdAt
+                  ? `${formatDistanceToNow(new Date(project?.createdAt), { addSuffix: true })}`
                   : 'Time unknown'}
               </Typography>
             </Stack>
