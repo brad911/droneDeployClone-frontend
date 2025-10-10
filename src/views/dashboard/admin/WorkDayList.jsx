@@ -19,15 +19,10 @@ import {
   Stack,
   InputLabel,
   useTheme,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import MainCard from 'ui-component/cards/MainCard';
-import Loader from 'ui-component/Loader';
 import axiosInstance from 'utils/axios.config';
 import { useSelector } from 'react-redux';
 import { useSnackbar } from 'notistack';
@@ -504,6 +499,11 @@ const WorkDayList = () => {
                     <TableCell
                       sx={{ color: theme.palette.primary.contrastText }}
                     >
+                      Progress Status
+                    </TableCell>
+                    <TableCell
+                      sx={{ color: theme.palette.primary.contrastText }}
+                    >
                       Action
                     </TableCell>
                   </TableRow>
@@ -563,6 +563,9 @@ const WorkDayList = () => {
                             {workDay.tiffFile
                               ? workDay.tiffFile.split('-')[5]
                               : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {workDay?.comment ? workDay?.comment : '-'}
                           </TableCell>
                           <TableCell>
                             <Stack spacing={1} sx={{ minWidth: 200 }}>

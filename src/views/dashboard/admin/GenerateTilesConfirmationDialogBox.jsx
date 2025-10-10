@@ -18,14 +18,14 @@ const GenerateTilesConfirmationBox = ({
   handleCancelGenerateTiles,
   handleConfirmGenerateTiles,
 }) => {
-  const [maxZoom, setMaxZoom] = useState(18); // ✅ Default value
+  const [maxZoom, setMaxZoom] = useState(18);
 
   const handleZoomChange = (_, value) => {
     setMaxZoom(value);
   };
 
   const handleProceed = () => {
-    handleConfirmGenerateTiles(maxZoom); // ✅ Pass zoom to parent function
+    handleConfirmGenerateTiles(maxZoom);
   };
 
   return (
@@ -33,11 +33,10 @@ const GenerateTilesConfirmationBox = ({
       open={confirmDialog.open}
       onClose={generateTilesLoading ? undefined : handleCancelGenerateTiles}
       aria-labelledby="generate-tiles-dialog-title"
-      aria-describedby="generate-tiles-dialog-description"
       PaperProps={{
         sx: {
           borderRadius: 2,
-          minWidth: 400,
+          minWidth: 420,
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
         },
       }}
@@ -45,63 +44,46 @@ const GenerateTilesConfirmationBox = ({
       <DialogTitle
         id="generate-tiles-dialog-title"
         sx={{
-          bgcolor: 'primary.light',
-          color: 'warning.contrastText',
+          bgcolor: 'primary.main',
+          color: 'white',
           fontWeight: 600,
           fontSize: '1.1rem',
+          mb: 2,
         }}
       >
-        ⚠️ Confirmation
+        🧱 Generate Raster Tiles
       </DialogTitle>
 
       <DialogContent sx={{ pt: 3, pb: 2 }}>
         {generateTilesLoading ? (
           <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Box
-              sx={{
-                width: 64,
-                height: 64,
-                borderRadius: '50%',
-                bgcolor: 'primary.light',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mx: 'auto',
-                mb: 2,
-              }}
-            >
-              <IconPhotoEdit sx={{ color: 'primary.light', fontSize: 32 }} />
-            </Box>
+            <Loader />
             <Typography
               variant="h6"
               sx={{
                 fontWeight: 600,
-                mb: 2,
-                color: 'text.primary',
+                mt: 2,
+                mb: 1,
               }}
             >
-              Generating Tiles...
+              Starting background job...
             </Typography>
             <Typography
-              variant="body1"
+              variant="body2"
               sx={{
                 color: 'text.secondary',
                 lineHeight: 1.6,
-                mb: 3,
+                maxWidth: 300,
+                mx: 'auto',
               }}
             >
-              Please wait while we process your request. This may take several
-              minutes.
+              Your raster tile generation has started. You can track progress in
+              the <strong>“Comment”</strong> section of this workday.
             </Typography>
-            <Box sx={{ width: '100%', maxWidth: 300, mx: 'auto' }}>
-              <Loader />
-            </Box>
           </Box>
         ) : (
           <>
-            <Box
-              sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mt: 2 }}
-            >
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
               <Box
                 sx={{
                   width: 48,
@@ -112,38 +94,23 @@ const GenerateTilesConfirmationBox = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  mt: 0.5,
                 }}
               >
-                <IconPhotoEdit sx={{ color: 'primary.light', fontSize: 24 }} />
+                <IconPhotoEdit size={26} />
               </Box>
+
               <Box>
                 <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 600,
-                    mb: 1,
-                    color: 'text.primary',
-                  }}
+                  variant="body2"
+                  sx={{ color: 'text.secondary', lineHeight: 1.6 }}
                 >
-                  Time-Intensive Operation
-                </Typography>
-                <Typography
-                  variant="body1"
-                  id="generate-tiles-dialog-description"
-                  sx={{
-                    color: 'text.secondary',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  This tile generation process will take at least{' '}
-                  <strong>10 minutes</strong> to complete. The system will
-                  process your data in the background.
+                  This process may take few hours depending on image size. Once
+                  started, it will run safely in the background — you can
+                  monitor progress in the comment box.
                 </Typography>
               </Box>
             </Box>
 
-            {/* 🔧 Zoom Selector */}
             <Box sx={{ mt: 4 }}>
               <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
                 Maximum Zoom Level: <strong>{maxZoom}</strong>
@@ -172,15 +139,7 @@ const GenerateTilesConfirmationBox = ({
             borderColor: 'error.main',
             fontWeight: 500,
             px: 3,
-            py: 1,
-            '&:hover': {
-              bgcolor: 'error.50',
-              borderColor: 'error.dark',
-            },
-            '&:disabled': {
-              color: 'grey.400',
-              borderColor: 'grey.300',
-            },
+            '&:hover': { bgcolor: 'error.50' },
           }}
         >
           Cancel
@@ -194,21 +153,10 @@ const GenerateTilesConfirmationBox = ({
             color: 'white',
             fontWeight: 500,
             px: 3,
-            py: 1,
-            '&:hover': {
-              bgcolor: 'secondary.light',
-              color: 'black',
-            },
-            '&:focus': {
-              bgcolor: 'primary.main',
-            },
-            '&:disabled': {
-              bgcolor: 'grey.300',
-              color: 'grey.500',
-            },
+            '&:hover': { bgcolor: 'secondary.light', color: 'black' },
           }}
         >
-          {generateTilesLoading ? 'Processing...' : 'Proceed'}
+          {generateTilesLoading ? 'Starting...' : 'Start Job'}
         </Button>
       </DialogActions>
     </Dialog>
