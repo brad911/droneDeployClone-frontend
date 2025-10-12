@@ -1,4 +1,3 @@
-// import React from 'react';
 import {
   Card,
   CardMedia,
@@ -7,17 +6,41 @@ import {
   Box,
   Stack,
   Button,
+  IconButton,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import ImageIcon from '@mui/icons-material/PhotoLibrary';
 import PersonIcon from '@mui/icons-material/Person';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from 'react-router';
 import { formatDistanceToNow } from 'date-fns';
 import { useDispatch } from 'react-redux';
 import { setSelectedProject } from '../../../../store/slices/projectSlice';
 import image from '../../../../assets/images/conture-map.jpg';
-const ProjectTile = ({ project, count }) => {
+import { useState } from 'react';
+
+const ProjectTile = ({ project, count, onDelete }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const menuOpen = Boolean(anchorEl);
+
+  const handleMenuClick = (e) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleMenuClose = (e) => {
+    e.stopPropagation();
+    setAnchorEl(null);
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    setAnchorEl(null);
+    if (onDelete) onDelete(project);
+  };
 
   const handleView = () => {
     const id = project._id || project.id;
@@ -41,17 +64,14 @@ const ProjectTile = ({ project, count }) => {
       }}
       onClick={handleView}
     >
-      {/* Image with overlay */}
+      {/* Image + overlay */}
       <Box sx={{ position: 'relative', height: 140 }}>
         <CardMedia
           component="img"
           height="140"
           image={image}
           alt={project?.name}
-          sx={{
-            objectFit: 'cover',
-            filter: 'brightness(60%)',
-          }}
+          sx={{ objectFit: 'cover', filter: 'brightness(60%)' }}
         />
         <Box
           sx={{
@@ -70,29 +90,34 @@ const ProjectTile = ({ project, count }) => {
             {project?.name}
           </Typography>
         </Box>
+
+        {/* 3-dot menu */}
+        <IconButton
+          size="small"
+          onClick={handleMenuClick}
+          sx={{
+            position: 'absolute',
+            top: 5,
+            right: 5,
+            color: 'white',
+            backgroundColor: 'rgba(0,0,0,0.4)',
+            '&:hover': { backgroundColor: 'rgba(0,0,0,0.6)' },
+          }}
+        >
+          <MoreVertIcon fontSize="small" />
+        </IconButton>
+
+        <Menu
+          anchorEl={anchorEl}
+          open={menuOpen}
+          onClose={handleMenuClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <MenuItem onClick={handleDelete}>Delete Project</MenuItem>
+        </Menu>
       </Box>
 
-      {/* Progress Bar */}
-      {/* <Box px={2} py={1}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={0.5}
-        >
-          <Typography variant="caption" color="text.secondary">
-            {project.progress}%
-          </Typography>
-          <Typography variant="caption" color="text.secondary"></Typography>
-        </Stack>
-        <LinearProgress
-          variant="determinate"
-          value={project.progress}
-          sx={{ height: 6, borderRadius: 10 }}
-        />
-      </Box> */}
-
-      {/* Footer with Icons and View Button */}
       <CardContent sx={{ pt: 1, pb: 1 }}>
         <Stack
           direction="row"
@@ -111,7 +136,9 @@ const ProjectTile = ({ project, count }) => {
             <Stack>
               <Typography variant="caption" fontSize={8} color="text.secondary">
                 {project?.createdAt
-                  ? `${formatDistanceToNow(new Date(project?.createdAt), { addSuffix: true })}`
+                  ? `${formatDistanceToNow(new Date(project?.createdAt), {
+                      addSuffix: true,
+                    })}`
                   : 'Time unknown'}
               </Typography>
             </Stack>

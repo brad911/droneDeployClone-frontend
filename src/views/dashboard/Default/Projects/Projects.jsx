@@ -9,6 +9,11 @@ import {
   InputLabel,
   FormControl,
   Pagination,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ProjectTile from './ProjectTile';
@@ -16,6 +21,7 @@ import { useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@emotion/react';
 import { useSelector } from 'react-redux';
+import { enqueueSnackbar } from 'notistack';
 import axiosInstance from '../../../../utils/axios.config';
 
 function Projects() {
@@ -29,10 +35,15 @@ function Projects() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Pagination state
+  // Pagination
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const LIMIT = 12;
+
+  // Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchProjects = async (search = '', sort = '', pageNumber = 1) => {
     setLoading(true);
@@ -54,7 +65,7 @@ function Projects() {
 
       const data = response.data?.data;
       setFilteredProjects(data?.results || []);
-      setTotalPages(data?.totalPages || 1); // assumes backend returns totalPages
+      setTotalPages(data?.totalPages || 1);
     } catch (err) {
       setError(err.message || 'Failed to fetch projects');
     } finally {
@@ -69,6 +80,43 @@ function Projects() {
   const handleSearch = () => {
     setPage(1);
     fetchProjects(searchTerm, sortBy, 1);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedProject) return;
+    setDeleting(true);
+    try {
+      const res = await axiosInstance.delete(
+        `/project/${selectedProject._id}`,
+        {
+          headers: { Authorization: user.token },
+        },
+      );
+
+      if (res.status === 200) {
+        enqueueSnackbar('Project deleted successfully', { variant: 'success' });
+        // Refresh list
+        fetchProjects(searchTerm, sortBy, page);
+      }
+    } catch (e) {
+      console.log('Error deleting project:', e);
+      if (e?.response?.status === 403) {
+        enqueueSnackbar('You do not have permission to delete this project', {
+          variant: 'error',
+        });
+      } else {
+        enqueueSnackbar('Error deleting project', { variant: 'error' });
+      }
+    } finally {
+      setDeleting(false);
+      setDeleteDialogOpen(false);
+      setSelectedProject(null);
+    }
+  };
+
+  const handleDeleteRequest = (project) => {
+    setSelectedProject(project);
+    setDeleteDialogOpen(true);
   };
 
   return (
@@ -160,6 +208,7 @@ function Projects() {
                 <ProjectTile
                   project={project.projectId}
                   count={project.memberCount}
+                  onDelete={handleDeleteRequest}
                 />
               </Grid>
             ))}
@@ -177,6 +226,39 @@ function Projects() {
           )}
         </>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => !deleting && setDeleteDialogOpen(false)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>Delete Project</DialogTitle>
+        <DialogContent>
+          <Typography>
+            You are about to delete <strong>{selectedProject?.name}</strong>.
+            This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            disabled={deleting}
+          >
+            Cancel
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={handleDeleteConfirm}
+            disabled={deleting}
+            startIcon={deleting ? <CircularProgress size={18} /> : null}
+          >
+            {deleting ? 'Deleting...' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
