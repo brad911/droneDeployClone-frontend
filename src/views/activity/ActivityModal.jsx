@@ -12,6 +12,11 @@ import {
   MenuItem,
   CircularProgress,
   Box,
+  FormControl,
+  InputLabel,
+  Select,
+  Checkbox,
+  FormControlLabel,
   useTheme,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -34,6 +39,7 @@ const ActivityModal = ({
 }) => {
   const isEdit = Boolean(activity);
   const theme = useTheme();
+
   const [form, setForm] = useState({
     name: '',
     quantity: '',
@@ -50,6 +56,12 @@ const ActivityModal = ({
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // 🔹 For templates
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [isTemplate, setIsTemplate] = useState(false);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+
   const fetchTeamMembers = async () => {
     try {
       setLoadingMembers(true);
@@ -64,9 +76,48 @@ const ActivityModal = ({
     }
   };
 
+  // 🔹 Fetch available templates
+  const fetchTemplates = async () => {
+    try {
+      setLoadingTemplates(true);
+      const res = await axiosInstance.get(`/activity`, {
+        params: {
+          projectId,
+          isTemplate: true,
+        },
+      });
+      setTemplates(res.data?.data.results || []);
+    } catch (err) {
+      console.error('Error fetching templates:', err);
+    } finally {
+      setLoadingTemplates(false);
+    }
+  };
+
+  // 🔹 Load checklist items from a selected template only
+  const handleTemplateSelect = async (templateId) => {
+    setSelectedTemplate(templateId);
+    if (!templateId) return;
+    try {
+      const res = await axiosInstance.get(`/activity-checklist`, {
+        params: { activityId: templateId, limit: 100 },
+      });
+      const items = res.data?.data?.results || [];
+      setChecklist(
+        items.length > 0
+          ? items.map((i) => ({ description: i.description }))
+          : [{ description: '' }],
+      );
+    } catch (err) {
+      console.error('Error loading checklist template:', err);
+    }
+  };
+
   useEffect(() => {
     if (open) {
       fetchTeamMembers();
+      if (!isEdit) fetchTemplates();
+
       if (isEdit) {
         setForm({
           name: activity.name ?? '',
@@ -93,6 +144,8 @@ const ActivityModal = ({
           endedAt: null,
         });
         setChecklist([{ description: '' }]);
+        setSelectedTemplate('');
+        setIsTemplate(false);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,6 +180,7 @@ const ActivityModal = ({
         endedAt: form.endedAt ? form.endedAt.toISOString() : null,
         activityChecklist: checklist,
         projectId,
+        isTemplate,
       };
 
       if (isEdit) {
@@ -146,9 +200,7 @@ const ActivityModal = ({
     } catch (err) {
       enqueueSnackbar(
         err?.response?.data?.message || 'Failed to submit activity',
-        {
-          variant: 'error',
-        },
+        { variant: 'error' },
       );
       console.error('Error submitting activity:', err);
     } finally {
@@ -161,7 +213,12 @@ const ActivityModal = ({
       <DialogTitle>{isEdit ? 'Edit Activity' : 'Create Activity'}</DialogTitle>
       <DialogContent>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid
+            container
+            justifyContent={'space-around'}
+            spacing={2}
+            sx={{ mt: 1 }}
+          >
             <Grid item xs={12}>
               <TextField
                 label="Name"
@@ -205,13 +262,22 @@ const ActivityModal = ({
             </Grid>
 
             <Grid item xs={6}>
-              <TextField
-                label="Status"
-                fullWidth
-                name="status"
-                value={form.status}
-                onChange={handleChange}
-              />
+              <FormControl>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  sx={{ minWidth: 220 }}
+                  name="status"
+                  value={form.status}
+                  label="Status"
+                  onChange={handleChange}
+                >
+                  <MenuItem value="planned">Planned</MenuItem>
+                  <MenuItem value="in_progress">In Progress</MenuItem>
+                  <MenuItem value="completed">Completed</MenuItem>
+                  <MenuItem value="delayed">Delayed</MenuItem>
+                  <MenuItem value="planned_further">Planned Further</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
 
             <Grid item xs={6}>
@@ -221,10 +287,9 @@ const ActivityModal = ({
                 onChange={(newValue) =>
                   setForm((s) => ({ ...s, startedAt: newValue }))
                 }
+                format="DD-MM-YYYY"
                 slotProps={{
-                  textField: {
-                    sx: theme.typography.muiDate, // ✅ apply your theme style here/
-                  },
+                  textField: { sx: theme.typography.muiDate },
                 }}
               />
             </Grid>
@@ -236,10 +301,9 @@ const ActivityModal = ({
                 onChange={(newValue) =>
                   setForm((s) => ({ ...s, endedAt: newValue }))
                 }
+                format="DD-MM-YYYY"
                 slotProps={{
-                  textField: {
-                    sx: theme.typography.muiDate, // ✅ apply your theme style here
-                  },
+                  textField: { sx: theme.typography.muiDate },
                 }}
               />
             </Grid>
@@ -278,44 +342,87 @@ const ActivityModal = ({
           </Grid>
         </LocalizationProvider>
 
+        {/* ✅ Checklist Section */}
         {!isEdit && (
-          <Box mt={2}>
-            <Typography variant="subtitle1">Checklist</Typography>
-            {checklist.map((item, i) => (
-              <Grid
-                container
-                alignItems="center"
-                spacing={1}
-                key={i}
-                sx={{ mt: 1 }}
-              >
-                <Grid item xs={10}>
-                  <TextField
-                    fullWidth
-                    placeholder={`Checklist item ${i + 1}`}
-                    value={item.description}
-                    onChange={(e) => handleChecklistChange(i, e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={2}>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleRemoveChecklist(i)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            ))}
-            <Button
-              variant="text"
-              startIcon={<AddIcon />}
-              sx={{ mt: 1 }}
-              onClick={handleAddChecklist}
+          <Grid container spacing={2} justifyContent={'space-around'}>
+            <Grid
+              width={'90%'}
+              item
+              mt={2}
+              spacing={2}
+              flex
+              justifyContent={'center'}
             >
-              Add Checklist Item
-            </Button>
-          </Box>
+              <FormControl sx={{ mb: 2, width: '100%' }}>
+                <InputLabel>Use Existing Checklist</InputLabel>
+                <Select
+                  value={selectedTemplate}
+                  label="Use Existing Checklist"
+                  onChange={(e) => handleTemplateSelect(e.target.value)}
+                  disabled={loadingTemplates}
+                >
+                  <MenuItem value="">None</MenuItem>
+                  {templates.map((t) => (
+                    <MenuItem key={t.id} value={t.id}>
+                      {t.name || `Template #${t.id}`}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid
+              item
+              sx={{ px: 3, pb: 2, width: '100%' }}
+              justifyContent={'left'}
+            >
+              <Typography variant="subtitle1">Checklist</Typography>
+              {checklist.map((item, i) => (
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={1}
+                  key={i}
+                  sx={{ mt: 1 }}
+                >
+                  <Grid item xs={10}>
+                    <TextField
+                      fullWidth
+                      placeholder={`Checklist item ${i + 1}`}
+                      value={item.description}
+                      onChange={(e) => handleChecklistChange(i, e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={2}>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleRemoveChecklist(i)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              ))}
+              <Button
+                variant="text"
+                startIcon={<AddIcon />}
+                sx={{ mt: 1 }}
+                onClick={handleAddChecklist}
+              >
+                Add Checklist Item
+              </Button>
+            </Grid>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isTemplate}
+                  onChange={(e) => setIsTemplate(e.target.checked)}
+                />
+              }
+              label="Save this checklist as a reusable template"
+              sx={{ mt: 2 }}
+            />
+          </Grid>
         )}
       </DialogContent>
 

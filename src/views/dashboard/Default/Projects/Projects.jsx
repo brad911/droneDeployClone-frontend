@@ -30,7 +30,7 @@ function Projects() {
   const user = useSelector((state) => state.auth);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('');
+  const [sortBy, setSortBy] = useState('project.name:asc');
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -55,7 +55,7 @@ function Projects() {
         page: pageNumber,
         limit: LIMIT,
       };
-      if (search) params.search = search;
+      if (search) params.projectName = search;
       if (sort) params.sortBy = sort;
 
       const response = await axiosInstance.get('/project-members', {
@@ -164,8 +164,18 @@ function Projects() {
                   label="Sort By"
                   onChange={(e) => setSortBy(e.target.value)}
                 >
-                  <MenuItem value="name">Name</MenuItem>
-                  <MenuItem value="images">Date</MenuItem>
+                  <MenuItem value="project.name:asc">
+                    Project Name (A → Z)
+                  </MenuItem>
+                  <MenuItem value="project.name:desc">
+                    Project Name (Z → A)
+                  </MenuItem>
+                  <MenuItem value="project.createdAt:desc">
+                    Project Date (Newest)
+                  </MenuItem>
+                  <MenuItem value="project.createdAt:asc">
+                    Project Date (Oldest)
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -206,7 +216,7 @@ function Projects() {
             {filteredProjects.map((project, index) => (
               <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
                 <ProjectTile
-                  project={project.projectId}
+                  project={project.project}
                   count={project.memberCount}
                   onDelete={handleDeleteRequest}
                 />
