@@ -213,6 +213,9 @@ const Activity = () => {
                         <strong>Name</strong>
                       </TableCell>
                       <TableCell>
+                        <strong>Name</strong>
+                      </TableCell>
+                      <TableCell>
                         <strong>Quantity</strong>
                       </TableCell>
                       <TableCell>
@@ -222,13 +225,16 @@ const Activity = () => {
                         <strong>Cost</strong>
                       </TableCell>
                       <TableCell>
-                        <strong>Started At</strong>
+                        <strong>Start</strong>
                       </TableCell>
                       <TableCell>
-                        <strong>Ended At</strong>
+                        <strong>End</strong>
                       </TableCell>
                       <TableCell>
                         <strong>Assigned To</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Status</strong>
                       </TableCell>
 
                       {(role === 'owner' || role === 'editor') && (
@@ -255,10 +261,11 @@ const Activity = () => {
                           <TableCell>
                             {(page - 1) * limit + index + 1}
                           </TableCell>
-                          <TableCell>{activity.name}</TableCell>
-                          <TableCell>{activity.quantity}</TableCell>
-                          <TableCell>{activity.unit}</TableCell>
-                          <TableCell>{activity.cost}</TableCell>
+                          <TableCell>{activity?.name}</TableCell>
+                          <TableCell>{activity?.itemName}</TableCell>
+                          <TableCell>{activity?.quantity}</TableCell>
+                          <TableCell>{activity?.unit}</TableCell>
+                          <TableCell>{activity?.cost}</TableCell>
                           <TableCell>
                             {new Date(activity.startedAt).toLocaleDateString(
                               'en-GB',
@@ -281,6 +288,7 @@ const Activity = () => {
                           </TableCell>
 
                           <TableCell>{assignedName}</TableCell>
+                          <TableCell>{activity?.status}</TableCell>
 
                           {(role === 'owner' || role === 'editor') && (
                             <TableCell align="center">

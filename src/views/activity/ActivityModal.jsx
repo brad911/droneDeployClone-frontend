@@ -41,6 +41,7 @@ const ActivityModal = ({
   const theme = useTheme();
 
   const [form, setForm] = useState({
+    itemName: '',
     name: '',
     quantity: '',
     unit: '',
@@ -120,6 +121,7 @@ const ActivityModal = ({
 
       if (isEdit) {
         setForm({
+          itemName: activity.itemName ? activity.itemName : '',
           name: activity.name ?? '',
           quantity: activity.quantity ?? '',
           unit: activity.unit ?? '',
@@ -134,6 +136,7 @@ const ActivityModal = ({
         });
       } else {
         setForm({
+          itemName: '',
           name: '',
           quantity: '',
           unit: '',
@@ -170,6 +173,7 @@ const ActivityModal = ({
     setSubmitting(true);
     try {
       const payload = {
+        itemName: form.itemName,
         name: form.name,
         quantity: form.quantity,
         unit: form.unit,
@@ -184,7 +188,7 @@ const ActivityModal = ({
       };
 
       if (isEdit) {
-        await axiosInstance.patch(`/activity/${activity._id}`, payload);
+        await axiosInstance.patch(`/activity/${activity.id}`, payload);
         if (onUpdated) onUpdated();
       } else {
         const res = await axiosInstance.post('/activity', payload);
@@ -225,6 +229,15 @@ const ActivityModal = ({
                 fullWidth
                 name="name"
                 value={form.name}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Item Name"
+                fullWidth
+                name="itemName"
+                value={form.itemName}
                 onChange={handleChange}
               />
             </Grid>
@@ -339,21 +352,8 @@ const ActivityModal = ({
                 )}
               </TextField>
             </Grid>
-          </Grid>
-        </LocalizationProvider>
-
-        {/* ✅ Checklist Section */}
-        {!isEdit && (
-          <Grid container spacing={2} justifyContent={'space-around'}>
-            <Grid
-              width={'90%'}
-              item
-              mt={2}
-              spacing={2}
-              flex
-              justifyContent={'center'}
-            >
-              <FormControl sx={{ mb: 2, width: '100%' }}>
+            <Grid item xs={12}>
+              <FormControl sx={{ mb: 2, minWidth: 220 }} fullWidth>
                 <InputLabel>Use Existing Checklist</InputLabel>
                 <Select
                   value={selectedTemplate}
@@ -364,13 +364,25 @@ const ActivityModal = ({
                   <MenuItem value="">None</MenuItem>
                   {templates.map((t) => (
                     <MenuItem key={t.id} value={t.id}>
-                      {t.name || `Template #${t.id}`}
+                      {t.itemName || `Template #${t.id}`}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
+          </Grid>
+        </LocalizationProvider>
 
+        {/* ✅ Checklist Section */}
+        {!isEdit && (
+          <Grid
+            width={'90%'}
+            item
+            mt={2}
+            spacing={2}
+            flex
+            justifyContent={'center'}
+          >
             <Grid
               item
               sx={{ px: 3, pb: 2, width: '100%' }}
