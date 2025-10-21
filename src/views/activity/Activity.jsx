@@ -210,10 +210,10 @@ const Activity = () => {
                         <strong>#</strong>
                       </TableCell>
                       <TableCell>
-                        <strong>Name</strong>
+                        <strong>Activity Name</strong>
                       </TableCell>
                       <TableCell>
-                        <strong>Name</strong>
+                        <strong>Item</strong>
                       </TableCell>
                       <TableCell>
                         <strong>Quantity</strong>

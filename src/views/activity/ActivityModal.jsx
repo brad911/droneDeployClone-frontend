@@ -11,7 +11,6 @@ import {
   Typography,
   MenuItem,
   CircularProgress,
-  Box,
   FormControl,
   InputLabel,
   Select,
@@ -225,7 +224,7 @@ const ActivityModal = ({
           >
             <Grid item xs={12}>
               <TextField
-                label="Name"
+                label="Activity Name"
                 fullWidth
                 name="name"
                 value={form.name}
@@ -234,7 +233,7 @@ const ActivityModal = ({
             </Grid>
             <Grid item xs={12}>
               <TextField
-                label="Item Name"
+                label="Item"
                 fullWidth
                 name="itemName"
                 value={form.itemName}

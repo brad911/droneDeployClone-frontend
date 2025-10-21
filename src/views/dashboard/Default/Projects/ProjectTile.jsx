@@ -5,7 +5,6 @@ import {
   Typography,
   Box,
   Stack,
-  Button,
   IconButton,
   Menu,
   MenuItem,
@@ -55,7 +54,6 @@ const ProjectTile = ({ project, count, onDelete }) => {
         maxHeight: 220,
         position: 'relative',
         width: 320,
-        maxWidth: 320,
         borderRadius: 3,
         overflow: 'hidden',
         cursor: 'pointer',
@@ -90,68 +88,86 @@ const ProjectTile = ({ project, count, onDelete }) => {
             {project?.name}
           </Typography>
         </Box>
-
-        {/* 3-dot menu */}
-        <IconButton
-          size="small"
-          onClick={handleMenuClick}
-          sx={{
-            position: 'absolute',
-            top: 5,
-            right: 5,
-            color: 'white',
-            backgroundColor: 'rgba(0,0,0,0.4)',
-            '&:hover': { backgroundColor: 'rgba(0,0,0,0.6)' },
-          }}
-        >
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
-
-        <Menu
-          anchorEl={anchorEl}
-          open={menuOpen}
-          onClose={handleMenuClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        >
-          <MenuItem onClick={handleDelete}>Delete Project</MenuItem>
-        </Menu>
       </Box>
 
+      {/* Info row */}
       <CardContent sx={{ pt: 1, pb: 1 }}>
         <Stack
           direction="row"
           justifyContent="space-between"
           alignItems="center"
         >
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Stack direction="row" spacing={0.5} alignItems="center">
+          {/* Left side */}
+          <Stack
+            direction="row"
+            spacing={1.5}
+            alignItems="center"
+            flexWrap="nowrap"
+          >
+            <Stack
+              direction="row"
+              spacing={0.5}
+              alignItems="center"
+              sx={{ minWidth: 0 }}
+            >
               <ImageIcon fontSize="small" />
-              <Typography variant="caption">{project?.location}</Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: 140, // allow longer text before truncation
+                }}
+              >
+                {project?.location}
+              </Typography>
             </Stack>
+
             <Stack direction="row" spacing={0.5} alignItems="center">
               <PersonIcon fontSize="small" />
               <Typography variant="caption">{count}</Typography>
             </Stack>
-            <Stack>
-              <Typography variant="caption" fontSize={8} color="text.secondary">
-                {project?.createdAt
-                  ? `${formatDistanceToNow(new Date(project?.createdAt), {
-                      addSuffix: true,
-                    })}`
-                  : 'Time unknown'}
-              </Typography>
-            </Stack>
+
+            <Typography variant="caption" fontSize={8} color="text.secondary">
+              {project?.createdAt
+                ? `${formatDistanceToNow(new Date(project?.createdAt), {
+                    addSuffix: true,
+                  })}`
+                : 'Time unknown'}
+            </Typography>
           </Stack>
-          <Button
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleView();
-            }}
-          >
-            View
-          </Button>
+
+          {/* Right side: 3-dot menu */}
+          <Box>
+            <IconButton
+              size="small"
+              onClick={handleMenuClick}
+              sx={{
+                color: 'text.secondary',
+                '&:hover': { backgroundColor: 'rgba(0,0,0,0.05)' },
+              }}
+            >
+              <MoreVertIcon fontSize="small" />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={menuOpen}
+              onClose={handleMenuClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+              <MenuItem onClick={handleDelete}>Delete</MenuItem>
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleView();
+                }}
+              >
+                View
+              </MenuItem>
+            </Menu>
+          </Box>
         </Stack>
       </CardContent>
     </Card>
