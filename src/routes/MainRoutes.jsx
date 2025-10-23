@@ -4,7 +4,8 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import ProtectedRoute from '../utils/protectedRoute';
-import Activity from '../views/activity/Activity';
+import Activity from '../views/dashboard/activity/Activity';
+import Resources from '../views/dashboard/Resources/Resources';
 
 // ==============================|| LAZY IMPORTS ||============================== //
 const DashboardDefault = Loadable(
@@ -81,6 +82,7 @@ const MainRoutes = {
     { path: '/work-days', element: <ProtectedRoute element={WorkDayList} /> },
     { path: '/project/:projectID/:projectWorkDayID', element: <ProjectWork /> },
     { path: '/project/:projectID/activity', element: <Activity /> },
+    { path: '/project/:projectID/resources', element: <Resources /> },
   ],
 };
 

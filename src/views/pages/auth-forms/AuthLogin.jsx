@@ -73,10 +73,10 @@ export default function AuthLogin() {
   };
   const formik = useFormik({
     initialValues: {
-      email: '',
-      password: '',
-      // email: 'bilalthetester@gmail.com',
-      // password: 'Abc123!@#!@#!@#',
+      // email: '',
+      // password: '',
+      email: 'bilalthetester@gmail.com',
+      password: 'Abc123!@#!@#!@#',
       keepLoggedIn: true,
     },
     validationSchema: Yup.object({

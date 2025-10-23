@@ -30,7 +30,7 @@ function Projects() {
   const user = useSelector((state) => state.auth);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('project.name:asc');
+  const [sortBy, setSortBy] = useState('project.createdAt:desc');
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

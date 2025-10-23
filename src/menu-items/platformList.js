@@ -8,6 +8,7 @@ import {
   IconFiles,
   IconUsers,
   IconIconsFilled,
+  IconReorder,
 } from '@tabler/icons-react';
 
 const getPlatformMenu = (projectId, projectName, permissions = {}) => {
@@ -34,13 +35,23 @@ const getPlatformMenu = (projectId, projectName, permissions = {}) => {
       breadcrumbs: false,
     });
   }
-  if (permissions.activityManagement) {
+  if (permissions.resourceManagement) {
     children.push({
       id: 'activityManagement',
       title: 'Activity',
       type: 'item',
       url: `/project/${projectId}/activity`,
       icon: IconIconsFilled,
+      breadcrumbs: false,
+    });
+  }
+  if (permissions.resourceManagement) {
+    children.push({
+      id: 'resourceManagement',
+      title: 'Resources',
+      type: 'item',
+      url: `/project/${projectId}/resources`,
+      icon: IconReorder,
       breadcrumbs: false,
     });
   }

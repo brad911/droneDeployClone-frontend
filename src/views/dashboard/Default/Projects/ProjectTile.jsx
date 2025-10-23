@@ -129,12 +129,19 @@ const ProjectTile = ({ project, count, onDelete }) => {
               <Typography variant="caption">{count}</Typography>
             </Stack>
 
-            <Typography variant="caption" fontSize={8} color="text.secondary">
+            {/* <Typography variant="caption" fontSize={8} color="text.secondary">
               {project?.createdAt
                 ? `${formatDistanceToNow(new Date(project?.createdAt), {
                     addSuffix: true,
                   })}`
                 : 'Time unknown'}
+            </Typography> */}
+            <Typography variant="caption" fontSize={10} color="text.secondary">
+              {project?.createdAt
+                ? new Date(project.createdAt)
+                    .toLocaleDateString('en-GB') // ✅ formats as dd/mm/yyyy
+                    .replace(/\//g, '-') // ✅ converts to dd-mm-yyyy
+                : 'Date unknown'}
             </Typography>
           </Stack>
 
