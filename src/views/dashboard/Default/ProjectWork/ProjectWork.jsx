@@ -121,6 +121,7 @@ export default function ProjectWork() {
     showPolygons: true,
     showLineString: true,
     builtinOverlay: false,
+    shapeOverlay: false,
   });
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [historicalDates, setHistoricalDates] = useState([]);
@@ -932,6 +933,8 @@ export default function ProjectWork() {
 
   // 🎯 Render features & layers whenever map state changes
   useEffect(() => {
+    if (!selectedDate || !selectedWorkDay.id) return;
+    cleanupLayers(selectedWorkDay.id);
     const workDay = workDayData.find((w) => w.name === selectedDate);
     if (!mapRef.current || !isMapLoaded || !workDay) return;
 
@@ -939,17 +942,30 @@ export default function ProjectWork() {
 
     // 🔹 IDs for sources & layers (scoped to workDay)
     const overlaySourceId = `overlay-${workDay.id}`;
+    const shapeOverlaySourceId = `shape-overlay-${workDay.id}`;
     const overlayLayers = {
       fill: `overlay-fill-${workDay.id}`,
       line: `overlay-line-${workDay.id}`,
       point: `overlay-point-${workDay.id}`,
+    };
+    const shapeOverlayLayers = {
+      fill: `shapeOverlay-fill-${workDay.id}`,
+      line: `shapeOverlay-line-${workDay.id}`,
+      point: `shapeOverlay-point-${workDay.id}`,
     };
 
     // 🧹 Cleanup old overlay layers & sources
     Object.values(overlayLayers).forEach((id) => {
       if (map.getLayer(id)) map.removeLayer(id);
     });
+    // 🧹 Cleanup old shapeOverlay layers & sources
+    Object.values(shapeOverlayLayers).forEach((id) => {
+      if (map.getLayer(id)) map.removeLayer(id);
+    });
+
     if (map.getSource(overlaySourceId)) map.removeSource(overlaySourceId);
+    if (map.getSource(shapeOverlaySourceId))
+      map.removeSource(shapeOverlaySourceId);
 
     // 🧹 Always clear Draw when workDay changes or features update
     if (drawRef.current) {
@@ -959,6 +975,9 @@ export default function ProjectWork() {
     // 🔹 Separate overlay vs editable features
     const overlayFeatures = mapFeatures.filter((f) => f.properties?.overlay);
     const editableFeatures = mapFeatures.filter((f) => !f.properties?.overlay);
+    const shapeOverlayFeatures = mapFeatures.filter(
+      (f) => f.properties?.shapefile,
+    );
 
     // =========================
     // ✏️ Editable Features (Draw)
@@ -1024,6 +1043,57 @@ export default function ProjectWork() {
           id: overlayLayers.point,
           type: 'circle',
           source: overlaySourceId,
+          filter: ['==', ['geometry-type'], 'Point'],
+          paint: {
+            'circle-radius': 3,
+            'circle-color': ['coalesce', ['get', 'color_hex'], '#2563EB'],
+          },
+        });
+      }
+    }
+
+    // =========================
+    // 🗺️ ShapeOverlay Features
+    // =========================
+    if (layers.shapeOverlay && shapeOverlayFeatures.length) {
+      map.addSource(shapeOverlaySourceId, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: shapeOverlayFeatures },
+      });
+
+      if (layers.showPolygons) {
+        map.addLayer({
+          id: shapeOverlayLayers.fill,
+          type: 'fill',
+          source: shapeOverlaySourceId,
+          filter: ['==', ['geometry-type'], 'Polygon'],
+          paint: {
+            'fill-color': ['coalesce', ['get', 'color_hex'], '#2563EB'],
+            'fill-opacity': 0.3,
+          },
+        });
+      }
+
+      if (layers.showLineString) {
+        map.addLayer({
+          id: shapeOverlayLayers.line,
+          type: 'line',
+          source: shapeOverlaySourceId,
+          filter: ['==', ['geometry-type'], 'LineString'],
+          paint: {
+            'line-color': ['coalesce', ['get', 'color_hex'], '#2563EB'],
+            'line-width': 1,
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+        });
+      }
+
+      if (layers.showComments) {
+        map.addLayer({
+          id: shapeOverlayLayers.point,
+          type: 'circle',
+          source: shapeOverlaySourceId,
           filter: ['==', ['geometry-type'], 'Point'],
           paint: {
             'circle-radius': 3,
@@ -1398,6 +1468,17 @@ export default function ProjectWork() {
                 />
               }
               label="CAD Overlay"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={layers.shapeOverlay}
+                  onChange={handleLayerChange}
+                  name="shapeOverlay"
+                  disabled={loading}
+                />
+              }
+              label="SHP Overlay"
             />
           </FormGroup>
 

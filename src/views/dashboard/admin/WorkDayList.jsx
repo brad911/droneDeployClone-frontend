@@ -44,6 +44,7 @@ const sortOptions = [
 
 const WorkDayList = () => {
   const dxfFileInputRef = useRef(null);
+  const cadFileInputRef = useRef(null);
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const [workDays, setWorkDays] = useState([]);
@@ -196,7 +197,10 @@ const WorkDayList = () => {
     const extension = file.name.split('.').pop().toLowerCase();
     const key = `${workDay.id || workDay._id}_${type}`;
 
-    if (type === 'tiff' && extension !== 'tiff') {
+    if (
+      (type === 'tiff' && extension !== 'tiff') ||
+      (type === 'zip' && extension !== 'zip')
+    ) {
       enqueueSnackbar(`Only .${type.toUpperCase()} files are allowed`, {
         variant: 'error',
       });
@@ -364,6 +368,12 @@ const WorkDayList = () => {
     if (dxfFileInputRef.current) dxfFileInputRef.current.click();
   };
 
+  const handleCadFileInputClick = (workDay) => {
+    // reuse your existing uploadContext pattern
+    setUploadContext({ workDay, type: 'zip' });
+    if (cadFileInputRef.current) cadFileInputRef.current.click();
+  };
+
   const handleDxfFileChange = async () => {
     const { workDay } = uploadContext;
     const file = dxfFileInputRef.current?.files?.[0];
@@ -379,7 +389,7 @@ const WorkDayList = () => {
     }
     enqueueSnackbar('Uploading DXF file', { variant: 'info' });
     const formData = new FormData();
-    formData.append('file', file); // 👈 name must match Multer field name
+    formData.append('file', file);
     try {
       await axiosInstance.post(
         `/mapFeature/overlayUpload/${workDay._id || workDay.id}`,
@@ -396,6 +406,49 @@ const WorkDayList = () => {
       if (dxfFileInputRef.current) dxfFileInputRef.current.value = '';
     } catch (err) {
       console.error('DXF upload failed', err);
+      enqueueSnackbar(err.response?.data?.message || err.message, {
+        variant: 'error',
+      });
+    }
+  };
+  const handleCadFileChange = async () => {
+    const { workDay } = uploadContext;
+    const file = cadFileInputRef.current?.files?.[0];
+    console.log(file, '<=== cad file');
+    if (!file) {
+      enqueueSnackbar('Please select a .zip for shapes overlay upload format', {
+        variant: 'warning',
+      });
+      return;
+    }
+
+    const ext = file.name.split('.').pop().toLowerCase();
+    console.log(ext, '<=== ext cad');
+    if (ext !== 'zip') {
+      enqueueSnackbar('Only .zip files are allowed', { variant: 'error' });
+      return;
+    }
+    enqueueSnackbar('Uploading Zip file', { variant: 'info' });
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await axiosInstance.post(
+        `/mapFeature/shapeOverlayUpload/${workDay._id || workDay.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: token,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+
+      enqueueSnackbar('Shapes uploaded successfully!', {
+        variant: 'success',
+      });
+      if (cadFileInputRef.current) cadFileInputRef.current.value = '';
+    } catch (err) {
+      console.error('CAD zip file upload failed', err);
       enqueueSnackbar(err.response?.data?.message || err.message, {
         variant: 'error',
       });
@@ -668,6 +721,27 @@ const WorkDayList = () => {
                               >
                                 Upload DXF
                               </Button>
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                startIcon={<UploadIcon />}
+                                onClick={() => handleCadFileInputClick(workDay)}
+                                disabled={
+                                  uploading[`${workDay._id || workDay.id}_dxf`]
+                                }
+                                fullWidth
+                                sx={{
+                                  height: 36,
+                                  fontSize: '0.75rem',
+                                  fontWeight: 500,
+                                  textTransform: 'none',
+                                  borderWidth: 1.5,
+                                  '&:hover': { borderWidth: 2 },
+                                }}
+                              >
+                                Upload CAD zip file
+                              </Button>
 
                               {/* Generate Tiles Button */}
                               <Button
@@ -728,6 +802,13 @@ const WorkDayList = () => {
         style={{ display: 'none' }}
         accept=".dxf"
         onChange={handleDxfFileChange}
+      />
+      <input
+        type="file"
+        ref={cadFileInputRef}
+        style={{ display: 'none' }}
+        accept=".zip"
+        onChange={handleCadFileChange}
       />
       <GenerateTilesConfirmationBox
         confirmDialog={confirmDialog}
