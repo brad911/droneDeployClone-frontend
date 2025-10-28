@@ -24,8 +24,9 @@ const PermissionModal = ({ open, onClose, user, onSave }) => {
   };
 
   const handleSubmit = async () => {
+    console.log(permissions, '<======permissions to submit');
     try {
-      await axiosInstance.patch(`/user//updatePersmission/${user.id}`, {
+      await axiosInstance.patch(`/user/updatePersmission/${user.id}`, {
         permissions: permissions,
       });
       enqueueSnackbar('Permissions updated successfully!', {

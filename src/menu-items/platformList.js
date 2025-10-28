@@ -35,7 +35,7 @@ const getPlatformMenu = (projectId, projectName, permissions = {}) => {
       breadcrumbs: false,
     });
   }
-  if (permissions.resourceManagement) {
+  if (permissions.activityManagement) {
     children.push({
       id: 'activityManagement',
       title: 'Activity',

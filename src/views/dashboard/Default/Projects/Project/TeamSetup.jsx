@@ -43,7 +43,7 @@ const TeamSetup = () => {
     const fetchMembers = async () => {
       setLoading(true);
       try {
-        const res = await axiosInstance.get('/project-members', {
+        const res = await axiosInstance.get('/project-members/query', {
           params: { projectId },
           headers: { Authorization: token },
         });
@@ -241,7 +241,7 @@ const TeamSetup = () => {
                         size="small"
                         value={member.role}
                         onChange={(e) =>
-                          handlePermissionChange(member._id, e.target.value)
+                          handlePermissionChange(member.id, e.target.value)
                         }
                         sx={{ minWidth: 90 }}
                         disabled={member.role === 'owner'}
@@ -265,7 +265,7 @@ const TeamSetup = () => {
                     <TableCell align="center">
                       <IconButton
                         color="error"
-                        onClick={() => handleRemove(member._id)}
+                        onClick={() => handleRemove(member.id)}
                       >
                         <DeleteIcon />
                       </IconButton>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Box, Typography, MenuItem, FormControl, Select } from '@mui/material';
 import { ReactCompareSlider } from 'react-compare-slider';
 import mapboxgl from 'mapbox-gl';
@@ -80,8 +80,23 @@ export default function CompareProject() {
         const res = await axios.get(
           `/work-day?projectId=${projectId}&limit=1000`,
         );
-        const filtered = res.data.data.results.filter((w) => w.tileBaseUrl);
+
+        const filtered = res.data.data.results
+          .filter((w) => w.tileBaseUrl)
+          .map((w) => {
+            const date = new Date(w.name);
+            if (!isNaN(date.getTime())) {
+              const day = String(date.getDate()).padStart(2, '0');
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const year = date.getFullYear();
+              return { ...w, name: `${day}-${month}-${year}` };
+            }
+            // not a date → leave name as is
+            return w;
+          });
+
         setWorkDays(filtered);
+
         if (filtered.length >= 2) {
           setFirstWorkDay(filtered[0]);
           setSecondWorkDay(filtered[1]);
@@ -90,6 +105,7 @@ export default function CompareProject() {
         console.error('Failed to fetch workdays', err);
       }
     };
+
     fetchWorkDays();
   }, [projectId]);
 
