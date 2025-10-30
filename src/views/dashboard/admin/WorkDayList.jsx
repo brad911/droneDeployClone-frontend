@@ -740,7 +740,7 @@ const WorkDayList = () => {
                                   '&:hover': { borderWidth: 2 },
                                 }}
                               >
-                                Upload CAD zip file
+                                Upload SHP zip file
                               </Button>
 
                               {/* Generate Tiles Button */}

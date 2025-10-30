@@ -226,6 +226,7 @@ export default function ProjectWork() {
       const getColor = [
         'coalesce',
         ['get', 'user_color'],
+        ['get', 'color_hex'],
         ['get', 'color'],
         DEFAULT_COLOR,
       ];
@@ -897,7 +898,7 @@ export default function ProjectWork() {
 
       try {
         const { data } = await axiosInstance.get('/mapFeature', {
-          params: { workDayId: workDay.id, limit: 100 },
+          params: { workDayId: workDay.id, limit: 1000000 },
           headers: { Authorization: token },
         });
 
@@ -914,7 +915,8 @@ export default function ProjectWork() {
                 createdBy,
                 createdAt,
                 comment: properties?.comment || '',
-                color: properties?.color || selectedColor,
+                color:
+                  properties?.color || properties?.hex_color || selectedColor,
                 message: properties?.message || 'No message set',
               },
             }),
@@ -978,7 +980,8 @@ export default function ProjectWork() {
     const shapeOverlayFeatures = mapFeatures.filter(
       (f) => f.properties?.shapefile,
     );
-
+    console.log(shapeOverlayFeatures, '<============ shape overlay features');
+    console.log(overlayFeatures, '<============ overlay features');
     // =========================
     // ✏️ Editable Features (Draw)
     // =========================
@@ -1061,43 +1064,60 @@ export default function ProjectWork() {
         data: { type: 'FeatureCollection', features: shapeOverlayFeatures },
       });
 
+      // ✅ Polygons
       if (layers.showPolygons) {
         map.addLayer({
           id: shapeOverlayLayers.fill,
           type: 'fill',
           source: shapeOverlaySourceId,
-          filter: ['==', ['geometry-type'], 'Polygon'],
+          filter: [
+            'any',
+            ['==', ['geometry-type'], 'Polygon'],
+            ['==', ['geometry-type'], 'MultiPolygon'],
+          ],
           paint: {
-            'fill-color': ['coalesce', ['get', 'color_hex'], '#2563EB'],
+            'fill-color': ['coalesce', ['get', 'color'], '#2563EB'],
             'fill-opacity': 0.3,
           },
         });
       }
 
+      // ✅ Lines
       if (layers.showLineString) {
         map.addLayer({
           id: shapeOverlayLayers.line,
           type: 'line',
           source: shapeOverlaySourceId,
-          filter: ['==', ['geometry-type'], 'LineString'],
+          filter: [
+            'any',
+            ['==', ['geometry-type'], 'LineString'],
+            ['==', ['geometry-type'], 'MultiLineString'],
+          ],
           paint: {
-            'line-color': ['coalesce', ['get', 'color_hex'], '#2563EB'],
-            'line-width': 1,
+            'line-color': ['coalesce', ['get', 'color'], '#2563EB'],
+            'line-width': 2,
             'line-join': 'round',
             'line-cap': 'round',
           },
         });
       }
 
+      // ✅ Points
       if (layers.showComments) {
         map.addLayer({
           id: shapeOverlayLayers.point,
           type: 'circle',
           source: shapeOverlaySourceId,
-          filter: ['==', ['geometry-type'], 'Point'],
+          filter: [
+            'any',
+            ['==', ['geometry-type'], 'Point'],
+            ['==', ['geometry-type'], 'MultiPoint'],
+          ],
           paint: {
-            'circle-radius': 3,
-            'circle-color': ['coalesce', ['get', 'color_hex'], '#2563EB'],
+            'circle-radius': 5,
+            'circle-color': ['coalesce', ['get', 'color'], '#2563EB'],
+            'circle-stroke-width': 1,
+            'circle-stroke-color': '#ffffff',
           },
         });
       }
