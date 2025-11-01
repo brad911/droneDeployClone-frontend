@@ -916,7 +916,7 @@ export default function ProjectWork() {
                 createdAt,
                 comment: properties?.comment || '',
                 color:
-                  properties?.color || properties?.hex_color || selectedColor,
+                  properties?.color || properties?.color_hex || selectedColor,
                 message: properties?.message || 'No message set',
               },
             }),
@@ -949,6 +949,7 @@ export default function ProjectWork() {
       fill: `overlay-fill-${workDay.id}`,
       line: `overlay-line-${workDay.id}`,
       point: `overlay-point-${workDay.id}`,
+      text: `overlay-text-${workDay.id}`,
     };
     const shapeOverlayLayers = {
       fill: `shapeOverlay-fill-${workDay.id}`,
@@ -1041,15 +1042,48 @@ export default function ProjectWork() {
         });
       }
 
+      // ---- POINTS (non-text) ----
       if (layers.showComments) {
         map.addLayer({
           id: overlayLayers.point,
           type: 'circle',
           source: overlaySourceId,
-          filter: ['==', ['geometry-type'], 'Point'],
+          filter: [
+            'all',
+            ['==', ['geometry-type'], 'Point'],
+            ['!=', ['get', 'isText'], true], // exclude MTEXT / INSERT points
+          ],
           paint: {
             'circle-radius': 3,
             'circle-color': ['coalesce', ['get', 'color_hex'], '#2563EB'],
+          },
+        });
+      }
+
+      // ---- TEXT FOR MTEXT & INSERT ----
+      if (layers.showComments) {
+        map.addLayer({
+          id: overlayLayers.text,
+          type: 'symbol',
+          source: overlaySourceId,
+          filter: [
+            'all',
+            ['==', ['geometry-type'], 'Point'],
+            ['==', ['get', 'isText'], true], // only text points
+          ],
+          layout: {
+            'text-field': ['get', 'Text'], // DXF text content
+            'text-size': 10,
+            'text-offset': [0, 1.2], // lift text above marker point
+            'text-anchor': 'bottom',
+            'text-rotation': ['get', 'rotation'], // use rotation if exists
+            'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
+            'text-allow-overlap': false,
+          },
+          paint: {
+            'text-color': ['coalesce', ['get', 'color_hex'], '#000000'],
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 1,
           },
         });
       }
@@ -1076,7 +1110,12 @@ export default function ProjectWork() {
             ['==', ['geometry-type'], 'MultiPolygon'],
           ],
           paint: {
-            'fill-color': ['coalesce', ['get', 'color'], '#2563EB'],
+            'line-color': [
+              'coalesce',
+              ['get', 'color_hex'],
+              ['get', 'color'],
+              '#2563EB',
+            ],
             'fill-opacity': 0.3,
           },
         });
@@ -1094,8 +1133,13 @@ export default function ProjectWork() {
             ['==', ['geometry-type'], 'MultiLineString'],
           ],
           paint: {
-            'line-color': ['coalesce', ['get', 'color'], '#2563EB'],
-            'line-width': 2,
+            'line-color': [
+              'coalesce',
+              ['get', 'color_hex'],
+              ['get', 'color'],
+              '#2563EB',
+            ],
+            'line-width': 1,
             'line-join': 'round',
             'line-cap': 'round',
           },
@@ -1114,8 +1158,13 @@ export default function ProjectWork() {
             ['==', ['geometry-type'], 'MultiPoint'],
           ],
           paint: {
-            'circle-radius': 5,
-            'circle-color': ['coalesce', ['get', 'color'], '#2563EB'],
+            'circle-radius': 3,
+            'line-color': [
+              'coalesce',
+              ['get', 'color_hex'],
+              ['get', 'color'],
+              '#2563EB',
+            ],
             'circle-stroke-width': 1,
             'circle-stroke-color': '#ffffff',
           },
