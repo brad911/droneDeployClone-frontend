@@ -13,35 +13,50 @@ import ImageIcon from '@mui/icons-material/PhotoLibrary';
 import PersonIcon from '@mui/icons-material/Person';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from 'react-router';
-import { formatDistanceToNow } from 'date-fns';
 import { useDispatch } from 'react-redux';
 import { setSelectedProject } from '../../../../store/slices/projectSlice';
 import image from '../../../../assets/images/conture-map.jpg';
 import { useState } from 'react';
 
-const ProjectTile = ({ project, count, onDelete }) => {
+const ProjectTile = ({ project, count, onDelete, onDuplicate, onEdit }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
 
+  // --- Menu handlers ---
   const handleMenuClick = (e) => {
     e.stopPropagation();
     setAnchorEl(e.currentTarget);
   };
 
   const handleMenuClose = (e) => {
-    e.stopPropagation();
+    e?.stopPropagation?.();
     setAnchorEl(null);
   };
 
+  // --- Action handlers ---
   const handleDelete = (e) => {
     e.stopPropagation();
     setAnchorEl(null);
-    if (onDelete) onDelete(project);
+    onDelete?.(project);
   };
 
-  const handleView = () => {
+  const handleDuplicate = (e) => {
+    e.stopPropagation();
+    setAnchorEl(null);
+    onDuplicate?.(project);
+  };
+
+  const handleEdit = (e) => {
+    e.stopPropagation();
+    setAnchorEl(null);
+    onEdit?.(project);
+  };
+
+  const handleView = (e) => {
+    e?.stopPropagation?.();
+    setAnchorEl(null);
     const id = project._id || project.id;
     dispatch(setSelectedProject({ id, name: project.name }));
     navigate(`/project/${id}/View`);
@@ -62,7 +77,7 @@ const ProjectTile = ({ project, count, onDelete }) => {
       }}
       onClick={handleView}
     >
-      {/* Image + overlay */}
+      {/* Image section */}
       <Box sx={{ position: 'relative', height: 140 }}>
         <CardMedia
           component="img"
@@ -84,13 +99,21 @@ const ProjectTile = ({ project, count, onDelete }) => {
             px: 2,
           }}
         >
-          <Typography variant="subtitle1" fontWeight={700} color="white" noWrap>
+          <Typography
+            variant="subtitle1"
+            fontWeight={700}
+            color="white"
+            noWrap
+            sx={{
+              textShadow: '0px 1px 3px rgba(0,0,0,0.6)',
+            }}
+          >
             {project?.name}
           </Typography>
         </Box>
       </Box>
 
-      {/* Info row */}
+      {/* Project info + menu */}
       <CardContent sx={{ pt: 1, pb: 1 }}>
         <Stack
           direction="row"
@@ -117,7 +140,7 @@ const ProjectTile = ({ project, count, onDelete }) => {
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  maxWidth: 140, // allow longer text before truncation
+                  maxWidth: 140,
                 }}
               >
                 {project?.location}
@@ -129,18 +152,11 @@ const ProjectTile = ({ project, count, onDelete }) => {
               <Typography variant="caption">{count}</Typography>
             </Stack>
 
-            {/* <Typography variant="caption" fontSize={8} color="text.secondary">
-              {project?.createdAt
-                ? `${formatDistanceToNow(new Date(project?.createdAt), {
-                    addSuffix: true,
-                  })}`
-                : 'Time unknown'}
-            </Typography> */}
             <Typography variant="caption" fontSize={10} color="text.secondary">
               {project?.createdAt
                 ? new Date(project.createdAt)
-                    .toLocaleDateString('en-GB') // ✅ formats as dd/mm/yyyy
-                    .replace(/\//g, '-') // ✅ converts to dd-mm-yyyy
+                    .toLocaleDateString('en-GB') // dd/mm/yyyy
+                    .replace(/\//g, '-') // convert to dd-mm-yyyy
                 : 'Date unknown'}
             </Typography>
           </Stack>
@@ -164,14 +180,40 @@ const ProjectTile = ({ project, count, onDelete }) => {
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
-              <MenuItem onClick={handleDelete}>Delete</MenuItem>
               <MenuItem
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleView();
+                  handleView(e);
                 }}
               >
                 View
+              </MenuItem>
+
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEdit(e);
+                }}
+              >
+                Edit
+              </MenuItem>
+
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDuplicate(e);
+                }}
+              >
+                Duplicate
+              </MenuItem>
+
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(e);
+                }}
+              >
+                Delete
               </MenuItem>
             </Menu>
           </Box>

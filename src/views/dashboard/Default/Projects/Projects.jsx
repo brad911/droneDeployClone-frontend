@@ -9,11 +9,6 @@ import {
   InputLabel,
   FormControl,
   Pagination,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  CircularProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ProjectTile from './ProjectTile';
@@ -23,6 +18,9 @@ import { useTheme } from '@emotion/react';
 import { useSelector } from 'react-redux';
 import { enqueueSnackbar } from 'notistack';
 import axiosInstance from '../../../../utils/axios.config';
+import DeleteDialogue from './Dialogue/DeleteDialogue';
+import DuplicateDialogue from './Dialogue/DuplicateDialogue';
+import EditProjectModal from './Dialogue/EditProjectModal';
 
 function Projects() {
   const theme = useTheme();
@@ -44,6 +42,14 @@ function Projects() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Duplicate Dialog state
+  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
+
+  // Edit Modal state
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const fetchProjects = async (search = '', sort = '', pageNumber = 1) => {
     setLoading(true);
@@ -70,6 +76,59 @@ function Projects() {
       setError(err.message || 'Failed to fetch projects');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDuplicateRequest = (project) => {
+    setSelectedProject(project);
+    setDuplicateDialogOpen(true);
+  };
+
+  const handleDuplicateConfirm = async () => {
+    if (!selectedProject) return;
+    setDuplicating(true);
+    try {
+      const res = await axiosInstance.post(
+        `/project/duplicate/${selectedProject._id}`,
+      );
+      if (res.status === 200) {
+        enqueueSnackbar('Project duplicated successfully', {
+          variant: 'success',
+        });
+        fetchProjects(searchTerm, sortBy, page);
+      }
+    } catch (e) {
+      console.log(e);
+      enqueueSnackbar('Error duplicating project', { variant: 'error' });
+    } finally {
+      setDuplicating(false);
+      setDuplicateDialogOpen(false);
+      setSelectedProject(null);
+    }
+  };
+
+  const handleEditRequest = (project) => {
+    setSelectedProject(project);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async (formData) => {
+    setSaving(true);
+    try {
+      const res = await axiosInstance.patch(
+        `/project/${selectedProject._id}`,
+        formData,
+        { headers: { Authorization: user.token } },
+      );
+      if (res.status === 200) {
+        enqueueSnackbar('Project updated successfully', { variant: 'success' });
+        fetchProjects(searchTerm, sortBy, page);
+      }
+    } catch (e) {
+      enqueueSnackbar('Error updating project', { variant: 'error' });
+    } finally {
+      setSaving(false);
+      setEditModalOpen(false);
     }
   };
 
@@ -219,6 +278,8 @@ function Projects() {
                   project={project.project}
                   count={project.memberCount}
                   onDelete={handleDeleteRequest}
+                  onDuplicate={handleDuplicateRequest}
+                  onEdit={handleEditRequest}
                 />
               </Grid>
             ))}
@@ -237,38 +298,29 @@ function Projects() {
         </>
       )}
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
+      <DeleteDialogue
         open={deleteDialogOpen}
-        onClose={() => !deleting && setDeleteDialogOpen(false)}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle>Delete Project</DialogTitle>
-        <DialogContent>
-          <Typography>
-            You are about to delete <strong>{selectedProject?.name}</strong>.
-            This action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setDeleteDialogOpen(false)}
-            disabled={deleting}
-          >
-            Cancel
-          </Button>
-          <Button
-            color="error"
-            variant="contained"
-            onClick={handleDeleteConfirm}
-            disabled={deleting}
-            startIcon={deleting ? <CircularProgress size={18} /> : null}
-          >
-            {deleting ? 'Deleting...' : 'Delete'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        deleting={deleting}
+        selectedProject={selectedProject}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDeleteConfirm}
+      />
+
+      <DuplicateDialogue
+        open={duplicateDialogOpen}
+        duplicating={duplicating}
+        selectedProject={selectedProject}
+        onClose={() => setDuplicateDialogOpen(false)}
+        onConfirm={handleDuplicateConfirm}
+      />
+
+      <EditProjectModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSave={handleSaveEdit}
+        selectedProject={selectedProject}
+        saving={saving}
+      />
     </Box>
   );
 }
