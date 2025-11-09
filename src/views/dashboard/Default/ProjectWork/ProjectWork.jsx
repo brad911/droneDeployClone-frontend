@@ -160,7 +160,7 @@ export default function ProjectWork() {
         setHistoricalDates(completed.map((w) => w.name));
         setSelectedWorkDay(completed[0]);
         setWorkDayData(completed);
-
+        console.log(completed, '<==== completed work days');
         if (completed.length > 0) {
           setSelectedDate(completed[0].name);
           //adding all the features
@@ -168,8 +168,8 @@ export default function ProjectWork() {
             params: { workDayId: completed[0].id },
             headers: { Authorization: token },
           });
-          if (mapFeaturesResponse.data?.data?.results.length !== 0) {
-            setCommentFeatures(mapFeaturesResponse.data?.data?.results);
+          if (mapFeaturesResponse.data?.data?.length !== 0) {
+            setCommentFeatures(mapFeaturesResponse.data?.data);
           }
         } else {
           setError('No completed work days found for this project.');
@@ -898,12 +898,10 @@ export default function ProjectWork() {
 
       try {
         const { data } = await axiosInstance.get('/mapFeature', {
-          params: { workDayId: workDay.id, limit: 1000000 },
+          params: { workDayId: workDay.id },
           headers: { Authorization: token },
         });
-
-        const results = data?.data?.results || [];
-
+        const results = data?.data || [];
         const allFeaturesGeoJSON = {
           type: 'FeatureCollection',
           features: results.map(
