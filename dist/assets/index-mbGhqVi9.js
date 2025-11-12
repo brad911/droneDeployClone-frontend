@@ -1,4 +1,4 @@
-import{aw as di,ak as mi,r as s,P as d,af as ui}from"./index-C4X2afvd.js";import{_ as D}from"./tslib.es6-CTYbIaVE.js";/**
+import{aw as di,ak as mi,r as s,P as d,af as ui}from"./index-CyxoyYgp.js";import{_ as D}from"./tslib.es6-CTYbIaVE.js";/**
  * @license @tabler/icons-react v3.31.0 - MIT
  *
  * This source code is licensed under the MIT license.

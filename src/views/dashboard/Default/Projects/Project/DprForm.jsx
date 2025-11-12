@@ -79,20 +79,10 @@ const DprForm = () => {
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
 
   // 🔹 Dynamic lists
-  const [hinderances, setHinderances] = useState([
-    'hinderance1',
-    'hinderance2',
-  ]);
-  const [milestonesList, setMilestonesList] = useState([
-    'mileston1',
-    'mileston2',
-    'mileston3',
-  ]);
-  const [qualityList, setQualityList] = useState([
-    'quality1, quality2',
-    'quality3',
-  ]);
-  const [safetyList, setSafetyList] = useState(['safety1', 'safety2']);
+  const [hinderances, setHinderances] = useState(['']);
+  const [milestonesList, setMilestonesList] = useState(['']);
+  const [qualityList, setQualityList] = useState(['']);
+  const [safetyList, setSafetyList] = useState(['']);
   const [team, setTeam] = useState([]);
 
   // 🔹 Custom fields (object)
