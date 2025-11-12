@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -6,23 +6,44 @@ import {
   TextField,
   Button,
   Stack,
-  Divider,
-  IconButton,
-  Chip,
   MenuItem,
   FormControl,
   InputLabel,
-  OutlinedInput,
   Select,
+  Divider,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
 } from '@mui/material';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AddIcon from '@mui/icons-material/Add';
 import MainCard from 'ui-component/cards/MainCard';
 import FormControlSelect from 'ui-component/extended/Form/FormControlSelect';
 import Breadcrumbs from '../../../../../ui-component/extended/Breadcrumbs';
-import { IconBuildingCog, IconDroneOff, IconReport } from '@tabler/icons-react';
-import Paper from '@mui/material/Paper';
-import Avatar from '@mui/material/Avatar';
-
+import {
+  IconBuildingCog,
+  IconCopyXFilled,
+  IconDroneOff,
+  IconReport,
+} from '@tabler/icons-react';
+import axiosInstance from 'utils/axios.config';
+import PhotoDialog from './PhotoDialogue';
+import { useSelector } from 'react-redux';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import { set } from 'lodash-es';
+import { enqueueSnackbar } from 'notistack';
+import DPRDocument from './DPRDocument';
+import { pdf } from '@react-pdf/renderer';
+dayjs.extend(utc);
 const weatherOptions = [
   { value: 'sunny', label: 'Sunny' },
   { value: 'cloudy', label: 'Cloudy' },
@@ -38,478 +59,757 @@ const statusOptions = [
 ];
 
 const DprForm = () => {
-  // Placeholder project details
-  const [project, setProject] = useState({
-    name: '',
-    location: '',
-    contractId: '',
-    team: [],
-  });
-  const [from, setFrom] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0]; // "YYYY-MM-DD"
-  });
-  const [to, setTo] = useState(() => {
-    const today = new Date();
-    today.setDate(today.getDate() + 1); // add one day
-    return today.toISOString().split('T')[0]; // format: "YYYY-MM-DD"
-  });
+  // 🔹 Project details
+  const project = useSelector((state) => state.project);
+  // 🔹 Dates
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [logo, setLogo] = useState(null);
+  // 🔹 Core form data
   const [weather, setWeather] = useState('');
-  const [manpower, setManpower] = useState('');
-  const [material, setMaterial] = useState('');
-  const [machinery, setMachinery] = useState('');
+  const [manpower, setManpower] = useState([]);
+  const [material, setMaterial] = useState([]);
+  const [machinery, setMachinery] = useState([]);
+  const [activity, setActivity] = useState([]);
+  const [contactID, setContactID] = useState('');
   const [activities, setActivities] = useState([
     { name: '', quantity: '', unit: '', status: '', cost: '' },
   ]);
-  const [issues, setIssues] = useState('');
-  const [milestones, setMilestones] = useState('');
-  const [qualityObservations, setQualityObservations] = useState('');
-  const [safetyRemarks, setSafetyRemarks] = useState('');
   const [photos, setPhotos] = useState([]);
-  const [newField, setNewField] = useState('');
-  const [fields, setFields] = useState([]);
+  const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
 
-  // Handlers
+  // 🔹 Dynamic lists
+  const [hinderances, setHinderances] = useState([
+    'hinderance1',
+    'hinderance2',
+  ]);
+  const [milestonesList, setMilestonesList] = useState([
+    'mileston1',
+    'mileston2',
+    'mileston3',
+  ]);
+  const [qualityList, setQualityList] = useState([
+    'quality1, quality2',
+    'quality3',
+  ]);
+  const [safetyList, setSafetyList] = useState(['safety1', 'safety2']);
+  const [team, setTeam] = useState([]);
+
+  // 🔹 Custom fields (object)
+  const [newField, setNewField] = useState('');
+  const [customFields, setCustomFields] = useState({});
+
+  // 🔹 Fetch project members
+  const [projectMembers, setProjectMembers] = useState([]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const res = await axiosInstance.get('/project-members/query', {
+          params: { projectId: project.id, limit: 50 },
+        });
+
+        setProjectMembers(res.data?.data?.results || []);
+      } catch (err) {
+        console.error('Error fetching project members:', err);
+      }
+    };
+    fetchMembers();
+  }, [project.id]);
+
+  // 🔹 Fetch resources when dates change
+  useEffect(() => {
+    if (!from || !to) return;
+
+    const fetchResources = async () => {
+      try {
+        const endpoints = ['manPower', 'machinery', 'material', 'activity'];
+        const results = {};
+        console.log(to, '< to');
+        console.log(from, '< from');
+        for (const ep of endpoints) {
+          const res = await axiosInstance.get(`/${ep}`, {
+            params: {
+              projectId: project.id,
+              startDate: from,
+              endDate: to,
+              limit: 1000,
+              page: 1,
+            },
+          });
+          results[ep] = res.data?.data?.results || [];
+          console.log(results[ep]);
+        }
+        console.log('Fetched resource results:', results);
+        setManpower(results.manPower);
+        setMachinery(results.machinery);
+        setMaterial(results.material);
+        setActivity(results.activity);
+        console.log('✅ Resource data fetched:', results);
+      } catch (err) {
+        console.error('❌ Error fetching resources:', err);
+      }
+    };
+
+    fetchResources();
+  }, [from, to]);
+
+  const fetchProjectMembers = async () => {
+    try {
+      const res = await axiosInstance.get('/project-members/query', {
+        params: { projectId: project.id, limit: 1000 },
+      });
+      const results = res.data?.data?.results || [];
+      console.log(res.data?.data?.results[0]);
+      setProjectMembers(results);
+    } catch (e) {
+      console.error('Error fetching project members:', e);
+    }
+  };
+  useEffect(() => {
+    fetchProjectMembers();
+  }, []);
+
+  // 🔹 Helpers for dynamic text arrays
+  const addItem = (setter) => setter((prev) => [...prev, '']);
+  const updateItem = (setter, index, value) =>
+    setter((prev) => prev.map((item, i) => (i === index ? value : item)));
+  const removeItem = (setter, index) =>
+    setter((prev) => prev.filter((_, i) => i !== index));
+
+  // 🔹 Activities
   const handleActivityChange = (idx, key, value) => {
     const updated = [...activities];
     updated[idx][key] = value;
     setActivities(updated);
   };
-  const handleAddActivity = () => {
+  const addActivity = () =>
     setActivities([
       ...activities,
       { name: '', quantity: '', unit: '', status: '', cost: '' },
     ]);
-  };
+
+  // 🔹 Photos
+  const handleAddPhoto = (photoObj) => setPhotos((prev) => [...prev, photoObj]);
+
+  // 🔹 Custom field logic
   const handleAddField = () => {
-    if (newField.trim()) {
-      setFields([...fields, newField.trim()]);
+    if (newField.trim() && !customFields[newField]) {
+      setCustomFields((prev) => ({ ...prev, [newField]: '' }));
       setNewField('');
     }
   };
-  // Handler for photo upload
-  const handlePhotoUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setPhotos((prev) => [...prev, ...files]);
+  const handleCustomFieldChange = (key, value) => {
+    setCustomFields((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // 🔹 Submit handler
+  const handleSubmit = async () => {
+    const payload = {
+      projectContractId: contactID,
+      projectName: project.name,
+      projectLocation: project.location,
+      projectId: project.id,
+      from,
+      to,
+      weather,
+      manpower,
+      machinery,
+      material,
+      activities,
+      hinderances,
+      milestones: milestonesList,
+      qualityObservations: qualityList,
+      safetyRemarks: safetyList,
+      photos,
+      customFields,
+      activity,
+      logo,
+      projectMembers: team,
+    };
+
+    console.log('📦 Final DPR Payload:', payload);
+
+    // 🧠 Generate the PDF in-memory
+    const blob = await pdf(<DPRDocument payload={payload} />).toBlob();
+
+    // 💾 Trigger browser download
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `DPR_${new Date().toISOString().split('T')[0]}.pdf`;
+    link.click();
   };
 
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
-    { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
-    { title: 'Progress Report', icon: IconReport }, // No `to` makes it the current page
+    {
+      title: project.name,
+      to: `/project/${project.id}/View`,
+      icon: IconBuildingCog,
+    },
+    { title: 'Progress Report', icon: IconReport },
   ];
+  const handleDelete = (index) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // ✅ Validate MIME type (must start with "image/")
+    if (!file.type.startsWith('image/')) {
+      enqueueSnackbar('Only image files are allowed (PNG, JPG, JPEG, etc.)', {
+        variant: 'error',
+      });
+      e.target.value = ''; // clear invalid file input
+      return;
+    }
+
+    // ✅ Optional: validate file size (example: max 3MB)
+    const maxSizeMB = 3;
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      enqueueSnackbar(`Image size must be under ${maxSizeMB} MB`, {
+        variant: 'warning',
+      });
+      e.target.value = '';
+      return;
+    }
+
+    // ✅ If valid, set the logo
+    setLogo(file);
+    enqueueSnackbar('Logo uploaded successfully!', {
+      variant: 'success',
+    });
+  };
   return (
     <MainCard>
       <Box>
         <Typography variant="h1" gutterBottom>
           Generate Progress Report
         </Typography>
-        <Breadcrumbs
-          links={pageLinks}
-          card={true}
-          custom={true}
-          rightAlign={false}
-        />
+        <Breadcrumbs links={pageLinks} card custom rightAlign={false} />
       </Box>
 
       <Typography variant="subtitle1" sx={{ mb: 2 }}>
         Fill in the details for today's progress report
       </Typography>
-      <Box component="form" noValidate autoComplete="off">
-        {/* Project Details */}
-        <Grid
-          container
-          spacing={2}
-          sx={{
-            mb: 2,
-            border: '1px solid #e0e0e0',
-            borderRadius: 2,
-            p: 2,
-            flexWrap: 'nowrap',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Grid item xs={12} md={4} sx={{ width: '20%' }}>
-            <TextField
-              label="Project"
-              value={project.name}
-              sx={{ mb: 1 }}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} md={4} sx={{ width: '20%' }}>
-            <TextField
-              label="Project Location"
-              value={project.location}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} sx={{ width: '20%' }}>
-            <TextField
-              label="Contract ID/Project number"
-              value={project.contractId}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-          </Grid>
 
-          <Grid item xs={12} md={6} sx={{ width: '20%' }}>
-            <TextField
-              label="From"
-              type="date"
-              value={from}
-              onChange={(e) => setDate(e.target.value)}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6} sx={{ width: '20%' }}>
-            <TextField
-              label="To"
-              type="date"
-              value={to}
-              onChange={(e) => setDate(e.target.value)}
-              fullWidth
-              sx={{ mb: 1 }}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} sx={{ width: '20%' }}>
-            <FormControl fullWidth sx={{ mb: 1 }}>
-              <InputLabel id="project-team-label">Project Team</InputLabel>
-              <Select
-                labelId="project-team-label"
-                label="Project Team"
-                multiple
-                value={project.team}
-                onChange={(e) =>
-                  setProject((prev) => ({ ...prev, team: e.target.value }))
-                }
-                renderValue={(selected) => selected.join(', ')}
-              >
-                <MenuItem value="alice@example.com">alice@example.com</MenuItem>
-                <MenuItem value="bob@example.com">bob@example.com</MenuItem>
-                <MenuItem value="carol@example.com">carol@example.com</MenuItem>
-                <MenuItem value="dave@example.com">dave@example.com</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
+      {/* --- Project Details --- */}
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          mb: 2,
+          border: '1px solid #e0e0e0',
+          borderRadius: 2,
+          p: 2,
+          alignItems: 'center',
+        }}
+      >
+        <Grid item xs={12} md={4}>
+          <TextField label="Project" value={project.name} fullWidth disabled />
         </Grid>
-        {project.team.length > 0 && (
-          <Paper
-            spacing={2}
-            sx={{
-              mt: 2,
-              mb: 2,
-              p: 2,
-              border: '1px solid #e0e0e0',
-              borderRadius: 2,
-              width: '100%',
-            }}
-          >
-            <Typography
-              variant="subtitle2"
-              sx={{ mb: 1, color: 'text.secondary' }}
-            >
-              Project Team Members
-            </Typography>
-            <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
-              {project.team.map((member, idx) => (
-                <Chip
-                  key={idx}
-                  label={member}
-                  avatar={
-                    <Avatar
-                      sx={{
-                        bgcolor: 'primary.main',
-                        width: 24,
-                        height: 24,
-                        fontSize: 14,
-                      }}
-                    >
-                      {member[0]?.toUpperCase()}
-                    </Avatar>
-                  }
-                  sx={{ mb: 1 }}
-                />
-              ))}
-            </Stack>
-          </Paper>
-        )}
-
-        {/* Weather Conditions */}
-        <Box sx={{ mb: 2 }}>
-          <FormControlSelect
-            captionLabel="Weather Conditions"
-            currencies={weatherOptions}
-            selected={weather}
-            formState={''}
-            textPrimary={null}
-            textSecondary={null}
-            iconPrimary={null}
-            iconSecondary={null}
-          />
-        </Box>
-
-        {/* Manpower, Material, Machinery */}
-        <Grid
-          container
-          justifyContent={'space-between'}
-          sx={{ mb: 2, flexWrap: 'nowrap', borderRadius: 2 }}
-        >
-          <Grid item xs={12} md={4} sx={{ width: '33%' }}>
-            <TextField
-              label="Manpower"
-              value={manpower}
-              onChange={(e) => setManpower(e.target.value)}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} md={4} sx={{ width: '33%' }}>
-            <TextField
-              label="Material"
-              value={material}
-              onChange={(e) => setMaterial(e.target.value)}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} md={4} sx={{ width: '33%' }}>
-            <TextField
-              label="Machinery"
-              value={machinery}
-              onChange={(e) => setMachinery(e.target.value)}
-              fullWidth
-            />
-          </Grid>
-        </Grid>
-
-        {/* Activity Progress */}
-        <Box sx={{ mb: 2, border: '1px solid #e0e0e0', borderRadius: 2, p: 2 }}>
-          <Typography variant="h5" sx={{ mb: 1 }}>
-            Activity Progress
-          </Typography>
-          {activities.map((activity, idx) => (
-            <Grid container spacing={2} key={idx} sx={{ mb: 1 }}>
-              <Grid item xs={12} md={5}>
-                <TextField
-                  label="Activity Name"
-                  value={activity.name}
-                  onChange={(e) =>
-                    handleActivityChange(idx, 'name', e.target.value)
-                  }
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  label="Quantity"
-                  value={activity.quantity}
-                  onChange={(e) =>
-                    handleActivityChange(idx, 'quantity', e.target.value)
-                  }
-                  fullWidth
-                  type="number"
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  label="Unit"
-                  value={activity.unit}
-                  onChange={(e) =>
-                    handleActivityChange(idx, 'unit', e.target.value)
-                  }
-                  fullWidth
-                  type="text"
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <FormControl fullWidth>
-                  <InputLabel>Status</InputLabel>
-                  <Select
-                    label="Status"
-                    value={activity.status}
-                    onChange={(e) =>
-                      handleActivityChange(idx, 'status', e.target.value)
-                    }
-                    inputComponent={({ inputRef, ...props }) => (
-                      <select
-                        ref={inputRef}
-                        {...props}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          border: 'none',
-                          background: 'none',
-                        }}
-                      >
-                        <option value=""></option>
-                        {statusOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  />
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  label="Cost"
-                  value={activity.cost}
-                  onChange={(e) =>
-                    handleActivityChange(idx, 'cost', e.target.value)
-                  }
-                  fullWidth
-                  type="text"
-                />
-              </Grid>
-            </Grid>
-          ))}
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={handleAddActivity}
-            sx={{ mt: 1 }}
-          >
-            Add Activity
-          </Button>
-        </Box>
-
-        {/* Issues & Challenges */}
-        <Box sx={{ mb: 2 }}>
+        <Grid item xs={12} md={4}>
           <TextField
-            label="Hindrances and Challenges"
-            value={issues}
-            onChange={(e) => setIssues(e.target.value)}
+            label="Location"
+            value={project.location}
             fullWidth
-            multiline
-            minRows={2}
-            placeholder="Describe any issues or challenges encountered"
+            disabled
           />
-        </Box>
-
-        {/* Key Milestones, Quality Observations, Safety Remarks in a single row */}
-        <Grid
-          container
-          spacing={2}
-          sx={{
-            mb: 2,
-            borderRadius: 2,
-            border: '1px solid #e0e0e0',
-            flexWrap: 'nowrap',
-          }}
-        >
-          <Grid
-            item
-            xs={12}
-            sx={{ display: 'flex', flexDirection: 'column', width: '33%' }}
-          >
-            <TextField
-              label="Key Milestones Achieved"
-              value={milestones}
-              onChange={(e) => setMilestones(e.target.value)}
-              fullWidth
-              multiline
-              minRows={2}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} sx={{ width: '33%' }}>
-            <TextField
-              label="Quality Observations"
-              value={qualityObservations}
-              onChange={(e) => setQualityObservations(e.target.value)}
-              fullWidth
-              multiline
-              minRows={2}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} sx={{ width: '33%' }}>
-            <TextField
-              label="Safety Remarks"
-              value={safetyRemarks}
-              onChange={(e) => setSafetyRemarks(e.target.value)}
-              fullWidth
-              multiline
-              minRows={2}
-            />
-          </Grid>
         </Grid>
-        <Button variant="outlined" component="label" sx={{ mt: 1, mb: 2 }}>
-          Add Photos
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            hidden
-            onChange={handlePhotoUpload}
+        <Grid item xs={12} md={4}>
+          <TextField
+            label="Contract ID"
+            value={contactID}
+            fullWidth
+            onChange={(e) => setContactID(e.target.value)}
+            // disabled
           />
-        </Button>
-        {/* List uploaded images below */}
-        {photos.length > 0 && (
-          <Box sx={{ mt: 1 }}>
-            <Grid container spacing={1}>
-              {photos.map((photo, idx) => (
-                <Grid item key={idx}>
-                  <img
-                    src={URL.createObjectURL(photo)}
-                    alt={`uploaded-${idx}`}
-                    style={{
-                      width: 60,
-                      height: 60,
-                      objectFit: 'cover',
-                      borderRadius: 4,
-                      border: '1px solid #ccc',
-                    }}
-                  />
-                </Grid>
+        </Grid>
+
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Grid item xs={12} md={6}>
+            <DatePicker
+              sx={{ width: 220 }}
+              label="From"
+              value={from ? dayjs(from) : null}
+              onChange={(newValue) =>
+                setFrom(newValue ? dayjs.utc(newValue).toISOString() : '')
+              }
+              // For format in v6+ use `format`; in older might still be `inputFormat`
+              inputFormat="DD‑MM‑YYYY"
+              slotProps={{ textField: { fullWidth: true } }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <DatePicker
+              sx={{ width: 220 }}
+              label="To"
+              value={to ? dayjs(to) : null}
+              onChange={(newValue) =>
+                setTo(newValue ? dayjs.utc(newValue).toISOString() : '')
+              }
+              inputFormat="DD‑MM‑YYYY"
+              slotProps={{ textField: { fullWidth: true } }}
+            />
+          </Grid>
+        </LocalizationProvider>
+        <Grid item xs={12}>
+          <FormControl fullWidth sx={{ minWidth: 220 }}>
+            <InputLabel id="project-team-label">Project Team</InputLabel>
+            <Select
+              labelId="project-team-label"
+              label="Project Team" // ensures the label reserves space
+              multiple
+              value={team} // should be an array of strings
+              onChange={(e) => setTeam(e.target.value)}
+              renderValue={(selected) => selected.join(', ')} // display comma-separated values
+            >
+              {projectMembers.map((m, i) => (
+                <MenuItem
+                  key={i}
+                  value={`${m.userId.firstName} ${m.userId.lastName}`}
+                >
+                  {m.userId.firstName} {m.userId.lastName}
+                </MenuItem>
               ))}
-            </Grid>
+            </Select>
+          </FormControl>
+        </Grid>
+        {/* ✅ Project Logo Upload */}
+        <Grid item xs={12} md={6}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {logo ? (
+              <Box
+                sx={{
+                  border: '1px solid #ddd',
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                  width: 80,
+                  height: 80,
+                  flexShrink: 0,
+                }}
+              >
+                <img
+                  src={URL.createObjectURL(logo)}
+                  alt="Project Logo"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: 2,
+                  border: '1px dashed #bbb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#777',
+                  flexShrink: 0,
+                }}
+              >
+                No Logo
+              </Box>
+            )}
+
+            <Box>
+              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                Project Logo
+              </Typography>
+              <Button
+                component="label"
+                variant="outlined"
+                size="small"
+                startIcon={<CloudUploadIcon />}
+              >
+                {logo ? 'Change Logo' : 'Upload Logo'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleLogoChange}
+                />
+              </Button>
+            </Box>
+          </Box>
+        </Grid>
+      </Grid>
+
+      {/* --- Weather --- */}
+      <Box sx={{ mb: 2, minWidth: 200 }}>
+        <FormControl fullWidth>
+          <InputLabel id="weather-label">Weather Condition</InputLabel>
+          <Select
+            labelId="weather-label"
+            value={weather}
+            label="Weather Conditions"
+            onChange={(e) => setWeather(e.target.value)}
+          >
+            {weatherOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+      {/* List fetched resources */}
+      <Box sx={{ mt: 2 }}>
+        {Array.isArray(activity) && activity.length > 0 && (
+          <Box sx={{ mb: 3 }}>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="h4" sx={{ mb: 1 }}>
+              Activity Progress
+            </Typography>
+            <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+                    <TableCell sx={{ fontWeight: 600 }}>Created At</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Quantity</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Unit</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Cost</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Assigned To</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {activity.map((m, i) => (
+                    <TableRow key={i}>
+                      <TableCell>{m.createdAt?.split('T')[0] || '-'}</TableCell>
+                      <TableCell>{m.name || '-'}</TableCell>
+                      <TableCell>{m.quantity || '-'}</TableCell>
+                      <TableCell>{m.unit || '-'}</TableCell>
+                      <TableCell>{m.cost || '-'}</TableCell>
+                      <TableCell>
+                        {m.status ? m.status.replace('_', ' ') : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {/* populated reference */}
+                        {m.assignedTo?.firstName +
+                          ' ' +
+                          m.assignedTo.lastName || '-'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
         )}
-        {/* Create New Field */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <TextField
-            label="Create New Field"
-            value={newField}
-            onChange={(e) => setNewField(e.target.value)}
-            sx={{ flex: 1, mr: 2 }}
-          />
+      </Box>
+      <Box sx={{ mt: 2 }}>
+        {/* 🧍‍♂️ Manpower Section */}
+        {Array.isArray(manpower) && manpower.length > 0 && (
+          <Box sx={{ mb: 3 }}>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="h4" sx={{ mb: 1 }}>
+              Manpower
+            </Typography>
+            <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+                    <TableCell sx={{ fontWeight: 600 }}>Created At</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Manpower</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Supplier</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Trade</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Allocated</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Occupied</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Idle</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Remarks</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {manpower.map((m, i) => (
+                    <TableRow key={i}>
+                      <TableCell>{m.createdAt.split('T')[0] || '-'}</TableCell>
+                      <TableCell>{m.manPower || '-'}</TableCell>
+                      <TableCell>{m.supplier || '-'}</TableCell>
+                      <TableCell>{m.trade || '-'}</TableCell>
+                      <TableCell>{m.allocated ?? '-'}</TableCell>
+                      <TableCell>{m.occupied ?? '-'}</TableCell>
+                      <TableCell>{m.idle ?? '-'}</TableCell>
+                      <TableCell>{m.remarks || '-'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        )}
+        {/* 🚜 Machinery Section */}
+        {Array.isArray(machinery) && machinery.length > 0 && (
+          <Box sx={{ mb: 3 }}>
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="h4" sx={{ mb: 1 }}>
+              Machinery
+            </Typography>
+            <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+                    <TableCell sx={{ fontWeight: 600 }}>Created At</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Machinery</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Supplier</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Allocated</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Occupied</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Idle</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Maintenance</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Remarks</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {machinery.map((m, i) => (
+                    <TableRow key={i}>
+                      <TableCell>{m.createdAt.split('T')[0] || '-'}</TableCell>
+                      <TableCell>{m.machinery || '-'}</TableCell>
+                      <TableCell>{m.supplier || '-'}</TableCell>
+                      <TableCell>{m.allocated ?? '-'}</TableCell>
+                      <TableCell>{m.occupied ?? '-'}</TableCell>
+                      <TableCell>{m.idle ?? '-'}</TableCell>
+                      <TableCell>{m.maintainance ?? '-'}</TableCell>
+                      <TableCell>{m.remarks || '-'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        )}
+        {/* 🧱 Material Section */}
+        {Array.isArray(material) && material.length > 0 && (
+          <Box sx={{ mb: 3 }}>
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="h4" sx={{ mb: 1 }}>
+              Material
+            </Typography>
+            <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+                    <TableCell sx={{ fontWeight: 600 }}>Created At</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Material</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Supplier</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Unit</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Received</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Used</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Balance</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Remarks</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {material.map((m, i) => (
+                    <TableRow key={i}>
+                      <TableCell>{m.createdAt.split('T')[0] || '-'}</TableCell>
+                      <TableCell>{m.material || '-'}</TableCell>
+                      <TableCell>{m.supplier || '-'}</TableCell>
+                      <TableCell>{m.unit || '-'}</TableCell>
+                      <TableCell>{m.received ?? '-'}</TableCell>
+                      <TableCell>{m.used ?? '-'}</TableCell>
+                      <TableCell>{m.balance ?? '-'}</TableCell>
+                      <TableCell>{m.remarks || '-'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        )}
+      </Box>
+
+      {/* --- Hinderances / Milestones / Remarks --- */}
+      <Divider sx={{ my: 2 }} />
+      <Typography variant="h3" sx={{ mb: 1 }}>
+        Work Summary
+      </Typography>
+
+      {[
+        { title: 'Hindrances', state: hinderances, setter: setHinderances },
+        {
+          title: 'Key Milestones',
+          state: milestonesList,
+          setter: setMilestonesList,
+        },
+        {
+          title: 'Quality Observations',
+          state: qualityList,
+          setter: setQualityList,
+        },
+        { title: 'Safety Remarks', state: safetyList, setter: setSafetyList },
+      ].map(({ title, state, setter }, idx) => (
+        <Box key={idx} sx={{ mb: 2 }}>
+          <Typography variant="h4">{title}</Typography>
+          {state.map((item, i) => (
+            <Stack direction="row" spacing={1} key={i} sx={{ mt: 1 }}>
+              <TextField
+                fullWidth
+                value={item}
+                onChange={(e) => updateItem(setter, i, e.target.value)}
+                placeholder={`Enter ${title.toLowerCase()}`}
+              />
+              <Button color="error" onClick={() => removeItem(setter, i)}>
+                Remove
+              </Button>
+            </Stack>
+          ))}
           <Button
-            variant="contained"
-            onClick={handleAddField}
-            disabled={!newField.trim()}
+            startIcon={<AddIcon />}
+            onClick={() => addItem(setter)}
+            sx={{ mt: 1 }}
           >
-            Add +
+            Add {title}
           </Button>
         </Box>
+      ))}
 
-        {/* Editable fields list */}
-        {fields.length > 0 && (
-          <Stack spacing={2} sx={{ mb: 2 }}>
-            {fields.map((field, idx) => (
-              <TextField
-                key={idx}
-                fullWidth
-                label={`Custom Field ${idx + 1}`}
-                value={field}
-                onChange={(e) => {
-                  const updated = [...fields];
-                  updated[idx] = e.target.value;
-                  setFields(updated);
-                }}
-              />
-            ))}
-          </Stack>
-        )}
+      {/* --- Photos --- */}
+      <Button
+        variant="outlined"
+        onClick={() => setPhotoDialogOpen(true)}
+        sx={{ mb: 2 }}
+      >
+        Add Photos
+      </Button>
+      <PhotoDialog
+        open={photoDialogOpen}
+        onClose={() => setPhotoDialogOpen(false)}
+        onAdd={handleAddPhoto}
+      />
 
-        {/* Submit Button */}
-        <Button variant="contained" color="primary" fullWidth>
-          Submit
+      {photos.length > 0 && (
+        <Stack
+          direction="row"
+          flexWrap="wrap"
+          spacing={2}
+          useFlexGap
+          justifyContent="flex-start"
+        >
+          {photos.length > 0 && (
+            <Stack
+              direction="row"
+              flexWrap="wrap"
+              spacing={2}
+              useFlexGap
+              justifyContent="flex-start"
+            >
+              {photos.map((p, i) => (
+                <Paper
+                  key={i}
+                  elevation={3}
+                  sx={{
+                    width: 160,
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    position: 'relative',
+                    textAlign: 'center',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: 6,
+                    },
+                  }}
+                >
+                  {/* Delete Button */}
+                  <IconButton
+                    size="small"
+                    onClick={() => handleDelete(i)}
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      bgcolor: 'rgba(255,255,255,0.8)',
+                      '&:hover': { bgcolor: 'rgba(255,255,255,1)' },
+                    }}
+                  >
+                    <IconCopyXFilled fontSize="small" color="red" />
+                  </IconButton>
+
+                  {/* Image */}
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: 120,
+                      overflow: 'hidden',
+                      bgcolor: '#f9f9f9',
+                    }}
+                  >
+                    <img
+                      src={URL.createObjectURL(p.file)}
+                      alt={p.caption || `photo-${i}`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  </Box>
+
+                  {/* Caption */}
+                  <Box sx={{ p: 1.2 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 500,
+                        color: '#333',
+                        wordBreak: 'break-word',
+                        fontSize: '0.85rem',
+                      }}
+                    >
+                      {p.caption || 'No caption'}
+                    </Typography>
+                  </Box>
+                </Paper>
+              ))}
+            </Stack>
+          )}
+        </Stack>
+      )}
+
+      {/* --- Custom Fields --- */}
+      <Divider sx={{ my: 2 }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <TextField
+          label="Create New Field"
+          value={newField}
+          onChange={(e) => setNewField(e.target.value)}
+          sx={{ flex: 1, mr: 2 }}
+        />
+        <Button
+          variant="contained"
+          onClick={handleAddField}
+          disabled={!newField.trim()}
+        >
+          Add +
         </Button>
       </Box>
+
+      {Object.entries(customFields).map(([key, value]) => (
+        <TextField
+          key={key}
+          label={key}
+          value={value}
+          onChange={(e) => handleCustomFieldChange(key, e.target.value)}
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+      ))}
+
+      {/* --- Submit --- */}
+      <Button
+        variant="contained"
+        color="primary"
+        fullWidth
+        onClick={handleSubmit}
+      >
+        Submit
+      </Button>
     </MainCard>
   );
 };

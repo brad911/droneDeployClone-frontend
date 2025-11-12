@@ -58,7 +58,13 @@ const ProjectTile = ({ project, count, onDelete, onDuplicate, onEdit }) => {
     e?.stopPropagation?.();
     setAnchorEl(null);
     const id = project._id || project.id;
-    dispatch(setSelectedProject({ id, name: project.name }));
+    dispatch(
+      setSelectedProject({
+        id,
+        name: project.name,
+        location: project.location,
+      }),
+    );
     navigate(`/project/${id}/View`);
   };
 

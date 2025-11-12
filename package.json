@@ -13,6 +13,7 @@
     "@mui/icons-material": "7.1.0",
     "@mui/material": "^7.3.4",
     "@mui/x-date-pickers": "^8.15.0",
+    "@react-pdf/renderer": "^4.3.1",
     "@reduxjs/toolkit": "^2.8.2",
     "@tabler/icons-react": "3.31.0",
     "@tmcw/togeojson": "^7.1.2",
