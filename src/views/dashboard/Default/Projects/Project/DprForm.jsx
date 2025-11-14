@@ -19,6 +19,8 @@ import {
   TableHead,
   TableRow,
   IconButton,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AddIcon from '@mui/icons-material/Add';
@@ -84,7 +86,18 @@ const DprForm = () => {
   const [qualityList, setQualityList] = useState(['']);
   const [safetyList, setSafetyList] = useState(['']);
   const [team, setTeam] = useState([]);
-
+  const endpoints = [
+    { key: 'manPower', label: 'Manpower' },
+    { key: 'machinery', label: 'Machinery' },
+    { key: 'material', label: 'Material' },
+    { key: 'activity', label: 'Activity' },
+  ];
+  const [selectedEndpoints, setSelectedEndpoints] = useState(
+    endpoints.reduce((acc, ep) => ({ ...acc, [ep.key]: true }), {}), // all selected by default
+  );
+  const handleToggle = (key) => {
+    setSelectedEndpoints((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
   // 🔹 Custom fields (object)
   const [newField, setNewField] = useState('');
   const [customFields, setCustomFields] = useState({});
@@ -113,11 +126,13 @@ const DprForm = () => {
 
     const fetchResources = async () => {
       try {
-        const endpoints = ['manPower', 'machinery', 'material', 'activity'];
         const results = {};
-        console.log(to, '< to');
-        console.log(from, '< from');
-        for (const ep of endpoints) {
+
+        const endpointsToFetch = Object.keys(selectedEndpoints).filter(
+          (k) => selectedEndpoints[k],
+        );
+
+        for (const ep of endpointsToFetch) {
           const res = await axiosInstance.get(`/${ep}`, {
             params: {
               projectId: project.id,
@@ -128,21 +143,19 @@ const DprForm = () => {
             },
           });
           results[ep] = res.data?.data?.results || [];
-          console.log(results[ep]);
         }
-        console.log('Fetched resource results:', results);
-        setManpower(results.manPower);
-        setMachinery(results.machinery);
-        setMaterial(results.material);
-        setActivity(results.activity);
-        console.log('✅ Resource data fetched:', results);
+
+        setManpower(results.manPower || []);
+        setMachinery(results.machinery || []);
+        setMaterial(results.material || []);
+        setActivity(results.activity || []);
       } catch (err) {
         console.error('❌ Error fetching resources:', err);
       }
     };
 
     fetchResources();
-  }, [from, to]);
+  }, [from, to, selectedEndpoints]);
 
   const fetchProjectMembers = async () => {
     try {
@@ -152,6 +165,7 @@ const DprForm = () => {
       const results = res.data?.data?.results || [];
       console.log(res.data?.data?.results[0]);
       setProjectMembers(results);
+      setTeam(results.map((m) => `${m.userId.firstName} ${m.userId.lastName}`));
     } catch (e) {
       console.error('Error fetching project members:', e);
     }
@@ -224,9 +238,18 @@ const DprForm = () => {
     const blob = await pdf(<DPRDocument payload={payload} />).toBlob();
 
     // 💾 Trigger browser download
+    // Format filename: DPR_projectName_YYYYMMDD_HHMM.pdf
+    const now = new Date();
+    const pad = (num) => String(num).padStart(2, '0');
+
+    const datePart = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+    const timePart = `${pad(now.getHours())}${pad(now.getMinutes())}`;
+
+    const filename = `DPR_${project.name}_${datePart}_${timePart}.pdf`;
+
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `DPR_${new Date().toISOString().split('T')[0]}.pdf`;
+    link.download = filename;
     link.click();
   };
 
@@ -425,6 +448,43 @@ const DprForm = () => {
               </Button>
             </Box>
           </Box>
+        </Grid>
+        <Grid
+          container
+          spacing={2}
+          alignItems="center"
+          style={{ marginBottom: 16 }}
+        >
+          {/* Heading */}
+          <Grid item xs={12}>
+            <Typography variant="subtitle1" fontWeight="bold">
+              Import From:
+            </Typography>
+          </Grid>
+
+          {/* Checkboxes */}
+          <Grid item xs={12}>
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={2}
+                flexWrap="wrap"
+              >
+                {endpoints.map((ep) => (
+                  <FormControlLabel
+                    key={ep.key}
+                    control={
+                      <Checkbox
+                        checked={selectedEndpoints[ep.key]}
+                        onChange={() => handleToggle(ep.key)}
+                      />
+                    }
+                    label={ep.label}
+                  />
+                ))}
+              </Stack>
+            </Paper>
+          </Grid>
         </Grid>
       </Grid>
 

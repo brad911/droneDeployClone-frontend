@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   page: {
     padding: 30,
     fontSize: 11,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Times-Roman',
     lineHeight: 1.4,
   },
   title: {
@@ -24,25 +24,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 14,
     color: '#2563EB',
-    fontFamily: 'Helvetica',
+    fontFamily: 'Times-Bold',
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     marginTop: 12,
     marginBottom: 6,
     color: '#578FCA',
-    fontFamily: 'Helvetica',
+    fontFamily: 'Times-Bold',
   },
   text: {
-    fontSize: 11,
+    fontSize: 12,
     marginBottom: 6,
     color: '#1F3F66',
-    fontFamily: 'Helvetica',
+    fontFamily: 'Times-Roman',
   },
   divider: {
     borderBottomWidth: 0.5,
-    borderBottomColor: '#ccc', // neutral grey
+    borderBottomColor: '#ccc',
     marginVertical: 8,
   },
 
@@ -51,9 +51,9 @@ const styles = StyleSheet.create({
     display: 'table',
     width: 'auto',
     marginVertical: 8,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#ccc', // neutral grey border
+    // borderStyle: 'solid',
+    // borderWidth: 1,
+    // borderColor: '#ccc',
     borderRadius: 4,
   },
   row: {
@@ -61,21 +61,23 @@ const styles = StyleSheet.create({
   },
   cellHeader: {
     flex: 1,
-    backgroundColor: '#f5f5f5', // light grey
+    fontSize: 10,
+    backgroundColor: '#f5f5f5',
     padding: 6,
     fontWeight: 'bold',
     borderRightWidth: 1,
     borderColor: '#ccc',
-    color: '#333', // dark grey for text
-    fontFamily: 'Helvetica',
+    color: '#333',
+    fontFamily: 'Times-Bold',
   },
   cell: {
     flex: 1,
     padding: 6,
-    borderRightWidth: 1,
-    borderColor: '#ccc',
+    fontSize: 10,
+    // borderRightWidth: 1,
+    // borderColor: '#ccc',
     color: '#333',
-    fontFamily: 'Helvetica',
+    fontFamily: 'Times-Roman',
   },
 
   // ================= Images =================
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     textAlign: 'center',
     color: '#333',
-    fontFamily: 'Helvetica',
+    fontFamily: 'Times-Italic',
   },
 
   // ================= Footer =================
@@ -109,9 +111,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: 'center',
-    fontSize: 10,
+    fontSize: 8,
     color: '#999',
-    fontFamily: 'Helvetica',
+    fontFamily: 'Times-Roman',
   },
 });
 
@@ -142,30 +144,86 @@ const Table = ({ headers, rows }) => (
   </View>
 );
 
+const format = (iso) => {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('T')[0].split('-');
+  return `${d}-${m}-${y}`;
+};
+
 // ========================
 // 📄 Main Document
 // ========================
 const DPRDocument = ({ payload }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <Text style={styles.title}>Daily Progress Report</Text>
-      <Text style={{ fontSize: 12, textAlign: 'center', marginTop: 8 }}>
-        Date:{' '}
-        {(() => {
-          const d = new Date();
-          const day = String(d.getDate()).padStart(2, '0');
-          const month = String(d.getMonth() + 1).padStart(2, '0');
-          const year = d.getFullYear();
-          return `${day}-${month}-${year}`;
-        })()}
-      </Text>
+      {payload.logo ? (
+        // ================= WITH LOGO (3 columns) =================
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 15,
+          }}
+        >
+          {/* LEFT: Logo */}
+          <View style={{ width: '20%', alignItems: 'flex-start' }}>
+            <Image
+              style={{ width: 60, height: 60, objectFit: 'contain' }}
+              src={URL.createObjectURL(payload.logo)}
+            />
+          </View>
 
-      {payload.logo && (
-        <View style={{ alignItems: 'center', marginVertical: 10 }}>
-          <Image
-            style={{ width: 50, height: 50, objectFit: 'contain' }}
-            src={URL.createObjectURL(payload.logo)}
-          />
+          {/* CENTER: Title */}
+          <View style={{ width: '60%', alignItems: 'center' }}>
+            <Text style={styles.title}>Progress Report</Text>
+          </View>
+
+          {/* RIGHT: Date */}
+          <View style={{ width: '20%', alignItems: 'flex-end' }}>
+            <Text style={{ fontSize: 12 }}>
+              Date:{' '}
+              {(() => {
+                const d = new Date();
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                return `${day}-${month}-${year}`;
+              })()}
+            </Text>
+          </View>
+        </View>
+      ) : (
+        // ================= WITHOUT LOGO (2 columns) =================
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 10,
+          }}
+        >
+          {/* LEFT EMPTY SPACE (equal width) */}
+          <View style={{ width: '20%' }} />
+
+          {/* CENTER TITLE */}
+          <View style={{ width: '60%', alignItems: 'center' }}>
+            <Text style={styles.title}>Progress Report</Text>
+          </View>
+
+          {/* RIGHT DATE */}
+          <View style={{ width: '20%', alignItems: 'flex-end' }}>
+            <Text style={{ fontSize: 12 }}>
+              Date:{' '}
+              {(() => {
+                const d = new Date();
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                return `${day}-${month}-${year}`;
+              })()}
+            </Text>
+          </View>
         </View>
       )}
 
@@ -188,8 +246,8 @@ const DPRDocument = ({ payload }) => (
               : '-'}
           </Text>
           <Text style={styles.text}>
-            Reporting Period: {payload.from?.split('T')[0]} --→{' '}
-            {payload.to?.split('T')[0]}
+            Reporting Period: {format(payload.from)} {'-----'}
+            {format(payload.to)}
           </Text>
         </View>
 
@@ -208,13 +266,13 @@ const DPRDocument = ({ payload }) => (
       <View style={styles.divider} />
 
       {/* ================== Tables ================== */}
-      {['manpower', 'machinery', 'material', 'activity'].map((section) => {
+      {['activity', 'manpower', 'machinery', 'material'].map((section) => {
         const data = payload[section];
         if (!data || !data.length) return null;
 
         const headersMap = {
           manpower: [
-            'createdAt',
+            'Date',
             'Type',
             'Supplier',
             'Trade',
@@ -224,7 +282,7 @@ const DPRDocument = ({ payload }) => (
             'Remarks',
           ],
           machinery: [
-            'createdAt',
+            'Date',
             'Machinery',
             'Supplier',
             'Allocated',
@@ -234,7 +292,7 @@ const DPRDocument = ({ payload }) => (
             'Remarks',
           ],
           material: [
-            'createdAt',
+            'Date',
             'Material',
             'Supplier',
             'Unit',
@@ -244,7 +302,7 @@ const DPRDocument = ({ payload }) => (
             'Remarks',
           ],
           activity: [
-            'Created At',
+            'Date',
             'Activity',
             'Item',
             'Quantity',
@@ -253,13 +311,13 @@ const DPRDocument = ({ payload }) => (
             'Cost',
             'Start',
             'End',
-            'Assigned To',
+            'Assigned',
           ],
         };
 
         const rowsMap = {
           manpower: (m) => [
-            m.createdAt?.split('T')[0],
+            format(m.createdAt),
             m.manPower,
             m.supplier,
             m.trade,
@@ -269,7 +327,7 @@ const DPRDocument = ({ payload }) => (
             m.remarks,
           ],
           machinery: (m) => [
-            m.createdAt?.split('T')[0],
+            format(m.createdAt),
             m.machinery,
             m.supplier,
             m.allocated,
@@ -279,7 +337,7 @@ const DPRDocument = ({ payload }) => (
             m.remarks,
           ],
           material: (m) => [
-            m.createdAt?.split('T')[0],
+            format(m?.createdAt),
             m.material,
             m.supplier,
             m.unit,
@@ -289,7 +347,7 @@ const DPRDocument = ({ payload }) => (
             m.remarks,
           ],
           activity: (a) => [
-            a.createdAt?.split('T')[0],
+            format(a.createdAt),
             a.name,
             a.itemName,
             a.quantity,
@@ -298,7 +356,7 @@ const DPRDocument = ({ payload }) => (
             a.cost,
             a.startedAt?.split('T')[0],
             a.endedAt?.split('T')[0],
-            a.assignedTo?.email || '-',
+            a.assignedTo?.firstName + ' ' + a.assignedTo?.lastName || '-',
           ],
         };
 
@@ -346,10 +404,18 @@ const DPRDocument = ({ payload }) => (
       {/* ================== Photos ================== */}
       {payload.photos?.length > 0 && (
         <View wrap>
-          <Text style={styles.sectionTitle}>Annexture</Text>
+          <Text style={styles.sectionTitle}>Annexure</Text>
           <View style={styles.photoContainer} wrap>
             {payload.photos.map((p, i) => (
-              <View key={i} style={{ marginBottom: 10 }} wrap>
+              <View
+                key={i}
+                style={{
+                  marginBottom: 10,
+                  width: 180, // match photo width
+                  alignItems: 'center', // center children horizontally
+                }}
+                wrap
+              >
                 {p.file && p.file instanceof File ? (
                   <Image
                     src={URL.createObjectURL(p.file)}
@@ -358,19 +424,39 @@ const DPRDocument = ({ payload }) => (
                 ) : (
                   <Text>No Image</Text>
                 )}
-                <Text style={styles.caption}>{p.caption || '-'}</Text>
+                <Text
+                  style={{
+                    fontSize: 9,
+                    textAlign: 'center', // center the text
+                    color: '#333',
+                    fontFamily: 'Times-Italic',
+                    marginTop: 4,
+                  }}
+                >
+                  {i + 1 + '). '}
+                  {p.caption || '-'}
+                </Text>
               </View>
             ))}
           </View>
         </View>
       )}
 
+      {/* Fixed Page Number Footer */}
       <Text
-        style={styles.footer}
+        fixed
         render={({ pageNumber, totalPages }) =>
           `Page ${pageNumber} of ${totalPages}`
         }
-        fixed
+        style={{
+          position: 'absolute',
+          bottom: 50,
+          left: 50,
+          right: 0,
+          textAlign: 'center',
+          fontSize: 10,
+          color: '#999',
+        }}
       />
     </Page>
   </Document>
