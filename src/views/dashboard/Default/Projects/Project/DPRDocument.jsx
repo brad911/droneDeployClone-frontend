@@ -246,7 +246,7 @@ const DPRDocument = ({ payload }) => (
               : '-'}
           </Text>
           <Text style={styles.text}>
-            Reporting Period: {format(payload.from)} {'-----'}
+            Reporting Period: {format(payload.from)} {'--'}
             {format(payload.to)}
           </Text>
         </View>
@@ -257,7 +257,7 @@ const DPRDocument = ({ payload }) => (
             Location: {payload.projectLocation || '-'}
           </Text>
           <Text style={styles.text}>
-            Contract ID: {payload.contractId || '-'}
+            Contract ID: {payload.projectContractId || '-'}
           </Text>
           <Text style={styles.text}>Weather: {payload.weather || '-'}</Text>
         </View>
