@@ -36,12 +36,6 @@ import ColorPickerControl from './colorPickerControl';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
 
-const pageLinks = [
-  { title: 'Projects', to: '/project', icon: IconDroneOff },
-  { title: 'Project Name', icon: IconBuildingCog },
-  { title: 'Exterior(Map View)', icon: IconLiveViewFilled },
-];
-
 const popUpContent = ({ label, createdBy, createdAt }) => {
   return `
     <div style="
@@ -141,7 +135,20 @@ export default function ProjectWork() {
   });
   const [mapFeatures, setMapFeatures] = useState([]);
 
-  const projectId = useSelector((state) => state.project.id);
+  const { id: projectId, name: projectName } = useSelector(
+    (state) => state.project,
+  );
+
+  const pageLinks = [
+    { title: 'Projects', to: '/project', icon: IconDroneOff },
+    {
+      title: projectName,
+      icon: IconBuildingCog,
+      to: `/project/${projectId}/View`,
+    },
+    { title: 'Exterior(Map View)', icon: IconLiveViewFilled },
+  ];
+
   const token = useSelector((state) => state.auth.token);
 
   // Fetch work days data

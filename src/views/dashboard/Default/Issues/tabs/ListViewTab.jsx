@@ -240,15 +240,15 @@ export default function ListViewTab({
                 >
                   <Chip
                     icon={<CategoryIcon />}
-                    label={ticket.category || ticket.type}
+                    label={ticket?.category || ticket?.type}
                     size="small"
                     variant="outlined"
                     sx={{ fontWeight: 500 }}
                   />
-                  {ticket.assignedTo && (
+                  {ticket?.assignedTo && (
                     <Chip
                       icon={<PersonIcon />}
-                      label={`${ticket.assignedTo.firstName} ${ticket.assignedTo.lastName}`}
+                      label={`${ticket?.assignedTo?.firstName} ${ticket?.assignedTo?.lastName}`}
                       size="small"
                       color="primary"
                       sx={{ fontWeight: 500 }}

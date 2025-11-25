@@ -72,7 +72,9 @@ export default function CompareProject() {
   const [mapA, setMapA] = useState(null);
   const [mapB, setMapB] = useState(null);
 
-  const projectId = useSelector((state) => state.project.id);
+  const { id: projectId, name: projectName } = useSelector(
+    (state) => state.project,
+  );
 
   useEffect(() => {
     const fetchWorkDays = async () => {
@@ -120,7 +122,7 @@ export default function CompareProject() {
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
     {
-      title: 'Project Name',
+      title: projectName,
       to: `/project/${projectId}/View`,
       icon: IconBuildingCog,
     },

@@ -38,7 +38,9 @@ const placeholderImages = [
 ];
 
 export default function IssueReport() {
-  const projectId = useSelector((state) => state.project.selectedProjectId);
+  const { id: projectId, name: projectName } = useSelector(
+    (state) => state.project,
+  );
   const user = useSelector((state) => state.auth.user);
 
   const [tab, setTab] = useState('map');
@@ -46,7 +48,6 @@ export default function IssueReport() {
 
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
-
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(false);
   const [commentsLoading, setCommentsLoading] = useState(false);
@@ -70,7 +71,11 @@ export default function IssueReport() {
 
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
-    { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
+    {
+      title: projectName,
+      to: `/project/${projectId}/View`,
+      icon: IconBuildingCog,
+    },
     { title: 'Coordination Logs', icon: IconTagStarred },
   ];
 
