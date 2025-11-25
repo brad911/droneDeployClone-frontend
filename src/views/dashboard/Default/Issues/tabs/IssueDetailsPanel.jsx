@@ -3,8 +3,6 @@ import {
   Divider,
   Typography,
   Paper,
-  ImageList,
-  ImageListItem,
   Grid,
   Chip,
   TextField,
@@ -13,7 +11,6 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  ListItemText,
 } from '@mui/material';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import PersonIcon from '@mui/icons-material/Person';
@@ -21,9 +18,12 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CategoryIcon from '@mui/icons-material/Category';
 import SendIcon from '@mui/icons-material/Send';
 import { useState } from 'react';
+import dayjs from 'dayjs';
+import { CircularProgress } from '@mui/material';
 
 // Helper to format timestamp
 function formatTimeAgo(date) {
+  date = new Date(date);
   const now = new Date();
   const seconds = Math.floor((now - date) / 1000);
   if (seconds < 60) return 'just now';
@@ -36,35 +36,14 @@ function formatTimeAgo(date) {
   return date.toLocaleString();
 }
 
-export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
+export default function IssueDetailsPanel({
+  sampleIssue,
+  placeholderImages,
+  handleAddComment,
+  comments,
+  commentsLoading,
+}) {
   const [newComment, setNewComment] = useState('');
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: 'John Doe',
-      text: 'This issue needs immediate attention. Please prioritize.',
-      timestamp: new Date('2024-01-15T10:30:00'),
-    },
-    {
-      id: 2,
-      author: 'Jane Smith',
-      text: "I've assigned this to the development team.",
-      timestamp: new Date('2024-01-15T14:20:00'),
-    },
-  ]);
-
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      const comment = {
-        id: comments.length + 1,
-        author: 'Current User',
-        text: newComment,
-        timestamp: new Date(),
-      };
-      setComments([...comments, comment]);
-      setNewComment('');
-    }
-  };
 
   return (
     <Paper
@@ -79,8 +58,7 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
         borderRadius: 2,
         boxShadow: 1,
         border: '1px solid #f0f0f0',
-        maxHeight: '80vh',
-        overflow: 'auto',
+        maxHeight: '60vh',
       }}
     >
       {/* Breadcrumbs */}
@@ -96,23 +74,24 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
           Log Details
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-          {sampleIssue.createdAt.toLocaleDateString()}{' '}
-          {/* Show createdAt here */}
+          {sampleIssue?.createdAt
+            ? dayjs(sampleIssue.createdAt).format('DD-MM-YYYY')
+            : ''}
         </Typography>
       </Box>
       <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
-        Information about the selected issue
+        Information about the selected Log
       </Typography>
       <Divider />
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Typography variant="h5" fontWeight={600} sx={{ flex: 1 }}>
-          {sampleIssue.title}
+          {sampleIssue?.title}
         </Typography>
         <Chip
-          label={sampleIssue.status}
+          label={sampleIssue?.status}
           size="small"
           sx={{
-            bgcolor: sampleIssue.status === 'Open' ? '#f44336' : '#4caf50',
+            bgcolor: sampleIssue?.status === 'open' ? '#f44336' : '#4caf50',
             color: '#fff',
             fontWeight: 600,
             ml: 0.5,
@@ -122,7 +101,7 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
         />
       </Box>
       <Typography variant="caption" sx={{ mb: 1, lineHeight: 1.3 }}>
-        {sampleIssue.description}
+        {sampleIssue?.description}
       </Typography>
       <Grid container direction="column" gap={1}>
         {/* Row 1 */}
@@ -138,18 +117,18 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
                 variant="caption"
                 fontWeight={500}
                 color={
-                  sampleIssue.priority === 'High'
+                  sampleIssue?.priority === 'High'
                     ? 'error.main'
                     : 'text.primary'
                 }
               >
-                {sampleIssue.priority}
+                {sampleIssue?.priority}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
               <CategoryIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
               <Typography variant="caption" fontWeight={500}>
-                {sampleIssue.category}
+                {sampleIssue?.category}
               </Typography>
             </Box>
           </Grid>
@@ -158,7 +137,9 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
               <PersonIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
               <Typography variant="caption" fontWeight={500}>
-                {sampleIssue.assignee}
+                {sampleIssue?.assignedTo?.firstName +
+                  ' ' +
+                  sampleIssue?.assignedTo?.lastName}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -168,7 +149,9 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
                 sx={{ mr: 0.5 }}
               />
               <Typography variant="caption" fontWeight={500}>
-                {sampleIssue.dueDate || new Date().toLocaleDateString()}
+                {sampleIssue?.dueDate
+                  ? dayjs(sampleIssue.dueDate).format('DD-MM-YYYY')
+                  : dayjs().format('DD-MM-YYYY')}
               </Typography>
             </Box>
             {/* Removed createdAt from here */}
@@ -187,6 +170,7 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
           flexDirection: 'row',
           gap: 1,
           overflowX: 'auto',
+          minHeight: 50,
         }}
       >
         {placeholderImages.map((img, idx) => (
@@ -212,90 +196,109 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
         ))}
       </Box>
 
-      {/* Comments Section */}
-      <Divider sx={{ mb: 1 }} />
-      <Typography variant="h5" fontWeight={600} sx={{ mb: 1 }}>
-        Comments ({comments.length})
-      </Typography>
-
-      {/* Comments List */}
-      <Box sx={{ maxHeight: 320, minHeight: 220, overflow: 'auto', mb: 1 }}>
-        <List dense sx={{ p: 0 }}>
-          {comments.map((comment) => (
-            <ListItem
-              key={comment.id}
-              disableGutters
-              sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                mb: 1,
-                px: 0,
-                py: 0,
-                bgcolor: 'transparent',
-                minHeight: 36,
-              }}
-            >
-              <ListItemAvatar sx={{ minWidth: 32, mr: 1, mt: 0.5 }}>
-                <Avatar
+      {commentsLoading ? (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          {/* Comments Section */}
+          <Divider sx={{ mb: 1 }} />
+          <Typography variant="h5" fontWeight={600} sx={{ mb: 1 }}>
+            Comments ({comments.length})
+          </Typography>
+          {/* Comments List */}
+          <Box sx={{ maxHeight: 200, minHeight: 160, overflow: 'auto', mb: 1 }}>
+            <List dense sx={{ p: 0 }}>
+              {comments.map((comment) => (
+                <ListItem
+                  key={comment.id}
+                  disableGutters
                   sx={{
-                    width: 28,
-                    height: 28,
-                    fontSize: '0.9rem',
-                    bgcolor: 'primary.main',
-                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    mb: 1,
+                    px: 0,
+                    py: 0,
+                    bgcolor: 'transparent',
+                    minHeight: 36,
                   }}
                 >
-                  {comment.author
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
-                </Avatar>
-              </ListItemAvatar>
-              <Box
-                sx={{
-                  bgcolor: '#f0f2f5',
-                  borderRadius: 2,
-                  boxShadow: 1,
-                  px: 1.5,
-                  py: 1,
-                  minWidth: 0,
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography
-                    variant="subtitle2"
-                    fontWeight={700}
-                    sx={{ fontSize: '0.85rem', color: 'text.primary', mr: 1 }}
+                  <ListItemAvatar sx={{ minWidth: 32, mr: 1, mt: 0.5 }}>
+                    <Avatar
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        fontSize: '0.9rem',
+                        bgcolor: 'primary.main',
+                        color: '#fff',
+                      }}
+                    >
+                      {`${comment?.createdBy?.firstName?.[0] || ''}${
+                        comment?.createdBy?.lastName?.[0] || ''
+                      }`}
+                    </Avatar>
+                  </ListItemAvatar>
+                  <Box
+                    sx={{
+                      bgcolor: '#f0f2f5',
+                      borderRadius: 2,
+                      boxShadow: 1,
+                      px: 1.5,
+                      py: 1,
+                      minWidth: 0,
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
                   >
-                    {comment.author}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ fontSize: '0.7rem', mt: '2px' }}
-                  >
-                    {formatTimeAgo(comment.timestamp)}
-                  </Typography>
-                </Box>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontSize: '0.85rem',
-                    color: 'text.primary',
-                    mt: 0.5,
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  {comment.text}
-                </Typography>
-              </Box>
-            </ListItem>
-          ))}
-        </List>
-      </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography
+                        variant="subtitle2"
+                        fontWeight={700}
+                        sx={{
+                          fontSize: '0.85rem',
+                          color: 'text.primary',
+                          mr: 1,
+                        }}
+                      >
+                        {comment?.createdBy?.firstName +
+                          ' ' +
+                          comment?.createdBy?.lastName}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontSize: '0.7rem', mt: '2px' }}
+                      >
+                        {formatTimeAgo(comment?.createdAt)}
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontSize: '0.85rem',
+                        color: 'text.primary',
+                        mt: 0.5,
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {comment?.comment}
+                    </Typography>
+                  </Box>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </>
+      )}
 
       {/* Add Comment */}
       <Box sx={{ display: 'flex', gap: 0.5 }}>
@@ -304,7 +307,6 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
           placeholder="Add a comment..."
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
           sx={{
             flex: 1,
             '& .MuiInputBase-root': {
@@ -316,7 +318,10 @@ export default function IssueDetailsPanel({ sampleIssue, placeholderImages }) {
         <Button
           size="small"
           variant="contained"
-          onClick={handleAddComment}
+          onClick={() => {
+            handleAddComment(newComment);
+            setNewComment('');
+          }}
           disabled={!newComment.trim()}
           sx={{
             minWidth: 32,

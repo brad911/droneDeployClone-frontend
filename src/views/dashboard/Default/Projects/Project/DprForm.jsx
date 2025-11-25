@@ -44,7 +44,7 @@ import utc from 'dayjs/plugin/utc';
 import { set } from 'lodash-es';
 import { enqueueSnackbar } from 'notistack';
 import DPRDocument from './DPRDocument';
-import { pdf } from '@react-pdf/renderer';
+import { pdf, PDFDownloadLink } from '@react-pdf/renderer';
 dayjs.extend(utc);
 const weatherOptions = [
   { value: 'sunny', label: 'Sunny' },
@@ -209,6 +209,7 @@ const DprForm = () => {
 
   // 🔹 Submit handler
   const handleSubmit = async () => {
+    console.log(customFields, '<===== custom fields');
     const payload = {
       projectContractId: contactID,
       projectName: project.name,

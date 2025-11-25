@@ -1,5 +1,13 @@
-import React, { useState, useMemo } from 'react';
-import { Box, Typography, Button, Tabs, Tab, Divider } from '@mui/material';
+import { useState, useEffect } from 'react';
+import {
+  Box,
+  Typography,
+  Button,
+  Tabs,
+  Tab,
+  TextField,
+  MenuItem,
+} from '@mui/material';
 
 import MapViewTab from './tabs/MapViewTab';
 import ListViewTab from './tabs/ListViewTab';
@@ -13,6 +21,9 @@ import {
   IconTagStarred,
 } from '@tabler/icons-react';
 import MainCard from 'ui-component/cards/MainCard';
+import axiosInstance from '../../../../utils/axios.config';
+import { useSelector } from 'react-redux';
+import { enqueueSnackbar } from 'notistack';
 
 const TABS = [
   { label: 'Map View', value: 'map' },
@@ -26,83 +37,164 @@ const placeholderImages = [
   '/src/assets/images/landing_page_industry_capture/3.jpg',
 ];
 
-const sampleComments = [
-  {
-    user: 'John Smith',
-    avatar: '/src/assets/images/users/user-round.svg',
-    text: 'Inspected the issue.',
-    date: 'Jun 12, 10:30 AM',
-  },
-  {
-    user: 'Sarah Johnson',
-    avatar: '/src/assets/images/users/user-round.svg',
-    text: 'Materials ordered.',
-    date: 'Jun 12, 2:15 PM',
-  },
-];
-
-const sampleIssue = {
-  title: 'Structural alignment issue',
-  description: 'Column alignment shows 2.5cm deviation.',
-  priority: 'High',
-  category: 'Structural',
-  assignee: 'John Smith',
-  createdAt: new Date('2023-06-12T10:00:00'),
-  status: 'Open',
-};
-
-const ticketList = [
-  {
-    id: 1,
-    issue: 'Alignment issue',
-    type: 'Structural',
-    assignedTo: 'John Smith',
-    priority: 'High',
-    createdAt: new Date(2023, 5, 12, 10, 0),
-  },
-  {
-    id: 2,
-    issue: 'Wiring incomplete',
-    type: 'Electrical',
-    assignedTo: 'Sarah Johnson',
-    priority: 'Medium',
-    createdAt: new Date(2023, 5, 13, 15, 0),
-  },
-];
-
 export default function IssueReport() {
+  const projectId = useSelector((state) => state.project.selectedProjectId);
+  const user = useSelector((state) => state.auth.user);
+
   const [tab, setTab] = useState('map');
   const [showForm, setShowForm] = useState(false);
+
   const [comment, setComment] = useState('');
-  const [comments, setComments] = useState(sampleComments);
+  const [comments, setComments] = useState([]);
 
-  const handleAddComment = () => {
-    if (comment.trim()) {
-      setComments([
-        ...comments,
-        {
-          user: 'You',
-          avatar: '/src/assets/images/users/user-round.svg',
-          text: comment,
-          date: new Date().toLocaleString(),
-        },
-      ]);
-      setComment('');
-    }
-  };
+  const [issues, setIssues] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [selectedIssue, setSelectedIssue] = useState(null);
 
-  const calendarEvents = useMemo(() => {
-    return ticketList.map((ticket) => ({
-      title: `${ticket.issue} (${ticket.assignedTo})`,
-      start: ticket.createdAt,
-      end: new Date(ticket.createdAt.getTime() + 60 * 60 * 1000),
-    }));
-  }, []);
+  const [selectedWorkDay, setSelectedWorkDay] = useState('');
+  const [workdays, setWorkdays] = useState([]);
+
+  const [filters, setFilters] = useState({
+    category: '',
+    type: '',
+    priority: '',
+    status: '',
+    assignedTo: '',
+    search: '',
+    startDate: '',
+    endDate: '',
+  });
+
   const pageLinks = [
     { title: 'Projects', to: '/project', icon: IconDroneOff },
     { title: 'Project Name', to: '/project/1/View', icon: IconBuildingCog },
-    { title: 'Coordination Logs', icon: IconTagStarred }, // No `to` makes it the current page
+    { title: 'Coordination Logs', icon: IconTagStarred },
   ];
+
+  // ===============================
+  // Fetch Issues
+  // ===============================
+  const fetchIssues = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        ...filters,
+        limit: 1000,
+        workDayId: selectedWorkDay?.id,
+        projectId,
+      };
+      const res = await axiosInstance.get('/issue', {
+        params: params,
+      });
+
+      const results = res.data.data?.results || [];
+      console.log(results, '<===== issues');
+      setIssues(results);
+      setSelectedIssue(results[0] || null);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ===============================
+  // Fetch Work Days
+  // ===============================
+  const fetchWorkDays = async () => {
+    try {
+      const res = await axiosInstance.get('/work-day', {
+        params: { limit: 1000, projectId },
+      });
+
+      const wds = res.data.data.results || [];
+      setWorkdays(wds);
+      setSelectedWorkDay(wds[0] || null);
+    } catch (e) {
+      console.error('Error fetching workdays:', e);
+    }
+  };
+
+  // ===============================
+  // Fetch Team Members
+  // ===============================
+  const fetchTeamMembers = async () => {
+    try {
+      const res = await axiosInstance.get('/project-members/query', {
+        params: { projectId, limit: 1000 },
+      });
+      setTeamMembers(res.data.data.results || []);
+    } catch (e) {
+      console.error('Error fetching team members:', e);
+    }
+  };
+
+  // ===============================
+  // Fetch Comments for Selected Issue
+  // ===============================
+  const fetchComments = async () => {
+    if (!selectedIssue?.id) return;
+    setCommentsLoading(true);
+
+    try {
+      const res = await axiosInstance.get('/issueComment', {
+        params: { issueId: selectedIssue.id, limit: 100 },
+      });
+
+      setComments(res.data.data.results || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
+
+  // Add comment
+  const handleAddComment = async (comment) => {
+    if (!selectedIssue) return;
+
+    try {
+      const payload = {
+        comment,
+        createdBy: user.id,
+        issueId: selectedIssue.id,
+      };
+
+      const res = await axiosInstance.post('/issueComment', payload);
+
+      if (res.status === 201) {
+        enqueueSnackbar('Successfully Added Comment', { variant: 'success' });
+        fetchComments();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    setComment('');
+  };
+
+  // Load team members ONCE
+  useEffect(() => {
+    fetchTeamMembers();
+  }, []);
+
+  // Load workdays when projectId changes
+  useEffect(() => {
+    if (projectId) fetchWorkDays();
+  }, [projectId]);
+
+  // Load issues when projectId changes
+  useEffect(() => {
+    if (projectId) fetchIssues();
+  }, [projectId, selectedWorkDay, filters, refresh]);
+
+  // Load comments when selectedIssue changes
+  useEffect(() => {
+    fetchComments();
+  }, [selectedIssue]);
 
   return (
     <MainCard>
@@ -113,44 +205,81 @@ export default function IssueReport() {
           alignItems: 'center',
         }}
       >
-        <Box>
-          <Typography variant="h1" gutterBottom>
-            Coordination Logs
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button variant="contained" onClick={() => setShowForm(true)}>
-            + New Log
-          </Button>
-        </Box>
-      </Box>
-      <Breadcrumbs
-        links={pageLinks}
-        card={true}
-        custom={true}
-        rightAlign={false}
-      />
+        <Typography variant="h1">Coordination Logs</Typography>
 
-      {/* Tabs */}
+        <Button variant="contained" onClick={() => setShowForm(true)}>
+          + New Log
+        </Button>
+      </Box>
+
+      <Breadcrumbs links={pageLinks} card custom rightAlign={false} />
+
+      {/* Workday Selector */}
+      <Box sx={{ mb: 2, maxWidth: 300 }}>
+        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+          Select Work Day
+        </Typography>
+
+        <TextField
+          select
+          fullWidth
+          size="small"
+          value={selectedWorkDay?.id || ''}
+          onChange={(e) => {
+            const wd = workdays.find((w) => w.id === e.target.value);
+            setSelectedWorkDay(wd);
+          }}
+        >
+          {workdays.map((wd) => (
+            <MenuItem key={wd.id} value={wd.id}>
+              {wd.name || wd.date || 'Work Day'}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Box>
+
       <Tabs value={tab} onChange={(_, v) => setTab(v)}>
         {TABS.map((t) => (
           <Tab key={t.value} label={t.label} value={t.value} />
         ))}
       </Tabs>
 
-      {/* Main View */}
       <Box sx={{ display: 'flex', gap: 2 }}>
         <Box sx={{ flex: 2 }}>
-          {tab === 'map' && <MapViewTab />}
-          {tab === 'list' && <ListViewTab ticketList={ticketList} />}
+          {tab === 'map' && (
+            <MapViewTab
+              issues={issues}
+              setSelectedIssue={setSelectedIssue}
+              selectedIssue={selectedIssue}
+              selectedWorkDay={selectedWorkDay}
+            />
+          )}
+
+          {tab === 'list' && (
+            <ListViewTab
+              setTab={setTab}
+              ticketList={issues}
+              setSelectedIssue={setSelectedIssue}
+              filters={filters}
+              setFilters={setFilters}
+              teamMembers={teamMembers}
+              setRefresh={setRefresh}
+            />
+          )}
+
           {tab === 'calendar' && (
-            <CalendarViewTab calendarEvents={calendarEvents} />
+            <CalendarViewTab
+              setTab={setTab}
+              calendarEvents={issues}
+              setSelectedIssue={setSelectedIssue}
+            />
           )}
         </Box>
 
-        {tab === 'map' && (
+        {tab === 'map' && selectedIssue && (
           <IssueDetailsPanel
-            sampleIssue={sampleIssue}
+            commentsLoading={commentsLoading}
+            sampleIssue={selectedIssue}
             comments={comments}
             comment={comment}
             setComment={setComment}
@@ -160,14 +289,11 @@ export default function IssueReport() {
         )}
       </Box>
 
-      {/* Modal Form */}
       <IssueForm
+        selectedWorkDay={selectedWorkDay}
         open={showForm}
         onClose={() => setShowForm(false)}
-        onSave={(data) => {
-          console.log('Form submitted:', data);
-          setShowForm(false);
-        }}
+        onSave={() => setShowForm(false)}
       />
     </MainCard>
   );

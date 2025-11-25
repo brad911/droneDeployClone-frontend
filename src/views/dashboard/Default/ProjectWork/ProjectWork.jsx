@@ -587,7 +587,6 @@ export default function ProjectWork() {
           const area = geojsonArea.geometry(feature.geometry);
           const areaKm2 = (area / 1000000).toFixed(2);
           const areaM2 = area.toFixed(2);
-          const coords = turf.centroid(feature).geometry.coordinates;
           mapRef.current.__activePopup = popup;
 
           feature.properties.color = currentColor;
@@ -619,11 +618,6 @@ export default function ProjectWork() {
             // ✅ Get line length in km + meters
             const lengthKm = turf.length(feature, { units: 'kilometers' });
             const lengthM = (lengthKm * 1000).toFixed(2);
-
-            // ✅ Midpoint coordinates
-            const midpointCoords = turf.along(feature, lengthKm / 2, {
-              units: 'kilometers',
-            }).geometry.coordinates;
 
             // ✅ Save properties
             feature.properties.color = currentColor;
