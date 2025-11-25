@@ -591,9 +591,9 @@ const WorkDayList = () => {
                           <TableCell>{project.name || '-'}</TableCell>
                           <TableCell>{project.location || '-'}</TableCell>
                           <TableCell>
-                            {owner.firstName || owner.lastName
-                              ? `${owner.firstName || ''} ${owner.lastName || ''}`.trim()
-                              : owner.email || '-'}
+                            {owner?.firstName || owner.lastName
+                              ? `${owner?.firstName || ''} ${owner?.lastName || ''}`.trim()
+                              : owner?.email || '-'}
                           </TableCell>
                           <TableCell>
                             <FormControl size="small" sx={{ minWidth: 120 }}>

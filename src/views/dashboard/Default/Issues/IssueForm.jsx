@@ -344,8 +344,8 @@ const IssueForm = ({ open = false, onClose, selectedWorkDay }) => {
             size="small"
           >
             {teamMembers.map((m) => (
-              <MenuItem key={m.userId.id} value={m.userId.id}>
-                {m.userId.firstName} {m.userId.lastName}
+              <MenuItem key={m?.userId?.id} value={m?.userId?.id}>
+                {m?.userId?.firstName} {m?.userId?.lastName}
               </MenuItem>
             ))}
           </TextField>

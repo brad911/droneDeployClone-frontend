@@ -50,7 +50,7 @@ function Sidebar() {
           <Chip
             avatar={
               <Avatar
-                alt={`${user.firstName} ${user.lastName}`}
+                alt={`${user?.firstName} ${user?.lastName}`}
                 sx={{
                   bgcolor: 'text.secondary',
                   width: 32,
@@ -58,16 +58,16 @@ function Sidebar() {
                   fontSize: 10,
                 }}
               >
-                {`${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`}
+                {`${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}`}
               </Avatar>
             }
             label={
               <Box display="flex" flexDirection="column" lineHeight={1.2}>
                 <Typography variant="body1" fontWeight="500">
-                  {user.firstName} {user.lastName}
+                  {user?.firstName} {user?.lastName}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {user.designation}
+                  {user?.designation}
                 </Typography>
               </Box>
             }

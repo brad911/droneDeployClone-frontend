@@ -248,11 +248,11 @@ const Activity = () => {
                   <TableBody>
                     {activities.map((activity, index) => {
                       const assignedName = activity.assignedTo
-                        ? activity.assignedTo.firstName
-                          ? `${activity.assignedTo.firstName} ${activity.assignedTo.lastName}`
-                          : activity.assignedTo.name ||
-                            activity.assignedTo.userId?.name ||
-                            activity.assignedTo._id ||
+                        ? activity?.assignedTo?.firstName
+                          ? `${activity?.assignedTo?.firstName} ${activity?.assignedTo?.lastName}`
+                          : activity?.assignedTo?.name ||
+                            activity?.assignedTo.userId?.name ||
+                            activity?.assignedTo?._id ||
                             '—'
                         : '—';
 

@@ -177,7 +177,7 @@ export default function ListViewTab({
           <MenuItem value="">All</MenuItem>
           {teamMembers?.map((m) => (
             <MenuItem key={m.id} value={m.id}>
-              {m.userId.firstName} {m.userId.lastName}
+              {m?.userId?.firstName} {m?.userId?.lastName}
             </MenuItem>
           ))}
         </TextField>

@@ -222,7 +222,7 @@ const TeamSetup = () => {
                     <TableCell>{member.email}</TableCell>
                     <TableCell>
                       {member.userId
-                        ? member.userId.firstName + ' ' + member.userId.lastName
+                        ? member?.userId?.firstName + ' ' + member?.userId?.lastName
                         : 'Not Registered'}
                     </TableCell>
                     <TableCell>

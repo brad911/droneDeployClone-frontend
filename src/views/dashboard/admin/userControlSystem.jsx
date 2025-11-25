@@ -159,14 +159,14 @@ const UserControlSystem = () => {
                 {users.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
-                      {user.firstName} {user.lastName}
+                      {user?.firstName} {user?.lastName}
                     </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.designation}</TableCell>
-                    <TableCell>{user.organization}</TableCell>
+                    <TableCell>{user?.email}</TableCell>
+                    <TableCell>{user?.designation}</TableCell>
+                    <TableCell>{user?.organization}</TableCell>
                     {/* <TableCell>{user.gender}</TableCell> */}
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>{user.type}</TableCell>
+                    <TableCell>{user?.role}</TableCell>
+                    <TableCell>{user?.type}</TableCell>
                     <TableCell>
                       <Chip
                         label={user.status}

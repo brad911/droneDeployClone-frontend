@@ -383,9 +383,9 @@ const DprForm = () => {
               {projectMembers.map((m, i) => (
                 <MenuItem
                   key={i}
-                  value={`${m.userId.firstName} ${m.userId.lastName}`}
+                  value={`${m?.userId?.firstName} ${m?.userId?.lastName}`}
                 >
-                  {m.userId.firstName} {m.userId.lastName}
+                  {m?.userId?.firstName} {m?.userId?.lastName}
                 </MenuItem>
               ))}
             </Select>

@@ -46,7 +46,7 @@ const PermissionModal = ({ open, onClose, user, onSave }) => {
       <Divider />
       <DialogContent>
         <Typography variant="h3" gutterBottom>
-          {user.firstName} {user.lastName}
+          {user?.firstName} {user?.lastName}
         </Typography>
         <FormGroup>
           <Grid

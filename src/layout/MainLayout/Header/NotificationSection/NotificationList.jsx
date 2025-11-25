@@ -189,12 +189,12 @@ export default function NotificationList() {
           }
         >
           <ListItemAvatar>
-            <Avatar alt={user.firstName + '' + user.lastName} src={User1} />
+            <Avatar alt={user?.firstName + '' + user?.lastName} src={User1} />
           </ListItemAvatar>
           <ListItemText
             primary={
               <Typography variant="subtitle1">
-                {user.firstName + '' + user.lastName}
+                {user?.firstName + '' + user?.lastName}
               </Typography>
             }
           />
