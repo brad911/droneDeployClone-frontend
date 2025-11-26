@@ -19,6 +19,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import { set } from 'date-fns';
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
 
 const IssueForm = ({
@@ -27,6 +28,7 @@ const IssueForm = ({
   selectedWorkDay,
   teamMembers,
   projectId,
+  setRefresh,
 }) => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
@@ -132,6 +134,7 @@ const IssueForm = ({
           pinColor: '',
           photos: [],
         });
+        setRefresh((prev) => !prev);
       }
       onClose();
     } catch (err) {

@@ -301,6 +301,7 @@ export default function IssueReport() {
         open={showForm}
         onClose={() => setShowForm(false)}
         onSave={() => setShowForm(false)}
+        setRefresh={setRefresh}
       />
     </MainCard>
   );
