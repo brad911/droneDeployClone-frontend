@@ -19,7 +19,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { set } from 'date-fns';
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
 
 const IssueForm = ({ open = false, onClose, selectedWorkDay, teamMembers }) => {
@@ -111,8 +110,7 @@ const IssueForm = ({ open = false, onClose, selectedWorkDay, teamMembers }) => {
       await issueSchema.validate(form, { abortEarly: false });
 
       console.log('Submitting form:', form);
-      const payload = { ...form, workDayId: selectedWorkDay.id };
-      payload.projectId = projectId;
+      const payload = { ...form, workDayId: selectedWorkDay.id, projectId };
       console.log(payload, '<==== wow');
       const res = await axiosInstance.post('/issue', payload);
       console.log(res, '<==== submitted');
