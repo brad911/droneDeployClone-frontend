@@ -295,6 +295,7 @@ export default function IssueReport() {
       </Box>
 
       <IssueForm
+        teamMembers={teamMembers}
         selectedWorkDay={selectedWorkDay}
         open={showForm}
         onClose={() => setShowForm(false)}

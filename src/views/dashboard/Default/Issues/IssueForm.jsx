@@ -22,7 +22,7 @@ import dayjs from 'dayjs';
 import { set } from 'date-fns';
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
 
-const IssueForm = ({ open = false, onClose, selectedWorkDay }) => {
+const IssueForm = ({ open = false, onClose, selectedWorkDay, teamMembers }) => {
   const projectId = useSelector((state) => state.project.selectedProjectId);
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
@@ -79,7 +79,6 @@ const IssueForm = ({ open = false, onClose, selectedWorkDay }) => {
   const [selectedPinColor, setSelectedPinColor] = useState(null);
 
   const logType = ['issue', 'task'];
-  const [teamMembers, setTeamMembers] = useState([]);
   const categories = [
     'architecture',
     'structure',
@@ -149,26 +148,6 @@ const IssueForm = ({ open = false, onClose, selectedWorkDay }) => {
   // ----------------------------
   // ⭐ Fetch first workday
   // ----------------------------
-  useEffect(() => {
-    if (!open) return;
-    if (!projectId) return;
-
-    const fetchProjectMembers = async () => {
-      try {
-        const res = await axiosInstance(
-          `/project-members/query?projectId=${projectId}`,
-        );
-        const data = res.data.data.results;
-        console.log('Fetched project members:', data);
-        // You can set team members state here if needed
-        setTeamMembers(data);
-      } catch (err) {
-        console.error('Failed to fetch project members:', err);
-      }
-    };
-
-    fetchProjectMembers();
-  }, [open, projectId]);
 
   // ----------------------------
   // ⭐ Initialize Mapbox with orthomosaic tiles
