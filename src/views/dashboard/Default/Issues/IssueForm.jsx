@@ -21,8 +21,13 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
 
-const IssueForm = ({ open = false, onClose, selectedWorkDay, teamMembers }) => {
-  const projectId = useSelector((state) => state.project.selectedProjectId);
+const IssueForm = ({
+  open = false,
+  onClose,
+  selectedWorkDay,
+  teamMembers,
+  projectId,
+}) => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
