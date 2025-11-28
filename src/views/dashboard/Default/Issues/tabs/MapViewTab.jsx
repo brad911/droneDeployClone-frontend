@@ -6,14 +6,18 @@ import { enqueueSnackbar } from 'notistack';
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 export default function MapViewTab({
+  setCoordinates,
   issues = [],
   setSelectedIssue,
   selectedWorkDay,
+  selectedPinColor, // NEW PROP
+  showForm, // NEW PROP
 }) {
   const mapContainerRef = useRef(null);
   const mapIsReadyRef = useRef(false);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
+  const formMarkerRef = useRef(null); // Marker for NEW ISSUE
 
   const loadOrtho = () => {
     const map = mapRef.current;
@@ -24,9 +28,9 @@ export default function MapViewTab({
     const bounds = [
       [wd.tileBounds.west, wd.tileBounds.south],
       [wd.tileBounds.east, wd.tileBounds.north],
+      [wd.tileBounds.east, wd.tileBounds.north],
     ];
 
-    // Remove previous layer/source
     if (map.getLayer('ortho-layer')) map.removeLayer('ortho-layer');
     if (map.getSource('ortho')) map.removeSource('ortho');
 
@@ -47,7 +51,9 @@ export default function MapViewTab({
     map.fitBounds(bounds, { padding: 20 });
   };
 
+  // ────────────────────────────────
   // Initialize map
+  // ────────────────────────────────
   useEffect(() => {
     if (!mapRef.current) {
       mapRef.current = new mapboxgl.Map({
@@ -56,6 +62,7 @@ export default function MapViewTab({
         center: [69.959, 21.256],
         zoom: 15,
       });
+
       mapRef.current.addControl(new mapboxgl.NavigationControl());
 
       mapRef.current.on('load', () => {
@@ -64,18 +71,12 @@ export default function MapViewTab({
     }
   }, []);
 
-  // Add orthomosaic raster tiles
+  // ────────────────────────────────
+  // Load orthomosaic
+  // ────────────────────────────────
   useEffect(() => {
     if (!selectedWorkDay) return;
 
-    if (!selectedWorkDay.tileBounds) {
-      enqueueSnackbar('Selected workday does not have tile bounds.', {
-        variant: 'warning',
-      });
-      return;
-    }
-
-    // Wait until the map is fully ready
     if (!mapIsReadyRef.current) {
       const interval = setInterval(() => {
         if (mapIsReadyRef.current) {
@@ -89,40 +90,107 @@ export default function MapViewTab({
     loadOrtho();
   }, [selectedWorkDay]);
 
-  // Add markers for issues
+  // ────────────────────────────────
+  // Add issue markers
+  // ────────────────────────────────
   useEffect(() => {
     if (!mapRef.current) return;
     const map = mapRef.current;
 
-    // Remove old markers
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
-    // Only add markers if there are issues
     issues.forEach((issue) => {
       if (!issue.coordinates) return;
 
-      const marker = new mapboxgl.Marker({ color: issue.pinColor || '#ff0000' })
+      const marker = new mapboxgl.Marker({
+        color: issue.pinColor || '#ff0000',
+      })
         .setLngLat([issue.coordinates.lng, issue.coordinates.lat])
         .addTo(map);
 
-      // Click handler for marker
       marker.getElement().addEventListener('click', (e) => {
-        e.stopPropagation(); // Important: prevent map click
-        console.log(issue, '<==== wow');
+        e.stopPropagation();
         setSelectedIssue(issue);
       });
 
       markersRef.current.push(marker);
     });
-  }, [issues, selectedWorkDay, setSelectedIssue]);
+  }, [issues]);
 
+  // ────────────────────────────────
+  // ENABLE MAP CLICK ONLY IF showForm === true
+  // ────────────────────────────────
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+
+    const handleClick = (e) => {
+      if (!showForm) return;
+
+      const { lng, lat } = e.lngLat;
+
+      if (formMarkerRef.current) {
+        formMarkerRef.current.setLngLat([lng, lat]);
+      } else {
+        formMarkerRef.current = new mapboxgl.Marker({
+          color: selectedPinColor || '#00bcd4',
+        })
+          .setLngLat([lng, lat])
+          .addTo(map);
+      }
+
+      setCoordinates({ lat, lng });
+    };
+
+    // add listener
+    map.on('click', handleClick);
+
+    // cleanup (important)
+    return () => {
+      map.off('click', handleClick);
+    };
+  }, [showForm, selectedPinColor]);
+  // ────────────────────────────────
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (!formMarkerRef.current) return; // no marker yet → nothing to update
+
+    const map = mapRef.current;
+    const oldMarker = formMarkerRef.current;
+
+    // Get previous coordinates
+    const currentLngLat = oldMarker.getLngLat();
+
+    // Remove old marker
+    oldMarker.remove();
+
+    // Create a new marker with the new color
+    formMarkerRef.current = new mapboxgl.Marker({
+      color: selectedPinColor,
+    })
+      .setLngLat(currentLngLat)
+      .addTo(map);
+  }, [selectedPinColor]);
+
+  // ────────────────────────────────
+  // Remove marker if form closes
+  // ────────────────────────────────
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    if (!showForm && formMarkerRef.current) {
+      formMarkerRef.current.remove();
+      formMarkerRef.current = null;
+      setCoordinates(null); // clear stored coords, optional
+    }
+  }, [showForm]);
   return (
     <div
       ref={mapContainerRef}
       style={{
         width: '100%',
-        height: '560px',
+        height: '60vh',
         borderRadius: '12px',
         overflow: 'hidden',
       }}

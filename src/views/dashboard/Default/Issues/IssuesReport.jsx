@@ -24,6 +24,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import axiosInstance from '../../../../utils/axios.config';
 import { useSelector } from 'react-redux';
 import { enqueueSnackbar } from 'notistack';
+import IssueCreationPanel from './IssueCreationPanel';
 
 const TABS = [
   { label: 'Map View', value: 'map' },
@@ -57,6 +58,20 @@ export default function IssueReport() {
 
   const [selectedWorkDay, setSelectedWorkDay] = useState('');
   const [workdays, setWorkdays] = useState([]);
+  const [selectedPinColor, setSelectedPinColor] = useState('#FF0000');
+  const pinColors = [
+    '#FF0000', // Red
+    '#00A2FF', // Blue
+    '#00C853', // Green
+    '#FFD600', // Yellow
+    '#FF6D00', // Orange
+    '#AA00FF', // Purple
+    '#E91E63', // Pink
+    '#795548', // Brown
+    '#607D8B', // Slate
+    '#000000', // Black
+  ];
+  const [coordinates, setCoordinates] = useState(null);
 
   const [filters, setFilters] = useState({
     category: '',
@@ -210,9 +225,19 @@ export default function IssueReport() {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h1">Coordination Logs</Typography>
+        <Box sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h1" gutterBottom>
+            Compare View
+          </Typography>
+        </Box>
 
-        <Button variant="contained" onClick={() => setShowForm(true)}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setShowForm(true);
+            setTab('map');
+          }}
+        >
           + New Log
         </Button>
       </Box>
@@ -220,11 +245,12 @@ export default function IssueReport() {
       <Breadcrumbs links={pageLinks} card custom rightAlign={false} />
 
       {/* Workday Selector */}
-      <Box sx={{ mb: 2, maxWidth: 300 }}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-          Select Work Day
-        </Typography>
-
+      <Box sx={{ maxWidth: 300 }}>
+        <Box>
+          <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+            Select Historical Date
+          </Typography>
+        </Box>
         <TextField
           select
           fullWidth
@@ -253,6 +279,9 @@ export default function IssueReport() {
         <Box sx={{ flex: 2 }}>
           {tab === 'map' && (
             <MapViewTab
+              setCoordinates={setCoordinates}
+              showForm={showForm}
+              selectedPinColor={selectedPinColor}
               issues={issues}
               setSelectedIssue={setSelectedIssue}
               selectedIssue={selectedIssue}
@@ -281,20 +310,50 @@ export default function IssueReport() {
           )}
         </Box>
 
-        {tab === 'map' && selectedIssue && (
-          <IssueDetailsPanel
-            commentsLoading={commentsLoading}
-            sampleIssue={selectedIssue}
-            comments={comments}
-            comment={comment}
-            setComment={setComment}
-            handleAddComment={handleAddComment}
-            placeholderImages={placeholderImages}
+        {/* {tab === 'map' && selectedIssue && (
+          // <IssueDetailsPanel
+          //   commentsLoading={commentsLoading}
+          //   sampleIssue={selectedIssue}
+          //   comments={comments}
+          //   comment={comment}
+          //   setComment={setComment}
+          //   handleAddComment={handleAddComment}
+          //   placeholderImages={placeholderImages}
+          // />
+          <IssueCreationPanel
+            teamMembers={teamMembers}
+            projectId={projectId}
+            selectedWorkDay={selectedWorkDay}
+            setRefresh={setRefresh}
           />
-        )}
+        )} */}
+        {tab === 'map' &&
+          (showForm ? (
+            <IssueCreationPanel
+              pinColors={pinColors}
+              coordinates={coordinates}
+              setSelectedPinColor={setSelectedPinColor}
+              teamMembers={teamMembers}
+              projectId={projectId}
+              selectedWorkDay={selectedWorkDay}
+              setRefresh={setRefresh}
+              onClose={() => setShowForm(false)}
+            />
+          ) : (
+            <IssueDetailsPanel
+              pinColors={pinColors}
+              commentsLoading={commentsLoading}
+              sampleIssue={selectedIssue}
+              comments={comments}
+              comment={comment}
+              setComment={setComment}
+              handleAddComment={handleAddComment}
+              placeholderImages={placeholderImages}
+            />
+          ))}
       </Box>
 
-      <IssueForm
+      {/* <IssueForm
         teamMembers={teamMembers}
         projectId={projectId}
         selectedWorkDay={selectedWorkDay}
@@ -302,7 +361,7 @@ export default function IssueReport() {
         onClose={() => setShowForm(false)}
         onSave={() => setShowForm(false)}
         setRefresh={setRefresh}
-      />
+      /> */}
     </MainCard>
   );
 }
