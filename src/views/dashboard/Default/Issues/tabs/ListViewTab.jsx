@@ -410,7 +410,7 @@ export default function ListViewTab({
                 {/* RIGHT: BUTTON */}
                 {(user.id === ticket.assignedTo?.id ||
                   user.id === ticket.createdBy ||
-                  projectMembers.some(
+                  teamMembers.some(
                     (member) =>
                       member.userId === user.id && member.role === 'owner',
                   )) && (
