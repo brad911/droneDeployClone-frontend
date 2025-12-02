@@ -20,7 +20,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import { CircularProgress } from '@mui/material';
-
+import { keyframes } from '@mui/system';
 // Helper to format timestamp
 function formatTimeAgo(date) {
   date = new Date(date);
@@ -45,6 +45,16 @@ export default function IssueDetailsPanel({
 }) {
   const [newComment, setNewComment] = useState('');
 
+  const pulse = keyframes`
+      0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+    `;
+  const blink = keyframes`
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    `;
   return (
     <Paper
       sx={{
@@ -91,7 +101,23 @@ export default function IssueDetailsPanel({
           label={sampleIssue?.status}
           size="small"
           sx={{
-            bgcolor: sampleIssue?.status === 'open' ? '#f44336' : '#4caf50',
+            ...(sampleIssue?.status === 'resolved' && {
+              animation: `${pulse} 2s infinite`,
+              bgcolor: '#4caf50',
+              color: 'white',
+            }),
+
+            ...(sampleIssue?.status === 'inProgress' && {
+              animation: `${blink} 1.2s infinite`,
+              bgcolor: '#fb8c00',
+              color: 'white',
+            }),
+
+            ...(sampleIssue?.status === 'open' && {
+              animation: `${blink} 1.5s infinite`,
+              bgcolor: '#e53935',
+              color: 'white',
+            }),
             color: '#fff',
             fontWeight: 600,
             ml: 0.5,

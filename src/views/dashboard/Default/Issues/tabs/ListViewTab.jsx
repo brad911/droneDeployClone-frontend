@@ -10,6 +10,7 @@ import {
   TextField,
   MenuItem,
   Button,
+  IconButton,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import CategoryIcon from '@mui/icons-material/Category';
@@ -22,6 +23,8 @@ import { useState } from 'react';
 import ResolveIssueModal from '../ResolveIssueModal';
 import { enqueueSnackbar } from 'notistack';
 import axiosInstance from '../../../../../utils/axios.config';
+import { IconHistory } from '@tabler/icons-react';
+import { useSelector } from 'react-redux';
 
 export default function ListViewTab({
   ticketList,
@@ -33,7 +36,8 @@ export default function ListViewTab({
   setRefresh,
 }) {
   const theme = useTheme();
-
+  const user = useSelector((state) => state.auth.user);
+  console.log('Current User:', user);
   const [openResolveModal, setOpenResolveModal] = useState(false);
   const [currentTicket, setCurrentTicket] = useState(null);
 
@@ -305,21 +309,124 @@ export default function ListViewTab({
                       }}
                     />
                   )}
+                  <Tooltip
+                    placement="top"
+                    arrow
+                    title={
+                      <Box
+                        sx={{
+                          maxHeight: 150, // limit height
+                          overflowY: 'auto',
+                          p: 1,
+                          '&::-webkit-scrollbar': {
+                            width: 3, // thin scrollbar
+                          },
+                          '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: 'rgba(0,0,0,0.3)', // subtle thumb
+                            borderRadius: 3,
+                          },
+                          '&::-webkit-scrollbar-track': {
+                            backgroundColor: 'transparent',
+                          },
+                        }}
+                      >
+                        <table
+                          style={{
+                            borderCollapse: 'collapse',
+                            fontSize: '10px',
+                            width: '100%',
+                          }}
+                        >
+                          <thead>
+                            <tr>
+                              <th
+                                style={{
+                                  padding: '4px',
+                                  borderBottom: '1px solid #ccc',
+                                  textAlign: 'left',
+                                }}
+                              >
+                                Status
+                              </th>
+                              <th
+                                style={{
+                                  padding: '4px',
+                                  borderBottom: '1px solid #ccc',
+                                  textAlign: 'left',
+                                }}
+                              >
+                                Name
+                              </th>
+                              <th
+                                style={{
+                                  padding: '4px',
+                                  borderBottom: '1px solid #ccc',
+                                  textAlign: 'left',
+                                }}
+                              >
+                                Date
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {ticket?.log?.map((l, i) => (
+                              <tr key={i}>
+                                <td
+                                  style={{
+                                    padding: '2px',
+                                    textTransform: 'capitalize',
+                                  }}
+                                >
+                                  {l.status}
+                                </td>
+                                <td style={{ padding: '4px' }}>{l.name}</td>
+                                <td style={{ padding: '4px' }}>
+                                  {dayjs(l.date).format('DD-MM-YYYY')} —{' '}
+                                  {new Date(l.date).toLocaleTimeString()}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </Box>
+                    }
+                  >
+                    <IconButton
+                      size="small"
+                      sx={{
+                        padding: 0,
+                        margin: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        verticalAlign: 'middle',
+                      }}
+                    >
+                      <IconHistory fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 </Stack>
 
                 {/* RIGHT: BUTTON */}
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentTicket(ticket);
-                    setOpenResolveModal(true);
-                  }}
-                  sx={{ textTransform: 'none', fontWeight: 600 }}
-                >
-                  Resolve Issue
-                </Button>
+                {(user.id === ticket.assignedTo?.id ||
+                  user.id === ticket.createdBy ||
+                  projectMembers.some(
+                    (member) =>
+                      member.userId === user.id && member.role === 'owner',
+                  )) && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentTicket(ticket);
+                      setOpenResolveModal(true);
+                    }}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Resolve Issue
+                  </Button>
+                )}
               </Box>
             </Paper>
           );

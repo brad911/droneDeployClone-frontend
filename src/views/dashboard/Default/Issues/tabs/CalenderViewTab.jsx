@@ -15,6 +15,20 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
+const isLightColor = (hex) => {
+  if (!hex) return false;
+
+  const c = hex.replace('#', '');
+  const r = parseInt(c.substr(0, 2), 16);
+  const g = parseInt(c.substr(2, 2), 16);
+  const b = parseInt(c.substr(4, 2), 16);
+
+  // perceived brightness
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+  return brightness > 150; // light if brightness is high
+};
+
 export default function CalendarViewTab({
   calendarEvents,
   setSelectedIssue,
@@ -25,6 +39,7 @@ export default function CalendarViewTab({
   useEffect(() => {
     setData(
       calendarEvents.map((issue) => ({
+        pinColor: issue?.pinColor,
         id: issue.id,
         title: issue.title, // shown on calendar
         start: new Date(issue.createdAt), // start date
@@ -50,26 +65,36 @@ export default function CalendarViewTab({
         border: `1px solid ${theme.palette.divider}`,
       }}
     >
-      <Box sx={{ height: '100%' }}>
+      <Box sx={{ height: '100%', width: '100%' }}>
         <Calendar
+          showMore={true}
           localizer={localizer}
           events={data}
           startAccessor="start"
           endAccessor="end"
+          popup={false}
+          dayLayoutAlgorithm="no-overlap"
           titleAccessor="title"
           tooltipAccessor={(event) =>
-            `${event.title}\nPriority: ${event.priority}\nStatus: ${event.status}`
+            `📌 ${event.title}\n\n• Priority: ${event.priority}\n• Status: ${event.status}`
           }
           eventPropGetter={(event) => {
-            let backgroundColor = '#3174ad'; // default blue
-            if (event.priority === 'high') backgroundColor = '#d32f2f';
-            else if (event.priority === 'medium') backgroundColor = '#fbc02d';
-            else if (event.priority === 'low') backgroundColor = '#388e3c';
-            return { style: { backgroundColor, color: '#fff' } };
+            const bg = event?.pinColor || '#3174ad';
+            const readableText = isLightColor(bg) ? '#000000' : '#FFFFFF';
+
+            return {
+              style: {
+                backgroundColor: bg,
+                color: readableText,
+                padding: 0,
+                paddingLeft: 1,
+                margin: 0,
+              },
+            };
           }}
           onSelectEvent={(event) => {
             setTab('map');
-            setSelectedIssue(event); // store clicked event in state
+            setSelectedIssue(event);
           }}
         />
       </Box>
