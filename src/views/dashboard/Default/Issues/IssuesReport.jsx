@@ -13,7 +13,6 @@ import MapViewTab from './tabs/MapViewTab';
 import ListViewTab from './tabs/ListViewTab';
 import CalendarViewTab from './tabs/CalenderViewTab';
 import IssueDetailsPanel from './tabs/IssueDetailsPanel';
-import IssueForm from './IssueForm';
 import Breadcrumbs from '../../../../ui-component/extended/Breadcrumbs';
 import {
   IconBuildingCog,
@@ -223,11 +222,12 @@ export default function IssueReport() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          height: '100%',
         }}
       >
         <Box sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h1" gutterBottom>
-            Compare View
+            Coordination Logs
           </Typography>
         </Box>
 
@@ -310,23 +310,6 @@ export default function IssueReport() {
           )}
         </Box>
 
-        {/* {tab === 'map' && selectedIssue && (
-          // <IssueDetailsPanel
-          //   commentsLoading={commentsLoading}
-          //   sampleIssue={selectedIssue}
-          //   comments={comments}
-          //   comment={comment}
-          //   setComment={setComment}
-          //   handleAddComment={handleAddComment}
-          //   placeholderImages={placeholderImages}
-          // />
-          <IssueCreationPanel
-            teamMembers={teamMembers}
-            projectId={projectId}
-            selectedWorkDay={selectedWorkDay}
-            setRefresh={setRefresh}
-          />
-        )} */}
         {tab === 'map' &&
           (showForm ? (
             <IssueCreationPanel
@@ -352,16 +335,6 @@ export default function IssueReport() {
             />
           ))}
       </Box>
-
-      {/* <IssueForm
-        teamMembers={teamMembers}
-        projectId={projectId}
-        selectedWorkDay={selectedWorkDay}
-        open={showForm}
-        onClose={() => setShowForm(false)}
-        onSave={() => setShowForm(false)}
-        setRefresh={setRefresh}
-      /> */}
     </MainCard>
   );
 }

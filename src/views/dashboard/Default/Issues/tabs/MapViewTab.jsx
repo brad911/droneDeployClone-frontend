@@ -190,7 +190,7 @@ export default function MapViewTab({
       ref={mapContainerRef}
       style={{
         width: '100%',
-        height: '60vh',
+        height: '100%',
         borderRadius: '12px',
         overflow: 'hidden',
       }}

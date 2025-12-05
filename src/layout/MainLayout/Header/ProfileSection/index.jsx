@@ -88,7 +88,6 @@ export default function ProfileSection() {
     <>
       <Chip
         sx={{
-          ml: 2,
           height: '48px',
           alignItems: 'center',
           borderRadius: '27px',

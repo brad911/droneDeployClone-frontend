@@ -8,6 +8,8 @@ import {
   Button,
   Avatar,
   IconButton,
+  LinearProgress,
+  CircularProgress,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import * as Yup from 'yup';
@@ -95,19 +97,52 @@ export default function IssueCreationPanel({
   const handleSubmit = async () => {
     try {
       setLoading(true);
+
       let payload = {
         ...form,
         coordinates: coordinates,
       };
-      console.log('Validating form:', payload);
+
+      // Validate the form BEFORE sending
       await issueSchema.validate(payload, { abortEarly: false });
-      console.log('Submitting form:', form);
-      payload = { ...payload, workDayId: selectedWorkDay.id, projectId };
-      console.log(payload, '<==== wow');
-      const res = await axiosInstance.post('/issue', payload);
-      console.log(res, '<==== submitted');
+
+      // Now add required IDs
+      payload = {
+        ...payload,
+        workDayId: selectedWorkDay.id,
+        projectId,
+      };
+
+      // ---- CREATE FORMDATA ----
+      const formData = new FormData();
+
+      // Append all text fields
+      Object.keys(payload).forEach((key) => {
+        if (key === 'coordinates') {
+          formData.append('coordinates', JSON.stringify(payload.coordinates));
+        } else if (key !== 'photos') {
+          formData.append(key, payload[key]);
+        }
+      });
+
+      // Append images (assuming form.photos = array of File objects)
+      if (payload.photos && payload.photos.length > 0) {
+        payload.photos.forEach((file) => {
+          formData.append('photos', file);
+        });
+      }
+
+      // ---- SEND REQUEST ----
+      const res = await axiosInstance.post('/issue', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       if (res.status === 201) {
         enqueueSnackbar('Log created successfully!', { variant: 'success' });
+
+        // reset form
         setForm({
           dueDate: new Date().toISOString().split('T')[0],
           title: '',
@@ -119,12 +154,12 @@ export default function IssueCreationPanel({
           pinColor: '',
           photos: [],
         });
-        if (onClose) onClose(); // CLOSE FORM
+
+        onClose?.();
         setRefresh((prev) => !prev);
       }
     } catch (err) {
       if (err.inner) {
-        // Yup validation errors array
         err.inner.forEach((e) => {
           enqueueSnackbar(e.message, { variant: 'error' });
         });
@@ -133,8 +168,10 @@ export default function IssueCreationPanel({
         console.error(err);
       }
     }
+
     setLoading(false);
   };
+
   const handlePhotoUpload = (e) => {
     const files = Array.from(e.target.files);
     setForm((prev) => ({ ...prev, photos: [...prev.photos, ...files] }));
@@ -345,8 +382,8 @@ export default function IssueCreationPanel({
                 key={index}
                 elevation={2}
                 sx={{
-                  width: 100,
-                  height: 100,
+                  width: 50,
+                  height: 50,
                   borderRadius: 2,
                   overflow: 'hidden',
                   position: 'relative',
@@ -387,14 +424,18 @@ export default function IssueCreationPanel({
 
       {/* Submit */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-        <Button
-          variant="contained"
-          size="large"
-          disabled={loading}
-          onClick={handleSubmit}
-        >
-          Save Log
-        </Button>
+        {loading === true ? (
+          <CircularProgress />
+        ) : (
+          <Button
+            variant="contained"
+            size="large"
+            disabled={loading}
+            onClick={handleSubmit}
+          >
+            Save Log
+          </Button>
+        )}
       </Box>
     </Paper>
   );

@@ -11,21 +11,28 @@ import {
   List,
   ListItem,
   ListItemAvatar,
+  CircularProgress,
 } from '@mui/material';
+import { keyframes } from '@mui/system';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import PersonIcon from '@mui/icons-material/Person';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CategoryIcon from '@mui/icons-material/Category';
 import SendIcon from '@mui/icons-material/Send';
-import { useState } from 'react';
 import dayjs from 'dayjs';
-import { CircularProgress } from '@mui/material';
-import { keyframes } from '@mui/system';
+import { useState, useEffect } from 'react';
+import UploadImageModal from '../UploadImageModal';
+import axiosInstance from '../../../../../utils/axios.config';
+import { enqueueSnackbar } from 'notistack';
+import SingleImageViewer from '../../../../../ui-component/SingleImageViewer';
+import { useSelector } from 'react-redux';
+
+const MAX_PHOTOS = 5;
+
 // Helper to format timestamp
 function formatTimeAgo(date) {
-  date = new Date(date);
   const now = new Date();
-  const seconds = Math.floor((now - date) / 1000);
+  const seconds = Math.floor((now - new Date(date)) / 1000);
   if (seconds < 60) return 'just now';
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes} min ago`;
@@ -33,28 +40,126 @@ function formatTimeAgo(date) {
   if (hours < 24) return `${hours} hr ago`;
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
-  return date.toLocaleString();
+  return new Date(date).toLocaleString();
 }
 
 export default function IssueDetailsPanel({
   sampleIssue,
-  placeholderImages,
   handleAddComment,
   comments,
   commentsLoading,
 }) {
+  const userId = useSelector((state) => state.auth.user?.id);
   const [newComment, setNewComment] = useState('');
+  const [open, setOpen] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [photoUrls, setPhotoUrls] = useState(sampleIssue?.photos || []);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleImageClick = (img) => {
+    setSelectedImage(img);
+    setViewerOpen(true);
+  };
+  useEffect(() => {
+    if (!sampleIssue?.photos?.length) {
+      setPhotoUrls([]);
+      return;
+    }
+
+    const fetchUrls = async () => {
+      try {
+        const urls = await Promise.all(
+          sampleIssue.photos.map(async (key) => {
+            const res = await axiosInstance.post(`/issue/getUrl`, { Key: key });
+            console.log('Fetched URL response:', res);
+            return res.data.data; // assuming API returns { url: "signed_url_here" }
+          }),
+        );
+        setPhotoUrls(urls);
+      } catch (err) {
+        console.error('Failed to fetch photo URLs', err);
+        setPhotoUrls([]); // fallback
+      }
+    };
+
+    fetchUrls();
+  }, [sampleIssue]);
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + photoUrls.length > MAX_PHOTOS) {
+      enqueueSnackbar(`Max ${MAX_PHOTOS} photos allowed`, {
+        variant: 'warning',
+      });
+      return;
+    }
+    setSelectedFiles(files);
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFiles.length) return;
+    try {
+      const formData = new FormData();
+      selectedFiles.forEach((file) => formData.append('photos', file));
+      formData.append('workDayId', sampleIssue.workDayId);
+      formData.append('projectId', sampleIssue.projectId);
+
+      const res = await axiosInstance.post(
+        `/issue/image/${sampleIssue.id}`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+      );
+
+      if (res.status === 200) {
+        const updatedPhotos = res.data.photos || [];
+        setPhotoUrls(updatedPhotos);
+        enqueueSnackbar('Images uploaded successfully', { variant: 'success' });
+      }
+
+      setSelectedFiles([]);
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+      enqueueSnackbar('Failed to upload images', { variant: 'error' });
+    }
+  };
 
   const pulse = keyframes`
-      0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
-      70% { box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
-    `;
+    0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+  `;
   const blink = keyframes`
-      0% { opacity: 0.8; }
-      50% { opacity: 1; }
-      100% { opacity: 0.8; }
-    `;
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
+  `;
+  const deleteIssueImage = async (key) => {
+    console.log(key, '<==== wow');
+    if (!key || !sampleIssue?.id) return;
+    const wow = selectedImage.split('.com/')[1].split('?')[0];
+    try {
+      const res = await axiosInstance.post(
+        `/issue/image/delete/${sampleIssue?.id}`,
+        {
+          key: wow,
+        },
+      );
+
+      if (res.status === 200) {
+        enqueueSnackbar('Image deleted successfully', { variant: 'success' });
+      } else {
+        enqueueSnackbar('Failed to delete image', { variant: 'error' });
+      }
+    } catch (err) {
+      console.error('Delete image failed:', err);
+      enqueueSnackbar('Failed to delete image', { variant: 'error' });
+      throw err;
+    }
+  };
   return (
     <Paper
       sx={{
@@ -64,35 +169,26 @@ export default function IssueDetailsPanel({
         p: 2,
         display: 'flex',
         flexDirection: 'column',
-        gap: 0.5,
+        gap: 1,
         borderRadius: 2,
         boxShadow: 1,
         border: '1px solid #f0f0f0',
-        maxHeight: '60vh',
+        minHeight: '60vh',
       }}
     >
-      {/* Breadcrumbs */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          mb: 0.5,
-        }}
-      >
+      {/* Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
         <Typography variant="h3" fontWeight={600}>
           Log Details
         </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+        <Typography variant="caption" color="text.secondary">
           {sampleIssue?.createdAt
             ? dayjs(sampleIssue.createdAt).format('DD-MM-YYYY')
             : ''}
         </Typography>
       </Box>
-      <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
-        Information about the selected Log
-      </Typography>
-      <Divider />
+
+      {/* Title & Status */}
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Typography variant="h5" fontWeight={600} sx={{ flex: 1 }}>
           {sampleIssue?.title}
@@ -104,19 +200,14 @@ export default function IssueDetailsPanel({
             ...(sampleIssue?.status === 'resolved' && {
               animation: `${pulse} 2s infinite`,
               bgcolor: '#4caf50',
-              color: 'white',
             }),
-
             ...(sampleIssue?.status === 'inProgress' && {
               animation: `${blink} 1.2s infinite`,
               bgcolor: '#fb8c00',
-              color: 'white',
             }),
-
             ...(sampleIssue?.status === 'open' && {
               animation: `${blink} 1.5s infinite`,
               bgcolor: '#e53935',
-              color: 'white',
             }),
             color: '#fff',
             fontWeight: 600,
@@ -126,122 +217,129 @@ export default function IssueDetailsPanel({
           }}
         />
       </Box>
-      <Typography variant="caption" sx={{ mb: 1, lineHeight: 1.3 }}>
+      <Typography variant="caption" sx={{ mb: 1 }}>
         {sampleIssue?.description}
       </Typography>
-      <Grid container direction="column" gap={1}>
-        {/* Row 1 */}
-        <Grid container item spacing={2} justifyContent={'space-evenly'}>
-          <Grid item xs={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-              <PriorityHighIcon
-                fontSize="small"
-                color="error"
-                sx={{ mr: 0.5 }}
-              />
-              <Typography
-                variant="caption"
-                fontWeight={500}
-                color={
-                  sampleIssue?.priority === 'High'
-                    ? 'error.main'
-                    : 'text.primary'
-                }
-              >
-                {sampleIssue?.priority}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-              <CategoryIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
-              <Typography variant="caption" fontWeight={500}>
-                {sampleIssue?.category}
-              </Typography>
-            </Box>
-          </Grid>
 
-          <Grid item xs={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-              <PersonIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
-              <Typography variant="caption" fontWeight={500}>
-                {sampleIssue?.assignedTo?.firstName +
-                  ' ' +
-                  sampleIssue?.assignedTo?.lastName}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <CalendarTodayIcon
-                fontSize="small"
-                color="action"
-                sx={{ mr: 0.5 }}
-              />
-              <Typography variant="caption" fontWeight={500}>
-                {sampleIssue?.dueDate
-                  ? dayjs(sampleIssue.dueDate).format('DD-MM-YYYY')
-                  : dayjs().format('DD-MM-YYYY')}
-              </Typography>
-            </Box>
-            {/* Removed createdAt from here */}
-          </Grid>
+      {/* Meta Info */}
+      <Grid container spacing={1}>
+        <Grid item xs={6}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+            <PriorityHighIcon fontSize="small" color="error" sx={{ mr: 0.5 }} />
+            <Typography
+              variant="caption"
+              fontWeight={500}
+              color={
+                sampleIssue?.priority === 'High' ? 'error.main' : 'text.primary'
+              }
+            >
+              {sampleIssue?.priority}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <CategoryIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
+            <Typography variant="caption">{sampleIssue?.category}</Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={6}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+            <PersonIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
+            <Typography variant="caption">
+              {sampleIssue?.assignedTo?.firstName +
+                ' ' +
+                sampleIssue?.assignedTo?.lastName}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <CalendarTodayIcon
+              fontSize="small"
+              color="action"
+              sx={{ mr: 0.5 }}
+            />
+            <Typography variant="caption">
+              {sampleIssue?.dueDate
+                ? dayjs(sampleIssue.dueDate).format('DD-MM-YYYY')
+                : dayjs().format('DD-MM-YYYY')}
+            </Typography>
+          </Box>
         </Grid>
       </Grid>
 
-      <Divider sx={{ my: 0.5 }} />
-      <Typography variant="caption" fontWeight={600}>
+      {/* Photos */}
+      <Typography variant="caption" fontWeight={600} sx={{ mt: 1 }}>
         Photos
       </Typography>
-      {/* Images in a horizontal scrollable row */}
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'row',
           gap: 1,
           overflowX: 'auto',
-          minHeight: 50,
+          minHeight: 40,
         }}
       >
-        {placeholderImages.map((img, idx) => (
+        {photoUrls.map((img, idx) => (
           <Box
+            onClick={() => handleImageClick(img)}
             key={idx}
             sx={{
-              minWidth: 60,
+              width: 40,
               height: 40,
-              bgcolor: '#f3f3f3',
               borderRadius: 0.5,
+              overflow: 'hidden',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              overflow: 'hidden',
             }}
           >
             <img
               src={img}
-              alt={`placeholder-${idx}`}
-              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+              alt={`photo-${idx}`}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </Box>
         ))}
+
+        {photoUrls.length < MAX_PHOTOS && sampleIssue?.createdBy === userId && (
+          <Box
+            onClick={() => setOpen(true)}
+            sx={{
+              minWidth: 40,
+              height: 40,
+              bgcolor: '#e0e0e0',
+              borderRadius: 0.5,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              fontSize: 18,
+              fontWeight: 700,
+            }}
+          >
+            +
+          </Box>
+        )}
       </Box>
 
+      {/* Comments */}
       {commentsLoading ? (
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            height: '100%',
+            mt: 1,
           }}
         >
           <CircularProgress />
         </Box>
       ) : (
         <>
-          {/* Comments Section */}
-          <Divider sx={{ mb: 1 }} />
-          <Typography variant="h5" fontWeight={600} sx={{ mb: 1 }}>
+          <Divider sx={{ mt: 1, mb: 1 }} />
+          <Typography variant="h5" fontWeight={600}>
             Comments ({comments.length})
           </Typography>
-          {/* Comments List */}
-          <Box sx={{ maxHeight: 200, minHeight: 160, overflow: 'auto', mb: 1 }}>
+          <Box sx={{ maxHeight: 200, overflowY: 'auto' }}>
             <List dense sx={{ p: 0 }}>
               {comments.map((comment) => (
                 <ListItem
@@ -252,9 +350,6 @@ export default function IssueDetailsPanel({
                     alignItems: 'flex-start',
                     mb: 1,
                     px: 0,
-                    py: 0,
-                    bgcolor: 'transparent',
-                    minHeight: 36,
                   }}
                 >
                   <ListItemAvatar sx={{ minWidth: 32, mr: 1, mt: 0.5 }}>
@@ -267,9 +362,8 @@ export default function IssueDetailsPanel({
                         color: '#fff',
                       }}
                     >
-                      {`${comment?.createdBy?.firstName?.[0] || ''}${
-                        comment?.createdBy?.lastName?.[0] || ''
-                      }`}
+                      {comment?.createdBy?.firstName?.[0] +
+                        comment?.createdBy?.lastName?.[0]}
                     </Avatar>
                   </ListItemAvatar>
                   <Box
@@ -279,7 +373,6 @@ export default function IssueDetailsPanel({
                       boxShadow: 1,
                       px: 1.5,
                       py: 1,
-                      minWidth: 0,
                       flex: 1,
                       display: 'flex',
                       flexDirection: 'column',
@@ -289,11 +382,7 @@ export default function IssueDetailsPanel({
                       <Typography
                         variant="subtitle2"
                         fontWeight={700}
-                        sx={{
-                          fontSize: '0.85rem',
-                          color: 'text.primary',
-                          mr: 1,
-                        }}
+                        sx={{ fontSize: '0.85rem' }}
                       >
                         {comment?.createdBy?.firstName +
                           ' ' +
@@ -311,7 +400,6 @@ export default function IssueDetailsPanel({
                       variant="body2"
                       sx={{
                         fontSize: '0.85rem',
-                        color: 'text.primary',
                         mt: 0.5,
                         wordBreak: 'break-word',
                       }}
@@ -327,7 +415,7 @@ export default function IssueDetailsPanel({
       )}
 
       {/* Add Comment */}
-      <Box sx={{ display: 'flex', gap: 0.5 }}>
+      <Box sx={{ display: 'flex', gap: 0.5, mt: 1 }}>
         <TextField
           size="small"
           placeholder="Add a comment..."
@@ -335,10 +423,7 @@ export default function IssueDetailsPanel({
           onChange={(e) => setNewComment(e.target.value)}
           sx={{
             flex: 1,
-            '& .MuiInputBase-root': {
-              fontSize: '0.7rem',
-              height: 32,
-            },
+            '& .MuiInputBase-root': { fontSize: '0.7rem', height: 32 },
           }}
         />
         <Button
@@ -349,18 +434,28 @@ export default function IssueDetailsPanel({
             setNewComment('');
           }}
           disabled={!newComment.trim()}
-          sx={{
-            minWidth: 32,
-            height: 32,
-            px: 1,
-            '& .MuiButton-startIcon': {
-              margin: 0,
-            },
-          }}
         >
           <SendIcon sx={{ fontSize: '0.8rem' }} />
         </Button>
       </Box>
+
+      {/* Upload Modal */}
+      <UploadImageModal
+        open={open}
+        onClose={() => {
+          setSelectedFiles([]);
+          setOpen(false);
+        }}
+        onFilesSelected={handleFileSelect}
+        onUpload={handleUpload}
+        selectedFiles={selectedFiles}
+      />
+      <SingleImageViewer
+        onDelete={deleteIssueImage}
+        open={viewerOpen}
+        image={selectedImage}
+        onClose={() => setViewerOpen(false)}
+      />
     </Paper>
   );
 }

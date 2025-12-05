@@ -52,7 +52,7 @@ export default function MainLayout() {
         elevation={0}
         sx={{ bgcolor: 'background.default' }}
       >
-        <Toolbar sx={{ p: 2 }}>
+        <Toolbar>
           <Header />
         </Toolbar>
       </AppBar>

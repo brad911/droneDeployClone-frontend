@@ -25,9 +25,11 @@ export default function Logo() {
         fontFamily: 'BlackGold',
         fontSize: '24px',
         textDecoration: 'none',
+        padding: 2,
+        margin: 2,
       }}
     >
       INFRA<span style={{ color: ' #2563EB' }}>X</span>
     </p>
-  );
+);
 }

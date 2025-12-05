@@ -853,7 +853,6 @@ export default function ProjectWork() {
             });
           }
           if (feature.geometry.type === 'Point') {
-            console.log(feature, '<============wew');
             const popup = new mapboxgl.Popup()
               .setLngLat(feature.geometry.coordinates)
               .setHTML(
@@ -980,8 +979,6 @@ export default function ProjectWork() {
     const shapeOverlayFeatures = mapFeatures.filter(
       (f) => f.properties?.shapefile,
     );
-    console.log(shapeOverlayFeatures, '<============ shape overlay features');
-    console.log(overlayFeatures, '<============ overlay features');
     // =========================
     // ✏️ Editable Features (Draw)
     // =========================

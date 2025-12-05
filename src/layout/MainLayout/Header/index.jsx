@@ -37,7 +37,6 @@ export default function Header() {
         <Avatar
           variant="rounded"
           sx={{
-            mt: 2,
             ...theme.typography.commonAvatar,
             ...theme.typography.mediumAvatar,
             overflow: 'hidden',
